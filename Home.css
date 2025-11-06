@@ -146,3 +146,49 @@ body {
     z-index: 100; 
 }
 .icon-bubble { font-size: 2.5em; line-height: 1; }
+
+
+.more-features-scroll-container {
+    /* REPLACED FLEX WITH GRID */
+    display: grid;
+    grid-auto-flow: column; /* This is the key: makes the grid scroll horizontally */
+    grid-template-rows: repeat(2, auto); /* Creates two rows of automatic height */
+    gap: 25px; /* Replaces all margins for clean spacing */
+
+    overflow-x: auto; 
+    padding: 20px 0; /* Keeps the top/bottom padding */
+    
+    /* These properties are still fine */
+    -webkit-overflow-scrolling: touch; 
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+    scroll-behavior: smooth; 
+}
+
+.more-features-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+
+.more-feature-box {
+    /* NO FLEX PROPERTIES NEEDED */
+    /* flex: 0 0 auto; (Removed) */
+    
+    width: 220px; 
+    height: 150px; 
+    background-color: #e0e0e0; 
+    border-radius: 12px;
+    
+    /* REMOVED MARGINS (Gap handles this now) */
+    /* margin-right: 25px; (Removed) */
+    /* margin-bottom: 25px; (Removed) */
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6em;
+    font-weight: bold;
+    color: #555;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2); 
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
