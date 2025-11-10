@@ -1,0 +1,191 @@
+/* --- Basic Setup --- */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #ccc; /* Page background */
+}
+
+.atm-container {
+    width: 1000px; 
+    height: 700px; 
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; 
+    position: relative; /* Anchor for floating links */
+}
+
+/* --- Floating Top Links --- */
+.top-links {
+    position: absolute;
+    top: 25px;
+    right: 40px;
+    z-index: 10; /* Ensures they are on top */
+    font-size: 1.1em;
+    color: #666;
+}
+.top-link {
+    color: #333;
+    text-decoration: none;
+    margin: 0 8px;
+    font-weight: bold;
+}
+.top-link:hover {
+    text-decoration: underline;
+}
+.top-separator {
+    color: #ccc;
+}
+
+
+/* --- Main 2-Column Wrapper --- */
+.main-wrapper {
+    display: flex;
+    flex-grow: 1; /* Make it fill the remaining height */
+}
+
+/* --- Left Pane (Get Cash) --- */
+.left-pane {
+    flex: 6; /* Takes up 60% of the width */
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    /* Add padding-top to avoid links */
+    padding-top: 70px; 
+}
+
+.greeting {
+    font-size: 2.5em; 
+    font-weight: normal;
+    line-height: 1.3;
+    color: #333;
+    margin: 0 0 10px 0; 
+}
+
+.cash-section h2 {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #004a4f; /* Dark Teal */
+    margin-bottom: 10px;
+}
+
+.quick-cash-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columns */
+    gap: 20px;
+}
+
+.cash-btn {
+    background-color: #004a4f; /* Dark Teal */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 30px;
+    font-size: 2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.cash-btn:hover {
+    background-color: #003a3f; /* Darker teal */
+}
+
+.other-amount-btn {
+    margin-top: 20px;
+    width: 100%; /* Make it full width */
+    font-size: 1.5em;
+    padding: 25px;
+}
+
+/* --- Right Pane (Other Services) --- */
+.right-pane {
+    flex: 4; /* Takes up 40% of the width */
+    background-color: #f0f2f5; /* Light grey background */
+    padding: 40px;
+
+    position: relative; /* For positioning the chat icon */
+    /* Add padding-top to avoid links */
+    padding-top: 170px;
+}
+
+.right-pane h2 {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columns */
+    gap: 20px;
+}
+
+.service-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    height: 200px;
+    padding: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes icon and text apart */
+    text-align: left;
+    transition: box-shadow 0.2s;
+}
+
+.service-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.service-card .icon {
+    text-align: right;
+    font-size: 1.5em;
+    color: #555;
+}
+
+.more-services-link {
+    display: block;
+    margin-top: 30px;
+    text-align: right;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.more-services-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Chat Icon (Re-used) --- */
+.chat-icon {
+    position: absolute; 
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #e50000; /* Red background */
+    border-radius: 50%; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    cursor: pointer;
+    z-index: 100; 
+}
+.icon-bubble { 
+    font-size: 2.5em; 
+    line-height: 1;
+}
