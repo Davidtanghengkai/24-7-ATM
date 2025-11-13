@@ -149,19 +149,17 @@ body {
 
 
 .more-features-scroll-container {
-    /* REPLACED FLEX WITH GRID */
     display: grid;
-    grid-auto-flow: column; /* This is the key: makes the grid scroll horizontally */
+    grid-auto-flow: column; 
     grid-template-rows: repeat(2, auto); /* Creates two rows of automatic height */
-    gap: 25px; /* Replaces all margins for clean spacing */
-
+    gap: 30px; /* Replaces all margins for clean spacing */
+    column-gap: 20px;
     overflow-x: auto; 
-    padding: 20px 0; /* Keeps the top/bottom padding */
-    
-    /* These properties are still fine */
+    padding: 20px 0; 
     -webkit-overflow-scrolling: touch; 
     scrollbar-width: none; 
     -ms-overflow-style: none; 
+    justify-content: space-evenly;
     scroll-behavior: smooth; 
 }
 
@@ -170,18 +168,11 @@ body {
 }
 
 .more-feature-box {
-    /* NO FLEX PROPERTIES NEEDED */
-    /* flex: 0 0 auto; (Removed) */
     
     width: 220px; 
     height: 150px; 
     background-color: #e0e0e0; 
     border-radius: 12px;
-    
-    /* REMOVED MARGINS (Gap handles this now) */
-    /* margin-right: 25px; (Removed) */
-    /* margin-bottom: 25px; (Removed) */
-    
     display: flex;
     justify-content: center;
     align-items: center;
