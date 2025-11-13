@@ -1,61 +1,60 @@
-﻿CREATE DATABASE ATM_System;
-GO
+-- Create the Database
+CREATE DATABASE BankingSystem;
 
--- Use the database
-USE ATM_System;
-GO
+-- Use the created database
+USE BankingSystem;
 
--- 1️⃣ Users Table
-CREATE TABLE Users (
-    userId INT IDENTITY(1,1) PRIMARY KEY,
-    Name NVARCHAR(100) NOT NULL,
-    Dob NVARCHAR(100),
-    nationalId NVARCHAR(20) UNIQUE NOT NULL
+-- Creating the User table with a reference to the Biometrics table
+CREATE TABLE User (
+    id INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented user ID
+    name VARCHAR(255),
+    DOB DATE,
+    nationalID VARCHAR(50),
+    biometricID INT, -- Reference to the Biometrics table
+    FOREIGN KEY (biometricID) REFERENCES Biometrics(ID) -- Foreign Key referencing Biometrics table
 );
 
--- 2️⃣ Accounts Table
+-- Creating the Biometrics table
+CREATE TABLE Biometrics (
+    ID INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented ID
+    type VARCHAR(50), -- Type of biometric (fingerprint, face, etc.)
+    bioData VARCHAR(50) -- Stores the biometric data in binary format
+);
+
+-- Creating the Accounts table
 CREATE TABLE Accounts (
-    accountNo INT IDENTITY(1000,1) PRIMARY KEY,
-    userId INT NOT NULL,
-    Balance DECIMAL(12,2) DEFAULT 0,
-    Type NVARCHAR(50),
-    FOREIGN KEY (userId) REFERENCES Users(userId)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    AccountNo INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented Account Number
+    userID INT, -- Reference to the User
+    Balance DECIMAL(18, 2), -- Account balance
+    Type VARCHAR(50), -- Type of account (savings, checking, etc.)
+    FOREIGN KEY (userID) REFERENCES User(id) -- Foreign Key referencing User table
 );
 
--- 3️⃣ Card Table
+-- Creating the Card table
 CREATE TABLE Card (
-    cardNo INT IDENTITY(5000,1) PRIMARY KEY,
-    accountNo INT NOT NULL,
-    Status NVARCHAR(20) DEFAULT 'Active',
-    ExpiryDate DATE NOT NULL,
-    Pin CHAR(6) NOT NULL,
-    Biometric VARBINARY(MAX),
-    createdTime DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (accountNo) REFERENCES Accounts(accountNo)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    CardNo INT PRIMARY KEY, -- Card number as the primary key
+    UserID INT, -- Reference to the User
+    AccountNo INT, -- Reference to the Account
+    status VARCHAR(50), -- Card status (active, blocked, etc.)
+    expiryDate DATE, -- Expiry date of the card
+    PIN VARCHAR(4), -- 4-digit PIN
+    createdTime DATETIME, -- Time the card was created
+    FOREIGN KEY (UserID) REFERENCES User(id), -- Foreign Key referencing User table
+    FOREIGN KEY (AccountNo) REFERENCES Accounts(AccountNo) -- Foreign Key referencing Accounts table
 );
 
--- 1️⃣ Insert into Users table
-INSERT INTO Users (Name, Job, nationalId)
-VALUES 
-('John Tan', 'Software Engineer', 'S1234567A'),
-('Mary Lim', 'Teacher', 'S2345678B'),
-('Ahmad Ali', 'Nurse', 'S3456789C'),
-('Siti Rahman', 'Bank Manager', 'S4567890D');
+-- Creating the Authlog table
+CREATE TABLE Authlog (
+    Id INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented Authlog ID
+    atmID INT, -- ATM machine ID
+    cardNo INT, -- Card Number
+    userID INT, -- Reference to the User
+    loginAction VARCHAR(50), -- Action (login attempt, logout, etc.)
+    result VARCHAR(50), -- Result of the action (success, failure)
+    reason VARCHAR(255), -- Reason for failure, if any
+    timestamp DATETIME, -- Timestamp of the action
+    FOREIGN KEY (userID) REFERENCES User(id), -- Foreign Key referencing User table
+    FOREIGN KEY (cardNo) REFERENCES Card(CardNo) -- Foreign Key referencing Card table
+);
+ 
 
--- 2️⃣ Insert into Accounts table
-INSERT INTO Accounts (userId, Balance, Type)
-VALUES
-(1, 5200.50, 'Savings'),
-(1, 1500.00, 'Current'),
-(2, 750.25, 'Savings'),
-(3, 13200.00, 'Fixed Deposit'),
-(4, 8900.10, 'Savings');
-
--- 3️⃣ Sample view queries
-SELECT * FROM Users;
-SELECT * FROM Accounts;
-SELECT * FROM Card;
