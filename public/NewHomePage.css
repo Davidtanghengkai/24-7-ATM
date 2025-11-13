@@ -18,7 +18,7 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden; 
-    position: relative; /* Anchor for floating links */
+    position: relative; /* Anchor for floating links and modal */
 }
 
 /* --- Floating Top Links --- */
@@ -28,7 +28,7 @@ body {
     right: 40px;
     z-index: 10; /* Ensures they are on top */
     font-size: 1.1em;
-    color: #666;
+    color: #475066;
 }
 .top-link {
     color: #333;
@@ -40,9 +40,23 @@ body {
     text-decoration: underline;
 }
 .top-separator {
-    color: #ccc;
+    color: #475066;
 }
 
+/* --- Top Section: Back Link & Greeting --- */
+.back-link {
+    color: #475066; 
+    text-decoration: none;
+    font-size: 1em;
+    font-weight: normal;
+    margin-bottom: 40px; /* Wider gap to greeting */
+    
+    /* Position back link in the top left corner */
+    position: absolute;
+    top: 35px; /* Slightly adjusted to align with .top-links */
+    left: 40px; 
+    z-index: 10;
+}
 
 /* --- Main 2-Column Wrapper --- */
 .main-wrapper {
@@ -56,12 +70,11 @@ body {
     padding: 40px;
     display: flex;
     flex-direction: column;
-    /* Add padding-top to avoid links */
     padding-top: 70px; 
 }
 
 .greeting {
-    font-size: 2.5em; 
+    font-size: 1.8em; 
     font-weight: normal;
     line-height: 1.3;
     color: #333;
@@ -72,13 +85,13 @@ body {
     font-size: 1.8em;
     font-weight: bold;
     color: #004a4f; /* Dark Teal */
-    margin-bottom: 10px;
+    margin-bottom: 30px;
 }
 
 .quick-cash-grid {
     display: grid;
     grid-template-columns: 1fr 1fr; /* 2 columns */
-    gap: 20px;
+    gap: 30px;
 }
 
 .cash-btn {
@@ -107,18 +120,16 @@ body {
 /* --- Right Pane (Other Services) --- */
 .right-pane {
     flex: 4; /* Takes up 40% of the width */
-    background-color: #f0f2f5; /* Light grey background */
+    background-color: #F2F4F2; /* Light grey background */
     padding: 40px;
-
     position: relative; /* For positioning the chat icon */
-    /* Add padding-top to avoid links */
-    padding-top: 170px;
+    padding-top: 165px; /* Space for services header */
 }
 
 .right-pane h2 {
     font-size: 1.8em;
     font-weight: bold;
-    color: #333;
+    color: #5C6F95;
     margin-bottom: 20px;
 }
 
@@ -159,10 +170,9 @@ body {
     display: block;
     margin-top: 30px;
     text-align: right;
-    color: #007bff;
+    color: #59A3DB;
     text-decoration: none;
     font-size: 1.2em;
-    font-weight: bold;
 }
 
 .more-services-link:hover {
@@ -188,4 +198,74 @@ body {
 .icon-bubble { 
     font-size: 2.5em; 
     line-height: 1;
+}
+
+
+/* --- Modal Styling (Language Pop-up) --- */
+.modal-overlay {
+    position: absolute;
+    top: 60px;
+    right: 40px;
+    z-index: 2000;
+    
+    /* Initially hidden by default */
+    display: none; 
+}
+
+/* *** THE FIX: This rule makes the modal visible when JS adds 'active' *** */
+.modal-overlay.active {
+    display: block; 
+}
+
+.modal-content {
+    background-color: white;
+    padding: 15px 20px; 
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 180px; 
+    border: 2px solid #EF1815; 
+}
+
+.modal-header {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 5px;
+}
+
+.close-modal {
+    font-size: 1.4em;
+    font-weight: bold;
+    cursor: pointer;
+    color: #555;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.close-modal:hover {
+    background-color: #EF1815;
+    color: white;
+}
+
+.language-grid {
+    display: flex; 
+    flex-direction: column; 
+    gap: 5px; 
+    padding: 10px 0 5px 0;
+}
+
+.language-option {
+    text-decoration: none;
+    color: black;
+    font-size: 1.1em; 
+    font-weight: normal;
+    padding: 5px 10px; 
+    text-align: left;
+    transition: color 0.1s, background-color 0.1s;
+    border-radius: 4px;
+}
+
+.language-option:hover {
+    color: white;
+    background-color: #EF1815; 
 }
