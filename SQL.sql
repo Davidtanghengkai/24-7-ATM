@@ -39,7 +39,7 @@ CREATE TABLE Card (
 );
 
 -- 1️⃣ Insert into Users table
-INSERT INTO Users (Name, Job, nationalId)
+INSERT INTO Users (Name, Dob, nationalId)
 VALUES 
 ('John Tan', 'Software Engineer', 'S1234567A'),
 ('Mary Lim', 'Teacher', 'S2345678B'),
