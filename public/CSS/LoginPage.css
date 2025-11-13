@@ -215,3 +215,128 @@ body {
     color: white;
     background-color: #EF1815;
 }
+
+
+
+
+
+/* --- Face Modal --- */
+
+.face-modal-overlay {
+    position: fixed;
+    inset: 0; /* covers entire viewport */
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* page outside modal is translucent */
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    backdrop-filter: blur(2px); /* subtle blur of the page behind */
+}
+
+.face-modal-overlay.active {
+    display: flex;
+}
+
+.face-modal-content {
+    background-color: rgba(255, 255, 255, 0.98);
+    width: 50vw; /* takes up 50% of the viewport width */
+    max-width: 900px;
+    height: 50vh; /* takes up 50% of the viewport height */
+    min-width: 320px;
+    min-height: 280px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Title centered at the top of the modal */
+.face-modal-header {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 10;
+    width: calc(100% - 64px); /* leave room for side buttons */
+    pointer-events: none; /* keep header non-interfering with close button */
+}
+
+.face-modal-header .face-modal-title {
+    margin: 0;
+    font-size: 1.5rem; /* bigger title */
+    font-weight: 700;
+    color: #333;
+    pointer-events: auto; /* allow selection if needed */
+}
+
+/* Close button sits at the top-right inside the modal */
+.close-face-modal {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    color: #555;
+    padding: 6px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+    background: transparent;
+    z-index: 20;
+}
+
+.close-face-modal:hover {
+    background-color: #EF1815;
+    color: white;
+}
+/* Body centered within the modal - stacked as a column */
+.face-modal-body {
+    margin-top: 60px; /* make room for the top-centered title */
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column; /* column layout instead of row */
+    justify-content: flex-start;
+    align-items: stretch;
+    text-align: center;
+    overflow: hidden;
+    gap: 12px;
+    min-height: 0; /* allow children to shrink properly in flex container */
+}
+
+/* Full-page overlay */
+.face-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    z-index: 9999;
+}
+
+.face-modal-content{
+    width: 70%;
+    height: 80%;
+    background-color: rgba(255, 255, 255, 0.827);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.face-modal-content video, .face-modal-content canvas { 
+    border-radius:10px; 
+    margin-top:10px;
+ }

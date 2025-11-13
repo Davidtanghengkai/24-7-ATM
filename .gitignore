@@ -56,4 +56,5 @@ nunit-*.xml
 
 #Node.js Tools for Visual Studio
 node_modules/
-
+package.json
+package-lock.json
