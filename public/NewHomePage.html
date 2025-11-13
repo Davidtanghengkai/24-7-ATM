@@ -10,10 +10,12 @@
     <div class="atm-container">
         
         <div class="top-links">
-            <a href="#" class="top-link">Eng</a>
+            <a href="#" class="top-link" id="language-toggle">ENG</a>
             <span class="top-separator">|</span>
-            <a href="TransactionCancel.html" class="top-link">Exit</a>
+            <a href="#" class="top-link">Exit</a>
         </div>
+
+        <!--<a href="#" class="back-link">Back</a> Dont uncomment i just need this for reference-->
 
         <div class="main-wrapper">
             
@@ -45,11 +47,11 @@
                     </button>
                     <button class="service-card">
                         <span class="icon">💳</span>
-                        <span>Activate<br>Card</span>
+                        <span>Create a<br>Card</span>
                     </button>
                 </div>
 
-                <a href="MoreFeatures.html" class="more-services-link">More services &gt;</a>
+                <a href="NewMoreFeatures.html" class="more-services-link">More services &gt;</a>
 
                 <div class="chat-icon">
                     <span class="icon-bubble">💬</span>
@@ -57,6 +59,25 @@
             </div>
         </div>
 
+        <!-- FIX 2: Added the language modal structure -->
+        <div id="language-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="language-grid">
+                    <a href="#" class="language-option">English ✔</a>
+                    <a href="#" class="language-option">Chinese</a>
+                    <a href="#" class="language-option">Tamil</a>
+                    <a href="#" class="language-option">Malay</a>
+                    <a href="#" class="language-option">Japanese</a>
+                    <a href="#" class="language-option">Korean</a>
+                </div>
+            </div>
+        </div>
+
     </div>
+    <!-- FIX 3: Added the script link -->
+    <script src="language_modal.js"></script> 
 </body>
 </html>
