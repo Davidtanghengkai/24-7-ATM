@@ -1,6 +1,10 @@
 -- Create the Database
 CREATE DATABASE BankingSystem;
+-- Create the Database
+CREATE DATABASE BankingSystem;
 
+-- Use the created database
+USE BankingSystem;
 -- Use the created database
 USE BankingSystem;
 
@@ -19,8 +23,24 @@ CREATE TABLE Biometrics (
     ID INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented ID
     type VARCHAR(50), -- Type of biometric (fingerprint, face, etc.)
     bioData VARCHAR(50) -- Stores the biometric data in binary format
+-- Creating the User table with a reference to the Biometrics table
+CREATE TABLE User (
+    id INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented user ID
+    name VARCHAR(255),
+    DOB DATE,
+    nationalID VARCHAR(50),
+    biometricID INT, -- Reference to the Biometrics table
+    FOREIGN KEY (biometricID) REFERENCES Biometrics(ID) -- Foreign Key referencing Biometrics table
 );
 
+-- Creating the Biometrics table
+CREATE TABLE Biometrics (
+    ID INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented ID
+    type VARCHAR(50), -- Type of biometric (fingerprint, face, etc.)
+    bioData VARCHAR(50) -- Stores the biometric data in binary format
+);
+
+-- Creating the Accounts table
 -- Creating the Accounts table
 CREATE TABLE Accounts (
     AccountNo INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented Account Number
@@ -28,8 +48,14 @@ CREATE TABLE Accounts (
     Balance DECIMAL(18, 2), -- Account balance
     Type VARCHAR(50), -- Type of account (savings, checking, etc.)
     FOREIGN KEY (userID) REFERENCES User(id) -- Foreign Key referencing User table
+    AccountNo INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented Account Number
+    userID INT, -- Reference to the User
+    Balance DECIMAL(18, 2), -- Account balance
+    Type VARCHAR(50), -- Type of account (savings, checking, etc.)
+    FOREIGN KEY (userID) REFERENCES User(id) -- Foreign Key referencing User table
 );
 
+-- Creating the Card table
 -- Creating the Card table
 CREATE TABLE Card (
     CardNo INT PRIMARY KEY, -- Card number as the primary key

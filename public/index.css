@@ -1,0 +1,99 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* White card container */
+.atm-container {
+  background: white;
+  width: 85%;
+  max-width: 1100px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+/* Banner sections */
+.banner {
+  position: relative;
+  width: 100%;
+}
+
+.banner-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain; /* ensures full image visible */
+}
+
+/* Language text */
+.lang {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-size: 0.9rem;
+  color: #222;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.features {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  padding: 2rem 1.5rem;
+  gap: 1.2rem;
+}
+
+.feature-btn {
+  background-color: #134c5f;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  flex: 1 1 250px; /* all buttons same size */
+  min-width: 250px;
+  max-width: 300px;
+  text-align: center;
+  padding: 1.3rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.feature-btn span {
+  display: block;
+  font-weight: 400;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+.feature-btn:hover {
+  background-color: #0f3e4f;
+  transform: translateY(-3px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .feature-btn {
+    width: 90%;
+  }
+}
