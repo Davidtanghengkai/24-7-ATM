@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATM Login Verification</title>
-    <link rel="stylesheet" href="LoginPage.css">
+    <link rel="stylesheet" href="CSS/LoginPage.css">
 </head>
 <body>
     <div class="atm-container">
@@ -70,7 +70,18 @@
             </div>
         </div>
     </div>
+
+    <div class = "face-modal-overlay" id="face-modal">
+        <div class="face-modal-content">
+            <h1 class="face-modal-title">Face Verification</h1>
+            <p class="face-modal-instruction">Position your face within the frame</p>
+            <video id="video" width="480" height="360" autoplay muted></video>
+            <p id="status">Scanning...</p>
+        </div>
+    </div>
+
     <!-- JS file for modal functionality -->
-    <script src="language_modal.js"></script> 
+    <script src="JS/language_modal.js"></script>
+    <script src="JS/login.js"></script>
 </body>
 </html>
