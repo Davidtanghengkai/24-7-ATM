@@ -1,4 +1,4 @@
--- Create the Database
+﻿-- Create the Database
 CREATE DATABASE BankingSystem;
 
 -- Use the created database
@@ -10,15 +10,15 @@ CREATE TABLE User (
     name VARCHAR(255),
     DOB DATE,
     nationalID VARCHAR(50),
-    biometricID INT, -- Reference to the Biometrics table
-    FOREIGN KEY (biometricID) REFERENCES Biometrics(ID) -- Foreign Key referencing Biometrics table
 );
 
 -- Creating the Biometrics table
 CREATE TABLE Biometrics (
     ID INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented ID
+    userID INT NOT NULL, -- Reference to the User
     type VARCHAR(50), -- Type of biometric (fingerprint, face, etc.)
     bioData VARCHAR(50) -- Stores the biometric data in binary format
+    Foreign KEY (userID) REFERENCES User(id) -- Foreign Key referencing User table
 );
 
 -- Creating the Accounts table
