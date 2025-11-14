@@ -43,6 +43,22 @@ CREATE TABLE Card (
     FOREIGN KEY (AccountNo) REFERENCES Accounts(AccountNo) -- Foreign Key referencing Accounts table
 );
 
+-- 1️⃣ Insert into Users table
+INSERT INTO Users (Name, Dob, nationalId)
+VALUES 
+('John Tan', 'Software Engineer', 'S1234567A'),
+('Mary Lim', 'Teacher', 'S2345678B'),
+('Ahmad Ali', 'Nurse', 'S3456789C'),
+('Siti Rahman', 'Bank Manager', 'S4567890D');
+
+-- 2️⃣ Insert into Accounts table
+INSERT INTO Accounts (userId, Balance, Type)
+VALUES
+(1, 5200.50, 'Savings'),
+(1, 1500.00, 'Current'),
+(2, 750.25, 'Savings'),
+(3, 13200.00, 'Fixed Deposit'),
+(4, 8900.10, 'Savings');
 -- Creating the Authlog table
 CREATE TABLE Authlog (
     Id INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented Authlog ID
