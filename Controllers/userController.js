@@ -82,20 +82,7 @@ async function linkUserBiometric(req, res) {
     }
 }
 
-// DELETE /user/:id
-async function deleteUser(req, res) {
-    const { id } = req.params;
-    try {
-        await userModel.deleteById(parseInt(id, 10));
-        res.status(200).json({ message: "User deleted successfully" });
-    } catch (err) {
-        // This will often fail if foreign keys (in Accounts, Card) reference this user
-        res.status(500).json({ 
-            message: "Error deleting user. (May be in use)", 
-            error: err.message 
-        });
-    }
-}
+
 
 module.exports = {
     createUser,
@@ -103,5 +90,5 @@ module.exports = {
     getAllUsers,
     updateUser,
     linkUserBiometric,
-    deleteUser
+
 };
