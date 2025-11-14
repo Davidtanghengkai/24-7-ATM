@@ -5,31 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OCBC ATM Homepage (with JS)</title>
     <link rel="stylesheet" href="Home.css">
+    <link rel="stylesheet" href="language.css"> <!-- Added -->
 </head>
 <body>
     <div class="atm-container">
         
-<header class="top-header">
-            <a href="#" class="header-link">Change Language</a>
+        <header class="top-header">
+            <span id="openLang" class="header-link">Eng</span>
             <span class="separator">|</span>
-            <a href="TransactionCancel.html" class="header-link">Exit</a>
+            <a href="#" class="header-link">Exit</a>
         </header>
 
-        
-<main class="main-content">
+        <main class="main-content">
             <h1 class="greeting">
                 <span class="hello-red">Hello</span><span class="hello-exclamation">!</span><br>
                 What would you like to do today?
             </h1>
 
             <div class="other-features-link">
-                <a href="MoreFeatures.html" class="features-link">Other features &gt;&gt;&gt;</a>
+                <a href="#" class="features-link">Other features &gt;&gt;&gt;</a>
             </div>
 
             <div class="features-wrapper">
                 <button id="scroll-left" class="scroll-btn">&lt;</button>
-                
-<div class="features-scroll-container" id="features-container">
+
+                <div class="features-scroll-container" id="features-container">
                     <div class="feature-box">Feature 1</div>
                     <div class="feature-box">Feature 2</div>
                     <div class="feature-box">Feature 3</div>
@@ -37,17 +37,33 @@
                     <div class="feature-box">Feature 5</div>
                     <div class="feature-box">Feature 6</div>
                 </div>
-                
+
                 <button id="scroll-right" class="scroll-btn">&gt;</button>
             </div>
         </main>
 
-        
-<div class="chat-icon">
+        <div class="chat-icon">
             <span class="icon-bubble">💬</span>
         </div>
     </div>
-    
+
+    <!-- LANGUAGE POPUP START -->
+    <div id="languageModal" class="modal">
+        <div class="modal-content">
+
+            <div class="language-box">
+                <a href="#" class="lang">Chinese</a>
+                <a href="#" class="lang">Tamil</a>
+                <a href="#" class="lang">Malay</a>
+                <a href="#" class="lang">Japanese</a>
+                <a href="#" class="lang">Korean</a>
+            </div>
+
+            <button id="closeLang" class="close-btn">Close</button>
+        </div>
+    </div>
+
     <script src="home.js"></script>
+    <script src="language.js"></script> 
 </body>
 </html>

@@ -4,12 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATM More Features Screen</title>
-    <link rel="stylesheet" href="MoreFeatures.css">
+    <link rel="stylesheet" href="NewMoreFeatures.css">
 </head>
 <body>
     <div class="atm-container">
         
-        <a href="#" class="back-link">Back</a>
+        <!-- TOP RIGHT LINKS: Wrapped in a container -->
+        <div class="top-links">
+            <a href="#" class="top-link" id="language-toggle">ENG</a>
+            <span class="top-separator">|</span>
+            <a href="#" class="top-link">Exit</a>
+        </div>
+        
+        <!-- TOP LEFT LINK: Positioned separately -->
+        <a href="NewHomePage.html" class="back-link">Back</a> 
         
         <main class="main-content">
             <h1 class="greeting">
@@ -33,7 +41,7 @@
                 
                 <button class="feature-box">
                     <span class="icon">☰</span>
-                    <span class="feature-text">Oversea<br>transfer</span>
+                    <span class="feature-text">Overseas<br>transfer</span>
                 </button>
                 
                 <button class="feature-box">
@@ -54,23 +62,24 @@
         </main>
 
         <button class="scroll-right-btn">&gt;</button>
-
-        <div class="chat-icon-container">
-            <span class="chat-icon">💬</span>
+        
+        <div class="chat-icon">
+            <span class="icon-bubble">💬</span>
         </div>
-
+        
         <div id="language-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span class="close-modal">&times;</span>
-            </div>
-            <div class="language-grid">
-                <a href="#" class="language-option">English ✔</a>
-                <a href="#" class="language-option">Chinese</a>
-                <a href="#" class="language-option">Tamil</a>
-                <a href="#" class="language-option">Malay</a>
-                <a href="#" class="language-option">Japanese</a>
-                <a href="#" class="language-option">Korean</a>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="language-grid">
+                    <a href="#" class="language-option">English ✔</a>
+                    <a href="#" class="language-option">Chinese</a>
+                    <a href="#" class="language-option">Tamil</a>
+                    <a href="#" class="language-option">Malay</a>
+                    <a href="#" class="language-option">Japanese</a>
+                    <a href="#" class="language-option">Korean</a>
+                </div>
             </div>
         </div>
     </div>
