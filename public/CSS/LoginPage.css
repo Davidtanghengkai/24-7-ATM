@@ -124,6 +124,10 @@ body {
     object-fit: contain;
 }
 
+.face-icon img {
+    transform: scale(1.6);  
+}
+
 .card-text {
     font-size: 1.5em; 
     font-weight: bold;
