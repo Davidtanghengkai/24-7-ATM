@@ -284,7 +284,7 @@ async function initFaceRecognition() {
                             if (detectionInterval) {
                                 clearInterval(detectionInterval);
                                 detectionInterval = null;
-                                //window.location.href = '/public/NewHomePage.html';
+                                window.location.href = '/public/NewHomePage.html';
                             }
                             // perform next step here (e.g., proceed with authentication)
                         } else if (estimatedMeters > 0.5) {
