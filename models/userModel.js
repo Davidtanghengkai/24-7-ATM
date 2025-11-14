@@ -2,7 +2,7 @@
 const sql = require('mssql');
 const dbConfig = require('../config/dbConfig');
 
-//create user
+
 async function createUser(userData) {
     const { name, dob, nationalID } = userData;
     let pool;
@@ -29,7 +29,9 @@ async function createUser(userData) {
     }
 }
 
-//get user by id
+/**
+ * Gets a single user by their ID.
+ */
 async function getUserById(userId) {
     let pool;
     try {
@@ -40,7 +42,7 @@ async function getUserById(userId) {
         request.input('userId', sql.Int, userId);
 
         const result = await request.query(sqlStatement);
-        return result.recordset[0]; 
+        return result.recordset[0]; // Returns the user object or undefined
 
     } catch (err) {
         console.error("Error in userModel.getById:", err);
@@ -50,8 +52,9 @@ async function getUserById(userId) {
     }
 }
 
-
-// Gets all users from the database.
+/**
+ * Gets all users from the database.
+ */
 async function getAllUsers() {
     let pool;
     try {
@@ -59,7 +62,7 @@ async function getAllUsers() {
         const sqlStatement = `SELECT * FROM [User]`;
         
         const result = await pool.request().query(sqlStatement);
-        return result.recordset;
+        return result.recordset; // Returns an array of users
 
     } catch (err) {
         console.error("Error in userModel.getAll:", err);
@@ -69,11 +72,11 @@ async function getAllUsers() {
     }
 }
 
-
-// Updates an existing user's details.
-
+/**
+ * Updates an existing user's details.
+ */
 async function updateUsers(userId, userData) {
-const { name, dob, nationalID } = userData;
+    const { name, dob, nationalID } = userData;
     let pool;
     try {
         pool = await sql.connect(dbConfig);
@@ -101,37 +104,11 @@ const { name, dob, nationalID } = userData;
 }
 
 
-// Links a biometric ID to a user.
-async function linkBiometric(userId, biometricId) {
-    let pool;
-    try {
-        pool = await sql.connect(dbConfig);
-        const sqlStatement = `
-            UPDATE [User]
-            SET biometricID = @biometricId
-            OUTPUT INSERTED.id, INSERTED.biometricID
-            WHERE id = @userId`;
-            
-        const request = new sql.Request(pool);
-        request.input('userId', sql.Int, userId);
-        request.input('biometricId', sql.Int, biometricId);
-        
-        const result = await request.query(sqlStatement);
-        return result.recordset[0]; 
-
-    } catch (err) {
-        console.error("Error in userModel.linkBiometric:", err);
-        throw err;
-    } finally {
-        if (pool) pool.close();
-    }
-}
-
 
 module.exports = {
     createUser,
     getUserById,
     getAllUsers,
     updateUsers,
-    linkBiometric,
+
 };

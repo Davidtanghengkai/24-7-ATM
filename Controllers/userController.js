@@ -62,25 +62,6 @@ async function updateUser(req, res) {
     }
 }
 
-// PUT /user/:id/link-biometric
-async function linkUserBiometric(req, res) {
-    const { id } = req.params;
-    const { biometricId } = req.body;
-
-    if (!biometricId) {
-        return res.status(400).json({ message: "Missing biometricId" });
-    }
-
-    try {
-        const updatedLink = await userModel.linkBiometric(parseInt(id, 10), biometricId);
-        if (!updatedLink) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json({ message: "Biometric linked", data: updatedLink });
-    } catch (err) {
-        res.status(500).json({ message: "Error linking biometric", error: err.message });
-    }
-}
 
 
 
@@ -89,6 +70,4 @@ module.exports = {
     getUserById,
     getAllUsers,
     updateUser,
-    linkUserBiometric,
-
 };
