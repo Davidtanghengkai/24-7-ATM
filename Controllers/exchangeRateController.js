@@ -1,4 +1,4 @@
-const { getExchangeRate } = require("../models/exchangeRate");
+const { getExchangeRate } = require("../Models/exchangeRate");
 
 
 async function fetchExchangeRate(req, res) {

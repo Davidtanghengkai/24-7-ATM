@@ -1,7 +1,7 @@
 const { 
   getCountries, 
   getBanksByCountry
-} = require("../models/bankModel");
+} = require("../Models/bankModel");
 
 
 async function fetchCountries(req, res) {

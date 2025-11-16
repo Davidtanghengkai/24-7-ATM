@@ -1,0 +1,110 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.atm-container {
+  width: 700px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  padding: 40px 60px;
+}
+
+/* -------- STEP CONTROL -------- */
+.step { 
+  display: none; 
+  flex-direction: column; 
+  gap: 20px; 
+}
+
+.step.active { display: flex; }
+
+/* -------- HEADERS -------- */
+h2 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* -------- FORM LAYOUT -------- */
+.form-section {
+  background: #f7f7f7;
+  padding: 25px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-top: 10px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-weight: 600;
+  color: #444;
+}
+
+/* -------- INPUTS -------- */
+.input-box {
+  background: #fff;
+  border: 2px solid #dedede;
+  border-radius: 6px;
+  padding: 12px 15px;
+  font-size: 15px;
+  width: 300px;
+  max-width: 100%;
+}
+
+/* -------- BUTTONS -------- */
+.next-btn,
+button.next,
+#confirmTransfer,.back {
+  margin-top: 25px;
+  align-self: flex-end;
+  background: #e50000;
+  padding: 12px 35px;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.next-btn:hover,
+button.next:hover,
+#confirmTransfer:hover,.back:hover {
+  background: #c60801;
+}
+
+
+
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+/* -------- CONFIRM BOX -------- */
+.confirm-box {
+  background: none;
+  padding: 20px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.next-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}

@@ -1,4 +1,4 @@
-const { createBlockchainUser } = require("../models/blockchainUser");
+const { createBlockchainUser } = require("../Models/blockchainUser");
 
 async function addBlockchainUser(req, res) {
     try {
