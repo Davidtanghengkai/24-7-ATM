@@ -1,6 +1,6 @@
-// controllers/cardController.js
 const cardModel = require('../models/cardModel');
 
+// POST /card/
 async function createCard(req, res) {
     const { cardNo, userId, accountNo, expiryDate, pin } = req.body;
     if (!cardNo || !userId || !accountNo || !expiryDate || !pin) {
@@ -8,87 +8,136 @@ async function createCard(req, res) {
     }
 
     try {
-        const newCard = await cardModel.create({ cardNo, userId, accountNo, expiryDate, pin });
+        // FIXED: Called the correct model function
+        const newCard = await cardModel.createCard({ cardNo, userId, accountNo, expiryDate, pin });
         res.status(201).json({ message: "Card created", card: newCard });
     } catch (err) {
+        // ADDED: Server-side logging
+        console.error("Error in createCard controller:", err);
         res.status(500).json({ message: "Error creating card", error: err.message });
     }
 }
 
+// GET /card/:cardNo
 async function getCardByNo(req, res) {
-    const { cardNo } = req.params;
+    // ADDED: NaN validation
+    const cardNo = parseInt(req.params.cardNo, 10);
+    if (isNaN(cardNo)) {
+        return res.status(400).json({ message: "Invalid card number" });
+    }
+
     try {
-        const card = await cardModel.getByCardNo(parseInt(cardNo, 10));
+        const card = await cardModel.getByCardNo(cardNo);
         if (!card) {
             return res.status(404).json({ message: "Card not found" });
         }
         res.status(200).json(card);
     } catch (err) {
+        // ADDED: Server-side logging
+        console.error("Error in getCardByNo controller:", err);
         res.status(500).json({ message: "Error getting card", error: err.message });
     }
 }
 
+// GET /card/user/:userId
 async function getCardsForUser(req, res) {
-    const { userId } = req.params;
+    // ADDED: NaN validation
+    const userId = parseInt(req.params.userId, 10);
+    if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+    }
+
     try {
-        const cards = await cardModel.getByUserId(parseInt(userId, 10));
-        res.status(200).json(cards);
+        const cards = await cardModel.getByUserId(userId);
+        res.status(200).json(cards); // Returns cards, or empty array
     } catch (err) {
+        // ADDED: Server-side logging
+        console.error("Error in getCardsForUser controller:", err);
         res.status(500).json({ message: "Error getting user's cards", error: err.message });
     }
 }
 
-async function changePin(req, res) {
-    const { cardNo } = req.params;
-    const { newPin } = req.body;
-    if (!newPin || newPin.length !== 4) {
-        return res.status(400).json({ message: "A valid 4-digit newPin is required" });
-    }
-
-    try {
-        const updatedCard = await cardModel.updatePin(parseInt(cardNo, 10), newPin);
-        if (!updatedCard) {
-            return res.status(404).json({ message: "Card not found" });
-        }
-        res.status(200).json({ message: "PIN updated", data: updatedCard });
-    } catch (err) {
-        res.status(500).json({ message: "Error updating PIN", error: err.message });
-    }
-}
-
+// PUT /card/status/:cardNo
 async function changeStatus(req, res) {
-    const { cardNo } = req.params;
+    // ADDED: NaN validation
+    const cardNo = parseInt(req.params.cardNo, 10);
+    if (isNaN(cardNo)) {
+        return res.status(400).json({ message: "Invalid card number" });
+    }
+
     const { newStatus } = req.body;
     if (!newStatus) {
         return res.status(400).json({ message: "A newStatus is required" });
     }
 
     try {
-        const updatedCard = await cardModel.updateStatus(parseInt(cardNo, 10), newStatus);
+        // FIXED: Called the correct model function
+        const updatedCard = await cardModel.updateCardStatus(cardNo, newStatus);
         if (!updatedCard) {
             return res.status(404).json({ message: "Card not found" });
         }
         res.status(200).json({ message: "Status updated", data: updatedCard });
     } catch (err) {
+        // ADDED: Server-side logging
+        console.error("Error in changeStatus controller:", err);
         res.status(500).json({ message: "Error updating status", error: err.message });
     }
 }
 
+// DELETE /card/:cardNo
 async function deleteCard(req, res) {
-    const { cardNo } = req.params;
+    // ADDED: NaN validation
+    const cardNo = parseInt(req.params.cardNo, 10);
+    if (isNaN(cardNo)) {
+        return res.status(400).json({ message: "Invalid card number" });
+    }
+
     try {
-        await cardModel.deleteByCardNo(parseInt(cardNo, 10));
+        // We should check if it exists first for a 404
+        const card = await cardModel.getByCardNo(cardNo);
+        if (!card) {
+            return res.status(404).json({ message: "Card not found" });
+        }
+
+        await cardModel.deleteByCardNo(cardNo);
         res.status(200).json({ message: "Card deleted successfully" });
     } catch (err) {
+        // ADDED: Server-side logging
+        console.error("Error in deleteCard controller:", err);
         res.status(500).json({ message: "Error deleting card", error: err.message });
     }
 }
+
+// --- MISSING CONTROLLERS ADDED ---
+
+// GET /card/active/user/:userId
+async function findActiveCardByUserId(req, res) {
+    // ADDED: NaN validation
+    const userId = parseInt(req.params.userId, 10);
+    if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    try {
+        const card = await cardModel.findActiveCardByUserId(userId);
+        if (!card) {
+            return res.status(404).json({ message: "No active card found" });
+        }
+        res.status(200).json(card);
+    } catch (err) {
+        // ADDED: Server-side logging
+        console.error("Error in findActiveCardByUserId controller:", err);
+        res.status(500).json({ message: "Error finding active card", error: err.message });
+    }
+}
+
 
 module.exports = {
     createCard,
     getCardByNo,
     getCardsForUser,
-    changePin,
     changeStatus,
-    deleteCard
+    deleteCard,
+    findActiveCardByUserId
+
 };

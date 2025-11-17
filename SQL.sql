@@ -10,6 +10,7 @@ CREATE TABLE User (
     name VARCHAR(255),
     DOB DATE,
     nationalID VARCHAR(50),
+    Email VARCHAR(255) UNIQUE,
 );
 
 -- Creating the Biometrics table
