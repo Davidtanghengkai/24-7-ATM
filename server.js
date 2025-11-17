@@ -9,6 +9,11 @@ const PORT = process.env.PORT || 3000;
 app.use(cors()); 
 app.use(express.json()); 
 
+// --- NEW LINE TO SERVE STATIC FILES ---
+// This tells Express to serve files from the 'public' folder.
+// It will automatically find 'index.html' when you visit '/'
+app.use(express.static('public')); 
+
 // --- Import Controllers ---
 // We import the logic directly from your controller files
 const userController = require('./controllers/userController');
@@ -41,6 +46,8 @@ app.delete('/api/cards/:cardNo', cardController.deleteCard);
 app.post('/api/otp/send', otpController.sendOtp);
 
 // --- Base Route ---
+// (This route will no longer be hit for '/', 
+// because express.static serves index.html first)
 app.get('/', (req, res) => {
     res.send('API is running successfully!');
 });
