@@ -4,105 +4,89 @@ const dbConfig = require('../dbConfig');
 
 
 async function createUser(userData) {
-    const { name, dob, nationalID } = userData;
-    let connection; // Changed from 'pool'
+    const { name, dob, nationalID, bioType, BioData } = userData;
+    let pool;
     try {
-        connection = await sql.connect(dbConfig); // Open connection
-        const sqlStatement = `
-            INSERT INTO Users (name, DOB, nationalID)
-            OUTPUT INSERTED.id
-            VALUES (@name, @dob, @nationalID)`;
+        pool = await sql.connect(dbConfig);
 
-        const request = connection.request(); // Use connection
-        request.input('name', sql.NVarChar, name); // Use NVarChar for SQL Server
+        const bioReq = pool.request();
+        bioReq.input("type", sql.VarChar, bioType);
+        bioReq.input("bioData", sql.VarChar, BioData);
+        //Insert bioData first to return biometricID
+        const bioResult = await bioReq.query(`
+            INSERT INTO Biometrics (type, bioData)
+            OUTPUT INSERTED.ID
+            VALUES (@type, @bioData)
+        `);
+
+        const biometricID = bioResult.recordset[0].ID;
+        //insert User data now
+        const sqlStatement = `
+            INSERT INTO [User] (name, DOB, nationalID, biometricID)
+            OUTPUT INSERTED.id
+            VALUES (@name, @dob, @nationalID, @biometricID)`;
+
+        const request = pool.request();
+        request.input('name', sql.VarChar, name);
         request.input('dob', sql.Date, dob);
-        request.input('nationalID', sql.NVarChar, nationalID); // Use NVarChar
+        request.input('nationalID', sql.VarChar, nationalID);
+        request.input('biometricID', sql.Int, biometricID);
 
         const result = await request.query(sqlStatement);
-        return result.recordset[0].id; // Return the new ID
+        return result.recordset[0].id; // Return the user ID
 
     } catch (err) {
-        console.error("Error in userModel.createUser:", err);
+        console.error("Error in userModel.create:", err);
         throw err;
     } finally {
-        if (connection) await connection.close(); // Close connection
+        if (pool) pool.close();
     }
 }
+
 
 /**
  * Gets a single user by their ID.
  */
 async function getUserById(userId) {
-    let connection;
+    let pool;
     try {
-        connection = await sql.connect(dbConfig); // Open connection
-        // 3. Standardized table name to Users
-        const sqlStatement = `SELECT * FROM Users WHERE id = @userId`;
+        pool = await sql.connect(dbConfig);
+        const sqlStatement = `SELECT * FROM [User] WHERE id = @userId`;
 
-        const request = connection.request(); // Use connection
+        const request = new sql.Request(pool);
         request.input('userId', sql.Int, userId);
 
         const result = await request.query(sqlStatement);
-        return result.recordset[0]; // Returns the user object or undefined
+        return result.recordset[0]; 
 
     } catch (err) {
-        console.error("Error in userModel.getUserById:", err);
+        console.error("Error in userModel.getById:", err);
         throw err;
     } finally {
-        if (connection) await connection.close(); // Close connection
+        if (pool) pool.close();
     }
 }
 
 /**
- * Gets all users from the database.
+ * Gets all users from the database. (if needed?)
  */
 async function getAllUsers() {
-    let connection;
+    let pool;
     try {
-        connection = await sql.connect(dbConfig); // Open connection
-        const sqlStatement = `SELECT * FROM Users`;
+        pool = await sql.connect(dbConfig);
+        const sqlStatement = `SELECT * FROM [User]`;
         
-        const result = await connection.request().query(sqlStatement);
+        const result = await pool.request().query(sqlStatement);
         return result.recordset; // Returns an array of users
 
     } catch (err) {
-        console.error("Error in userModel.getAllUsers:", err);
+        console.error("Error in userModel.getAll:", err);
         throw err;
     } finally {
-        if (connection) await connection.close(); // Close connection
+        if (pool) pool.close();
     }
 }
 
-/**
- * Updates an existing user's details.
- */
-async function updateUsers(userId, userData) {
-    const { name, dob, nationalID } = userData;
-    let connection;
-    try {
-        connection = await sql.connect(dbConfig); // Open connection
-        const sqlStatement = `
-            UPDATE Users
-            SET name = @name, DOB = @dob, nationalID = @nationalID
-            OUTPUT INSERTED.*
-            WHERE id = @userId`;
-
-        const request = connection.request(); // Use connection
-        request.input('userId', sql.Int, userId);
-        request.input('name', sql.NVarChar, name);
-        request.input('dob', sql.Date, dob);
-        request.input('nationalID', sql.NVarChar, nationalID);
-
-        const result = await request.query(sqlStatement);
-        return result.recordset[0]; // Return the updated user
-
-    } catch (err) {
-        console.error("Error in userModel.updateUsers:", err);
-        throw err;
-    } finally {
-        if (connection) await connection.close(); // Close connection
-    }
-}
 
 /**
  * Finds a user by their email address.
@@ -127,10 +111,29 @@ const findUserByEmail = async (email) => {
     }
 };
 
+
+//Make biometrics MVC later
+async function getAllBiometrics() {
+    let pool;
+    try {
+        pool = await sql.connect(dbConfig);
+        const result = await pool.request().query(`SELECT * FROM Biometrics`);
+        return result.recordset;
+    } catch (err) {
+        console.error("Error in userModel.getAllBiometrics:", err);
+        throw err;
+    }
+    finally {
+        if (pool) pool.close();
+    }
+}
+
+
+
 module.exports = {
-    findUserByEmail,
     createUser,
     getUserById,
     getAllUsers,
-    updateUsers,
+    findUserByEmail,
+    getAllBiometrics
 };
