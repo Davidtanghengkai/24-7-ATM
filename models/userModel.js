@@ -1,4 +1,3 @@
-// models/userModel.js
 const sql = require('mssql');
 const dbConfig = require('../config/dbConfig');
 
@@ -89,6 +88,8 @@ async function createCard(data) {
         request.input("pin", sql.VarChar, pin);
         request.input("createdTime", sql.DateTime, createdTime);
         await request.query(sqlStatement);
+
+        return cardNo;
 
     } catch (err) {
         console.error("Error in userModel.createCard:", err);

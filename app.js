@@ -10,26 +10,41 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // --- 2. IMPORT & USE ROUTES ---
-const userRoutes = require('./routes/userRoutes');
-const biometricRoutes = require('./routes/biometricRoutes');
+const userController = require('./Controllers/userController');
 
 //routes
-app.use('/user', userRoutes);
-app.use('/biometric', biometricRoutes); 
+app.get('/user', userController.getAllUsers);                   // get all users
+app.get('/user/:id', userController.getUserById);          // get user by ID
+app.post('/user', userController.createUser);              // create user + biometrics entry
+
+// Accounts
+app.get('/accounts/:userId', userController.getAccountsByUserId); // get accounts for user
+app.post('/accounts', userController.createAccount); // create new account for user
+
+// Cards
+app.get('/cards/:userId/:accountNo', userController.getCardsByUserIdandAccountId); // get cards for user account
+app.post('/cards', userController.createCard);  // create new card for account tied to user
+
+// Biometrics
+app.get('/biometrics', userController.getAllBiometrics);         // get all biometrics
 
 // Start server
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
-    
-    console.log("\nRegistered User routes:");
-    console.log("  POST   /user/create");
-    console.log("  GET    /user/");
-    console.log("  GET    /user/:id");
-    console.log("  PUT    /user/:id");
-    console.log("  DELETE /user/:id");
-
-    console.log("\nRegistered Biometric routes:"); // <-- NEW
-    console.log("  POST   /biometric/");
-    console.log("  GET    /biometric/user/:userId");
-    console.log("  DELETE /biometric/:id");
+    console.log(`API documentation: http://localhost:${port}/api-docs`);
 });
+
+process.on("SIGINT", async () => {
+    console.log("Server is gracefully shutting down");
+    server.close(() => {
+        console.log("HTTP server closed");
+        process.exit(0);
+    });
+});
+
+//API Documentation setup
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger-output.json"); // Import generated spec
+
+// Serve the Swagger UI at a specific route
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
