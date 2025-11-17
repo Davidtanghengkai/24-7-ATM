@@ -1,34 +1,28 @@
 const userModel = require('../Models/userModel');
 
-// POST /user/create
+// POST /user
 async function createUser(req, res) {
-    const { name, dob, nationalID } = req.body;
-    
-    // 1. Body validation
-    if (!name || !dob || !nationalID) {
-        return res.status(400).json({ message: "Missing required fields" });
-    }
-
+    const userData = req.body;
     try {
-        const newUserID = await userModel.createUser({ name, dob, nationalID });
-        res.status(201).json({ message: "User created", userID: newUserID });
+        const newUserId = await userModel.createUser(userData);
+        res.status(201).json({ message: "User created successfully", userId: newUserId });
     } catch (err) {
-        // 2. Server-side logging
-        console.error("Error in createUser controller:", err);
-        res.status(500).json({ message: "Error creating user", error: err.message });
+        console.error("Error in userController.createUser:", err);
+        res.status(500).json({ message: "Internal server error, Failed to create user" });
     }
 }
 
+
 // GET /user/:id
 async function getUserById(req, res) {
-    // 1. Parse and Validate ID
-    const id = parseInt(req.params.id, 10);
+    //Parse and Validate ID
+    const id = parseInt(req.params.id);
     if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid user ID" });
     }
 
     try {
-        const user = await userModel.getUserById(id);
+        const user = await userModel.getUserById(id); //get user by id
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -36,50 +30,22 @@ async function getUserById(req, res) {
         res.status(200).json(user);
 
     } catch (err) {
-        // 2. Server-side logging
         console.error("Error in getUserById controller:", err);
         res.status(500).json({ message: "Error getting user", error: err.message });
     }
 }
 
 // GET /user/
-async function getAllUsers(req, res) {
+async function getAllUsers(req, res) { //gets all users if needed
     try {
         const users = await userModel.getAllUsers();
         res.status(200).json(users);
-    } catch (err) {
-        // Server-side logging
+    } catch (err) {  //general error handling
         console.error("Error in getAllUsers controller:", err);
         res.status(500).json({ message: "Error getting all users", error: err.message });
     }
 }
 
-// PUT /user/:id
-async function updateUser(req, res) {
-    // 1. Parse and Validate ID
-    const id = parseInt(req.params.id, 10);
-    if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid user ID" });
-    }
-
-    // 2. Body validation
-    const { name, dob, nationalID } = req.body;
-    if (!name || !dob || !nationalID) {
-        return res.status(400).json({ message: "Missing required fields" });
-    }
-
-    try {
-        const updatedUser = await userModel.updateUsers(id, { name, dob, nationalID });
-        if (!updatedUser) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json({ message: "User updated", user: updatedUser });
-    } catch (err) {
-        // 3. Server-side logging
-        console.error("Error in updateUser controller:", err);
-        res.status(500).json({ message: "Error updating user", error: err.message });
-    }
-}
 
 async function findUserByEmail(req, res) {
     // 1. Get email from query string
@@ -106,10 +72,21 @@ async function findUserByEmail(req, res) {
 }
 
 
+async function getAllBiometrics(req, res) { //create biometric MVC
+    try {
+        const biometrics = await userModel.getAllBiometrics(); //get all biometrics for face scanning function
+        res.status(200).json(biometrics);
+    } catch (err) {
+        console.error("Error in userController.getAllBiometrics:", err);
+        res.status(500).json({ message: "Internal server error, Failed to get all biometrics" });
+    }
+}
+
+
 module.exports = {
     createUser,
     getUserById,
     getAllUsers,
-    updateUser,
-    findUserByEmail, 
+    findUserByEmail,
+    getAllBiometrics
 };
