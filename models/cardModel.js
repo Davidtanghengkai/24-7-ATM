@@ -140,27 +140,27 @@ async function deleteByCardNo(cardNo) {
  * Finds the newest, active card for a user.
  * (UPDATED: Manages its own connection)
  */
-async function findActiveCardByUserId(userId) {
-    let connection;
-    try {
-        connection = await sql.connect(dbConfig); // Open connection
-        const request = connection.request(); // Create request from connection
-        request.input('userId', sql.Int, userId);
-
-        const sqlStatement = `
-            SELECT TOP 1 * FROM Card 
-            WHERE UserID = @userId AND status = 'active'
-            ORDER BY createdTime DESC`;
-        
-        const cardResult = await request.query(sqlStatement);
-        return cardResult.recordset[0]; // Returns the active card or undefined
-
-    } catch (err) {
-        console.error("Error in cardModel.findActiveCardByUserId:", err);
-        throw err;
-    } finally {
-        if (connection) await connection.close(); // Close connection
-    }
+async function findCardByUserId(userId) {
+    let pool;
+        try {
+            pool = await sql.connect(dbConfig);
+            const request = pool.request();
+            request.input('userId', sql.Int, userId);
+            request.input('accountNo', sql.Int, accountNo);
+            const result = await request.query(`
+                SELECT * FROM Card 
+                WHERE UserID = @userId AND AccountNo = @accountNo AND status = 'active'
+                ORDER BY createdTime DESC
+            `);
+            return result.recordset;
+        } 
+        catch (err) {
+            console.error("Error in userModel.getCardsByUserIdandAccountId:", err);
+            throw err;
+        }
+        finally {
+            if (pool) pool.close();
+        }
 }
 
 
@@ -170,6 +170,5 @@ module.exports = {
     getByUserId,
     updateCardStatus,
     deleteByCardNo,
-    findActiveCardByUserId
-
+    findCardByUserId
 };
