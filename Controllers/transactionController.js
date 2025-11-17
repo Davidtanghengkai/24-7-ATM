@@ -75,16 +75,42 @@ async function createOverseasTransaction(req, res) {
       blockID: null
     });
 
-    // 7. Respond
-    res.status(201).json({
+    // ------------------------------
+    // 7. BLOCKCHAIN LEDGER CREATION
+    // ------------------------------
+
+    // 7A — Get previous block hash
+    const previousHash = await getLastBlockHash();
+
+    // 7B — Prepare transactionData
+    const transactionData = JSON.stringify({
+      senderAccountNo,
+      receiverAccountNo,
+      receiverBankID,
+      amount,
+      currency: toCurrency,
+      exchangeRate: rate,
+      time: new Date()
+    });
+
+    // 7C — Create block
+    const block = await createBlock(previousHash, transactionData, "ATM001");
+
+    // --------------------------------
+
+    // 8. Success response
+    return res.status(201).json({
       message: "Transaction completed successfully",
       blockchainVerified: true,
       rate,
       senderAccountNo,
       receiverAccountNo,
-      convertedAmount: `${totalConverted} ${toCurrency}`
+      convertedAmount: `${totalConverted} ${toCurrency}`,
+      blockID: block.blockID,
+      blockHash: block.currentHash
     });
 
+    
   } catch (err) {
     console.error("❌ Controller Error:", err.message);
     res.status(500).json({ error: "Failed to process transaction" });
