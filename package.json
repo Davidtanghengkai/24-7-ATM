@@ -18,9 +18,11 @@
   },
   "homepage": "https://github.com/Davidtanghengkai/24-7-ATM#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "i": "^0.3.7",
-    "mssql": "^12.1.0"
+    "mssql": "^12.1.0",
+    "nodemailer": "^7.0.10"
   }
 }
