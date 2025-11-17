@@ -85,6 +85,9 @@
         <div class="form-row">
           <label>Amount (SGD)</label>
           <input type="number" id="amount" class="input-box" min="1" placeholder="e.g. 200">
+          <span id="balanceInfo" class="balance-text">
+            Balance: Loading...
+          </span>
         </div>
 
         <div class="form-row">
@@ -98,8 +101,6 @@
         <button class="next-btn" id="next4">Next ></button>
       </div>
     </div>
-
-
 
     <!-- STEP 5 -->
     <div class="step" id="step5">
@@ -118,7 +119,14 @@
     <pre id="result"></pre>
 
   </div>
-
+  <!-- ERROR OVERLAY -->
+  <div id="errorOverlay" class="overlay">
+    <div class="overlay-content">
+      <h3>Error</h3>
+      <p id="overlayMessage"></p>
+      <button id="closeOverlay" class="close-btn">OK</button>
+    </div>
+  </div>
   <script src="JS/OverseaTransfer.js"></script>
 </body>
 </html>

@@ -3,7 +3,6 @@ const {
   getBanksByCountry
 } = require("../Models/bankModel");
 
-
 async function fetchCountries(req, res) {
   try {
     const countries = await getCountries();
@@ -37,7 +36,5 @@ async function fetchBanks(req, res) {
     res.status(500).json({ error: "Failed to fetch banks" });
   }
 }
-
-
 
 module.exports = { fetchCountries,fetchBanks };

@@ -108,3 +108,54 @@ button.next:hover,
   justify-content: flex-end;
   margin-top: 20px;
 }
+
+/* Overlay Background */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.55);
+  display: none;               /* hidden by default */
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* Content Box */
+.overlay-content {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  text-align: center;
+  width: 320px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  border-top: 5px solid #e60000;
+}
+
+.overlay-content h3 {
+  color: #e60000;
+  margin-bottom: 10px;
+}
+
+.close-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #e60000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.close-btn:hover {
+  background: #b30000;
+}
+
+.balance-text {
+  font-size: 13px;
+  color: #555;
+  margin-top: 4px;
+}

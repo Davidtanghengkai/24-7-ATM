@@ -13,7 +13,7 @@ async function createOverseasTransaction(req, res) {
       receiverCountry,
       amount,
       fromCurrency,
-      toCurrency         // ✅ Currency now comes from frontend
+      toCurrency         //Currency now comes from frontend
     } = req.body;
 
     // 1. Validate
@@ -25,7 +25,7 @@ async function createOverseasTransaction(req, res) {
       !receiverCountry ||
       !amount ||
       !fromCurrency ||
-      !toCurrency        // 🔥 Ensure currency is included
+      !toCurrency        //Ensure currency is included
     ) {
       return res.status(400).json({ message: "Missing required fields" });
     }

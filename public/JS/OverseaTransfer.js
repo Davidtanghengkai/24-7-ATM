@@ -7,26 +7,94 @@ const resultBox = document.getElementById("result");
 
 let exchangeRate = 0;
 let toCurrency = "";
-let selectedBankID = null;
 
-// Step navigation
+// -------------------------------------------------
+// STEP NAVIGATION
+// -------------------------------------------------
 function showStep(step) {
   document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
-  document.getElementById(`step${step}`).classList.add("active");
+
+  const target = document.getElementById(`step${step}`);
+  if (target) {
+    target.classList.add("active");
+    currentStep = step;
+  }
 }
-function next() { if (currentStep < totalSteps) showStep(++currentStep); }
-function back() { if (currentStep > 1) showStep(--currentStep); }
 
-document.getElementById("next1").onclick = next;
+function next() {
+  if (currentStep < totalSteps) {
+    showStep(currentStep + 1);
+  }
+}
+
+function back() {
+  if (currentStep > 1) {
+    showStep(currentStep - 1);
+  }
+}
+
+// -------------------------------------------------
+// STEP 1 VALIDATION
+// -------------------------------------------------
+document.getElementById("next1").onclick = () => {
+  const username = document.getElementById("username").value.trim();
+  const sender = document.getElementById("senderAccount").value.trim();
+
+  if (!username) {
+    showError("Please fill in your name.");
+    return;
+  }
+
+  if (!sender) {
+    showError("Please enter your bank account number.");
+    return;
+  }
+
+  next();
+};
 document.getElementById("back2").onclick = back;
-document.getElementById("next2").onclick = next;
-document.getElementById("back3").onclick = back;
-document.getElementById("next3").onclick = next;
-document.getElementById("back4").onclick = back;
-document.getElementById("next4").onclick = next;
-document.getElementById("back5").onclick = back;
 
-// Load countries
+// -------------------------------------------------
+// STEP 2 VALIDATION
+// -------------------------------------------------
+document.getElementById("next2").onclick = () => {
+  const country = document.getElementById("country").value;
+  const bank = document.getElementById("bank").value; 
+
+  if ( !country ) {
+    showError("Please select country.");
+    return;
+  }
+
+  if (!bank){
+    showError("Please select bank.");
+    return;
+  }
+  next();
+};
+document.getElementById("back3").onclick = back;
+
+// -------------------------------------------------
+// STEP 3 VALIDATION
+// -------------------------------------------------
+document.getElementById("next3").onclick = async () => {
+  const receiver = document.getElementById("receiverAccount").value.trim();
+
+  if (!receiver) {
+    showError("Please enter the recipient account number.");
+    return;
+  }
+
+  next();
+
+  await loadSenderBalance();
+};
+document.getElementById("back4").onclick = back;
+
+
+// -------------------------------------------------
+// LOAD COUNTRIES
+// -------------------------------------------------
 async function loadCountries() {
   const countrySelect = document.getElementById("country");
   countrySelect.innerHTML = "<option>Loading...</option>";
@@ -43,32 +111,33 @@ async function loadCountries() {
       countrySelect.appendChild(opt);
     });
   } catch (err) {
-    console.error("Country fetch error:", err);
-    countrySelect.innerHTML = "<option>Error loading countries</option>";
+    showError("Failed to load countries.");
   }
 }
-
 loadCountries();
 
-// Country selection → fetch banks + detect currency + fetch exchange rate
+
+// -------------------------------------------------
+// LOAD BANKS + RATE
+// -------------------------------------------------
 document.getElementById("country").addEventListener("change", async () => {
   const country = document.getElementById("country").value;
   const bankSelect = document.getElementById("bank");
 
+  if (!country) return;
+
   bankSelect.innerHTML = "<option>Loading banks...</option>";
-  rateText.textContent = "⏳ Detecting currency and exchange rate...";
+  rateText.textContent = "⏳ Detecting exchange rate...";
 
   try {
-    // Fetch banks
     const res = await fetch(`/api/banks/${country}`);
     const banks = await res.json();
 
     bankSelect.innerHTML = "";
 
-    // Populate dropdown
     banks.forEach(b => {
       const opt = document.createElement("option");
-      opt.value = JSON.stringify({ 
+      opt.value = JSON.stringify({
         id: b.bankID,
         name: b.bankName,
         country: b.country,
@@ -78,83 +147,39 @@ document.getElementById("country").addEventListener("change", async () => {
       bankSelect.appendChild(opt);
     });
 
-    // Auto-detect currency from first bank
-    const detectedCurrency = banks[0].currency;
-    toCurrency = detectedCurrency;
+    toCurrency = banks[0].currency;
 
-    // Fetch exchange rate
-    const rateRes = await fetch(`/api/rate?base=SGD&target=${detectedCurrency}`);
+    const rateRes = await fetch(`/api/rate?base=SGD&target=${toCurrency}`);
     const rateData = await rateRes.json();
 
     if (rateData.rate) {
       exchangeRate = rateData.rate;
-      rateText.textContent = `💱 1 SGD = ${exchangeRate.toFixed(4)} ${detectedCurrency}`;
+      rateText.textContent = `💱 1 SGD = ${exchangeRate.toFixed(4)} ${toCurrency}`;
     } else {
-      exchangeRate = 0;
-      rateText.textContent = "⚠️ Failed to fetch exchange rate.";
+      showError("Failed to load exchange rate.");;
     }
 
   } catch (err) {
-    console.error("Fetch banks/currency error:", err);
-    bankSelect.innerHTML = "<option>Error loading banks</option>";
-    rateText.textContent = "⚠️ Could not detect currency/exchange rate.";
+    showError("Error fetching banks or exchange rate.");
   }
 });
 
-// --------------------------
-// CONFIRM TRANSFER
-// --------------------------
-document.getElementById("confirmTransfer").addEventListener("click", async () => {
-  const bankData = JSON.parse(document.getElementById("bank").value);
 
-  const payload = {
-    senderAccountNo: parseInt(document.getElementById("senderAccount").value),
-    receiverAccountNo: document.getElementById("receiverAccount").value,
-    receiverBankID: bankData.id,
-    receiverBankName: bankData.name,
-    receiverCountry: bankData.country,
-    amount: parseFloat(document.getElementById("amount").value),
-    fromCurrency: "SGD",
-    toCurrency: bankData.currency
-  };
-
-  resultBox.textContent = "⏳ Processing transfer...";
-
-  try {
-    const res = await fetch("/api/transfer", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      resultBox.textContent =
-        "Transfer Successful!\n\n" + JSON.stringify(data, null, 2);
-    } else {
-      resultBox.textContent =
-        "Transfer Failed: " + (data.error || data.message);
-    }
-
-  } catch (e) {
-    resultBox.textContent = "⚠️ Error: " + e.message;
-  }
-});
-
-document.getElementById("next4").addEventListener("click", () => {
-
-  const sender = document.getElementById("senderAccount").value;
-  const receiver = document.getElementById("receiverAccount").value;
+// -------------------------------------------------
+// STEP 4 SUMMARY PREVIEW
+// -------------------------------------------------
+document.getElementById("next4").onclick = () => {
+  const sender = document.getElementById("senderAccount").value.trim();
+  const receiver = document.getElementById("receiverAccount").value.trim();
   const amount = parseFloat(document.getElementById("amount").value);
-  
-  if (!sender || !receiver || !amount) {
-    alert("Please fill in all required fields before proceeding.");
+
+  if (!amount || amount <= 0) {
+    showError("Please enter a valid amount.");
     return;
   }
 
-  if (!exchangeRate || exchangeRate <= 0) {
-    alert("Exchange rate not loaded. Please re-select a country or bank.");
+  if (!exchangeRate) {
+    showError("Exchange rate not loaded.");
     return;
   }
 
@@ -176,4 +201,85 @@ document.getElementById("next4").addEventListener("click", () => {
     <hr>
     <strong>Total Deduction (SGD):</strong> ${total}
   `;
-});
+
+  next();
+  document.getElementById("back5").onclick = back;
+
+};
+
+
+// -------------------------------------------------
+// CONFIRM TRANSFER
+// -------------------------------------------------
+document.getElementById("confirmTransfer").onclick = async () => {
+  const bankData = JSON.parse(document.getElementById("bank").value);
+
+  const payload = {
+    senderAccountNo: parseInt(document.getElementById("senderAccount").value),
+    receiverAccountNo: document.getElementById("receiverAccount").value,
+    receiverBankID: bankData.id,
+    receiverBankName: bankData.name,
+    receiverCountry: bankData.country,
+    amount: parseFloat(document.getElementById("amount").value),
+    fromCurrency: "SGD",
+    toCurrency: bankData.currency
+  };
+
+  try {
+    const res = await fetch("/api/transfer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      resultBox.textContent = 
+        "Transfer Successful!\n\n" + JSON.stringify(data, null, 2);
+    } else {
+      showError(data.message || data.error || "Unknown error.");
+    }
+
+  } catch (err) {
+    showError("Network error. Please try again.");
+  }
+};
+
+async function loadSenderBalance() {
+  const sender = document.getElementById("senderAccount").value.trim();
+  const balanceInfo = document.getElementById("balanceInfo");
+
+  if (!sender) {
+    balanceInfo.textContent = "Current balance: unavailable (no account selected)";
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/accounts/${sender}/balance`);
+    const data = await res.json();
+
+    if (res.ok && typeof data.balance === "number") {
+      balanceInfo.textContent = `Current balance: SGD ${data.balance.toFixed(2)}`;
+    } else {
+      balanceInfo.textContent = "Current balance: unable to fetch.";
+    }
+  } catch (err) {
+    console.error("Balance fetch error:", err);
+    balanceInfo.textContent = "Current balance: error fetching data.";
+  }
+}
+
+
+// -------------------------------------------------
+// MODAL POPUP FUNCTION
+// -------------------------------------------------
+function showError(msg) {
+  document.getElementById("overlayMessage").textContent = msg;
+  document.getElementById("errorOverlay").style.display = "flex";
+}
+
+// CLOSE MODAL
+document.getElementById("closeOverlay").onclick = () => {
+  document.getElementById("errorOverlay").style.display = "none";
+};

@@ -34,7 +34,7 @@ async function createBlockchainUser(accountNo, bankName, country, verifiedByBank
         console.error("BlockchainUser Insert Error:", err);
         throw err;
     } finally {
-        if (conn) conn.close();   // ALWAYS CLOSE CONNECTION
+        if (conn) await conn.close();   // ALWAYS CLOSE CONNECTION
     }
 }
 
@@ -66,5 +66,6 @@ async function verifyBlockchainUser(accountNo, bankName, country) {
 }
 
 module.exports = {
-    createBlockchainUser, verifyBlockchainUser
+    createBlockchainUser, 
+    verifyBlockchainUser
 };
