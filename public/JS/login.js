@@ -123,9 +123,9 @@ async function initFaceRecognition() {
         try {
             // adjust path if your models are in a different folder
             await Promise.all([
-                faceapi.nets.tinyFaceDetector.loadFromUri('/cam_model'),
-                faceapi.nets.faceLandmark68Net.loadFromUri('/cam_model'),
-                faceapi.nets.faceRecognitionNet.loadFromUri('/cam_model'),
+                faceapi.nets.tinyFaceDetector.loadFromUri('./cam_model'),
+                faceapi.nets.faceLandmark68Net.loadFromUri('./cam_model'),
+                faceapi.nets.faceRecognitionNet.loadFromUri('./cam_model'),
             ]);
             modelsLoaded = true;
         } catch (err) {
