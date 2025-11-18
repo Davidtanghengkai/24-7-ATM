@@ -3,6 +3,7 @@ const userModel = require('../Models/userModel');
 // POST /user
 async function createUser(req, res) {
     const userData = req.body;
+    console.log("Incoming userData:", userData);
     try {
         const newUserId = await userModel.createUser(userData);
         res.status(201).json({ message: "User created successfully", userId: newUserId });
@@ -74,8 +75,8 @@ async function findUserByEmail(req, res) {
 
 async function getAllBiometrics(req, res) { //create biometric MVC
     try {
-        const biometrics = await userModel.getAllBiometrics(); //get all biometrics for face scanning function
-        res.status(200).json(biometrics);
+        const biometrics = await userModel.getAllBiometricsWithUser(); //get all biometrics for face scanning function
+        return res.status(200).json(biometrics);
     } catch (err) {
         console.error("Error in userController.getAllBiometrics:", err);
         res.status(500).json({ message: "Internal server error, Failed to get all biometrics" });
