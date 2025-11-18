@@ -1,5 +1,5 @@
 const sql = require("mssql");
-const dbConfig = require("../dbConfig");
+const dbConfig = require("../config/dbConfig");
 
 async function createAccount(accountData) {
     const { userId, accountType, balance } = accountData;
