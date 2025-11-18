@@ -51,7 +51,7 @@ const transactionController = require("./controllers/transactionController");
 const bankController= require("./controllers/bankController");
 const blockchainUserController = require("./controllers/blockchainUserController");
 const exchangeRateController = require("./controllers/exchangeRateController");
-
+const translationController = require("./controllers/translationController");
 // Middlewares
 const  validateTransfer = require("./middleware/validateTransfer");
 
