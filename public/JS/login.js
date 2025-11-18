@@ -20,7 +20,20 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
             statusText.textContent = "❌ " + result.message;
             return;
         }
+        const tokenRes = await fetch('/api/users/loginWithFace', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: result.userId })
+        });
 
+        const data = await tokenRes.json();
+        if (!tokenRes.ok) {
+            alert(data.message);
+            return;
+        }
+
+        localStorage.setItem('jwtToken', data.token);
+        localStorage.setItem('userId', data.userId);
         statusText.textContent = "✅ Face verified! Welcome!";
         console.log("Verified User ID:", result.userId);
         localStorage.setItem("userId", result.userId);

@@ -1,4 +1,6 @@
 const userModel = require('../Models/userModel');
+const { generateToken } = require('../middleware/authorization');
+const jwt = require('jsonwebtoken');
 
 // POST /user
 async function createUser(req, res) {
@@ -84,10 +86,36 @@ async function getAllBiometrics(req, res) { //create biometric MVC
 }
 
 
+async function loginWithFace(req, res) {
+    console.log('Body received:', req.body);
+    const { userId } = req.body;
+    if (!userId) return res.status(400).json({ message: 'userId missing' });
+
+    try {
+        const user = await userModel.getUserById(userId);
+        console.log('User found:', user);
+
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const token = jwt.sign(
+            { userId: user.id }, 
+            process.env.JWT_SECRET || 'secret', 
+            { expiresIn: '1h' }
+        );
+
+        return res.status(200).json({ token, userId: user.id });
+    } catch (err) {
+        console.error('LoginWithFace error:', err);
+        return res.status(500).json({ message: 'Server error', error: err.message });
+    }
+}
+
+
 module.exports = {
     createUser,
     getUserById,
     getAllUsers,
     findUserByEmail,
-    getAllBiometrics
+    getAllBiometrics,
+    loginWithFace
 };
