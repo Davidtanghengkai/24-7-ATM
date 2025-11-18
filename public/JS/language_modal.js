@@ -1,3 +1,6 @@
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
     
     // 1. Get elements using the IDs/Classes from the HTML
@@ -90,8 +93,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function fetchAndApplyTranslations(languageName) {
     try {
+        const apiUrl = `${window.location.origin}/api/translations`;
         // 1. Initiate the POST request to your backend controller
-        const response = await fetch('/api/translations', {
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json' 
@@ -110,7 +114,7 @@ async function fetchAndApplyTranslations(languageName) {
 
         for (const key in translations) {
 
-            const element = document.querySelector(`[data-i18n="${key}"]`);
+            const element = document.querySelector(`[translateRef="${key}"]`);
             
             if (element) {
 

@@ -46,6 +46,7 @@ const userController = require('./Controllers/userController');
 const cardController = require('./Controllers/cardController');
 const otpController = require('./Controllers/otpController');
 const accountController = require('./Controllers/accountController');
+const translationController = require('./Controllers/translationController');
 
 //Routes
 
@@ -70,6 +71,11 @@ app.get('/api/cards/active/user/:userId', cardController.findCardsByUserId);
 
 app.post('/api/send-otp', otpController.sendOtp);
 app.post('/api/verify-otp', otpController.verifyOtp);
+
+// == Translation routes ==
+app.post('/api/translations', translationController.getTranslations);
+
+
 
 // --- Base Route Just In Case ---
 app.get('/', (req, res) => {
