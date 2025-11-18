@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const cors = require('cors'); 
 const path = require("path");
 const session = require("express-session");
+
 dotenv.config();
 
 //Initialize Express App
@@ -91,6 +92,10 @@ app.get("/api/rate", exchangeRateController.fetchExchangeRate);
 app.get('/', (req, res) => {
     res.send('How did we get here?');
 });
+
+// Watson Assistant Routes
+const watsonRoutes = require('./routes/api/watson');
+app.use('/api/watson', watsonRoutes);
 
 
 const server = app.listen(port, () => {
