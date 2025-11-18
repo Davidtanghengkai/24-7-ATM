@@ -32,7 +32,8 @@ class TranslationModel {
             'Korean': 'ko',
             'Japanese': 'ja',
             'Arabic': 'ar',
-            'Bengali': 'bn'
+            'Bengali': 'bn',
+            'Burmese': 'my'
         };
         
         // Define source strings in English

@@ -1,0 +1,333 @@
+/* =========================================
+   1. GLOBAL RESET & FONTS
+   ========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* System Fonts - fast loading, no internet required */
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #ccc; /* Light gray background outside ATM */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* =========================================
+   2. ATM CONTAINER (THE FRAME)
+   ========================================= */
+.atm-container {
+    width: 1000px; 
+    height: 700px; 
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-radius: 15px;
+    
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; 
+    position: relative; /* Anchors absolute elements like links/modal */
+}
+
+/* =========================================
+   3. NAVIGATION LINKS
+   ========================================= */
+.top-links {
+    position: absolute;
+    top: 25px;
+    right: 40px;
+    font-weight: bold;
+    color: #475066;
+    z-index: 10;
+}
+
+.top-link {
+    text-decoration: none;
+    color: #333;
+    margin: 0 5px;
+    transition: color 0.2s;
+}
+.top-link:hover {
+    color: #EF1815;
+}
+
+.back-link {
+    position: absolute;
+    top: 25px;
+    left: 40px;
+    text-decoration: none;
+    color: #134c5f; /* OCBC Teal */
+    font-weight: bold;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+.back-link:before {
+    content: "← ";
+    margin-right: 5px;
+}
+
+/* =========================================
+   4. MAIN CONTENT AREA
+   ========================================= */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    padding-top: 40px; /* Push down slightly from top links */
+}
+
+.page-title {
+    font-size: 2rem;
+    color: #134c5f;
+    margin-bottom: 2rem;
+}
+
+/* =========================================
+   5. ACCOUNT BOXES (STACKED LIST)
+   ========================================= */
+.account-container {
+    display: flex;
+    flex-direction: column; /* Stack vertically */
+    gap: 1.5rem;            /* Space between boxes */
+    align-items: center;
+    width: 100%;
+}
+
+.account-box {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    height: 180px;       /* Fixed height for consistency */
+    width: 90%;          /* Stretches to near full width */
+    max-width: 850px;    /* Cap width on very large screens */
+
+    /* Layout: Left Side (Info) vs Right Side (Buttons) */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    
+    transition: all 0.2s ease;
+    cursor: default; /* Default cursor because the BOX isn't clickable, the BUTTONS are */
+}
+
+.account-box:hover {
+    border-color: #134c5f;
+    background-color: #fafafe;
+    box-shadow: 0 8px 20px rgba(19, 76, 95, 0.1);
+    transform: translateY(-2px);
+}
+
+/* --- LEFT SIDE: Icon & Text --- */
+.account-info {
+    display: flex;
+    align-items: center;
+    flex: 1; /* Takes up all available space on the left */
+}
+
+.box-icon {
+    font-size: 2.5rem;
+    margin-right: 1.5rem;
+    background: #f0f4f5;
+    color: #333;
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.text-details {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.account-box h3 {
+    color: #134c5f;
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+}
+
+.box-desc {
+    color: #777;
+    font-size: 1rem;
+}
+
+/* --- RIGHT SIDE: Separator & Buttons --- */
+.card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    
+    height: 70%; /* Height relative to the box to control separator line height */
+    
+    /* Vertical Separator Line */
+    border-left: 2px solid #ddd;
+    padding-left: 2rem;
+    margin-left: 1rem;
+}
+
+/* Big Red Buttons */
+.select-card-btn {
+    background-color: #EF1815; /* OCBC Red */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 6px rgba(239, 24, 21, 0.2);
+}
+
+.select-card-btn:hover {
+    background-color: #c41210; /* Darker red */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(239, 24, 21, 0.3);
+}
+
+/* =========================================
+   6. CHAT ICON & MODAL (Standard)
+   ========================================= */
+.chat-icon {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    background-color: #EF1815;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: transform 0.2s;
+    z-index: 100;
+}
+
+.chat-icon:hover {
+    transform: scale(1.1);
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 60px;
+    right: 40px;
+    z-index: 2000;
+    display: none;
+}
+.modal-overlay.active { display: block; }
+
+.modal-content {
+    background-color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 180px;
+    border: 2px solid #EF1815;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 5px;
+}
+
+.close-modal {
+    font-size: 1.4em;
+    font-weight: bold;
+    cursor: pointer;
+    color: #555;
+}
+.close-modal:hover { color: #EF1815; }
+
+.language-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px 0 5px 0;
+}
+
+.language-option {
+    text-decoration: none;
+    color: black;
+    font-size: 1.1em;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.1s;
+}
+
+.language-option:hover {
+    color: white;
+    background-color: #EF1815;
+}
+
+/* =========================================
+   7. RESPONSIVE DESIGN (Mobile Safety)
+   ========================================= */
+@media (max-width: 900px) {
+    .atm-container {
+        width: 95%;
+        height: 90vh;
+    }
+
+    .account-box {
+        flex-direction: column;
+        height: auto;
+        padding: 2rem;
+        gap: 1.5rem;
+        text-align: center;
+    }
+
+    .account-info {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .box-icon {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .text-details {
+        align-items: center;
+    }
+
+    .card-actions {
+        /* Remove separator on mobile */
+        border-left: none;
+        padding-left: 0;
+        margin-left: 0;
+        
+        width: 100%;
+        flex-direction: column; /* Stack buttons */
+        height: auto;
+    }
+
+    .select-card-btn {
+        width: 100%;
+    }
+}
