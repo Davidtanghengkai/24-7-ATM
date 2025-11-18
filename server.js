@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require("dotenv");
 const cors = require('cors'); 
 const path = require("path");
+const session = require("express-session");
 dotenv.config();
 
 //Initialize Express App
@@ -12,6 +13,16 @@ const port = process.env.PORT || 3000;
 app.use(cors()); 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); 
+
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'a-very-strong-dev-secret-key', // Use an env variable
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production', 
+        maxAge: 15 * 60 * 1000 // 15 minutes to match OTP expiry
+    }
+}));
 
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -32,8 +43,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Controllers
 const userController = require('./Controllers/userController');
-const cardController = require('./controllers/cardController');
-const otpController = require('./controllers/otpController');
+const cardController = require('./Controllers/cardController');
+const otpController = require('./Controllers/otpController');
 const accountController = require('./Controllers/accountController');
 
 //Routes
@@ -57,7 +68,8 @@ app.get('/api/cards/active/user/:userId', cardController.findCardsByUserId);
 
 // == OTP Routes ==
 
-app.post('/api/otp/send', otpController.sendOtp);
+app.post('/api/send-otp', otpController.sendOtp);
+app.post('/api/verify-otp', otpController.verifyOtp);
 
 // --- Base Route Just In Case ---
 app.get('/', (req, res) => {
