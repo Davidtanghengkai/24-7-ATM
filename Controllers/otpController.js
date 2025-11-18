@@ -1,4 +1,4 @@
-const otpModel = require('../models/otpModel');
+const otpModel = require('../Models/otpModel');
 const emailService = require('../services/NodeMailer');
 
 
