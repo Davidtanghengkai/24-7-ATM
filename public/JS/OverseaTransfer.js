@@ -235,8 +235,7 @@ document.getElementById("confirmTransfer").onclick = async () => {
     const data = await res.json();
 
     if (res.ok) {
-      resultBox.textContent = 
-        "Transfer Successful!\n\n" + JSON.stringify(data, null, 2);
+      showSuccess("Transfer successful!");
     } else {
       showError(data.message || data.error || "Unknown error.");
     }
@@ -282,4 +281,29 @@ function showError(msg) {
 // CLOSE MODAL
 document.getElementById("closeOverlay").onclick = () => {
   document.getElementById("errorOverlay").style.display = "none";
+};
+
+// SHOW SUCCESS MODAL
+function showSuccess(msg) {
+  const successOverlay = document.getElementById("successOverlay");
+  const successMessage = document.getElementById("successMessage");
+  
+  if (successMessage) {
+    successMessage.textContent = msg;
+  }
+  
+  if (successOverlay) {
+    successOverlay.classList.add("active");
+  } else {
+    console.error("Success overlay element not found!");
+  }
+}
+
+document.getElementById("confirmTransfer").addEventListener("click", () => {
+  document.getElementById("successOverlay").classList.add("active");
+});
+
+
+document.getElementById("closeSuccess").onclick = () => {
+  document.getElementById("successOverlay").classList.remove("active");
 };

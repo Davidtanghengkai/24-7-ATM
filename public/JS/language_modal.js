@@ -1,3 +1,6 @@
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
     
     // 1. Get elements using the IDs/Classes from the HTML
@@ -12,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // --- 🔴 NEW: Reusable Function to Set Language ---
+    //Reusable Function to Set Language ---
     function setActiveLanguage(selectedText) {
         // 1. Remove 'active' class and '✔' from ALL options
         langOptions.forEach(opt => {
@@ -20,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
             opt.textContent = opt.textContent.replace(' ✔', '').trim();
         });
 
-        // 2. Find and set the new active option
+        //Find and set the new active option
         langOptions.forEach(opt => {
             const optionText = opt.textContent.trim(); // Already cleaned
             if (optionText === selectedText) {
@@ -29,15 +32,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // 3. Update the main "ENG" button text
+        //Update the main "ENG" button text
         const langCode = selectedText.substring(0, 3).toUpperCase();
         langButton.textContent = langCode;
 
-        // 4. Save the choice to localStorage
+        fetchAndApplyTranslations(selectedText)
+        //Save the choice to localStorage
         localStorage.setItem('selectedLanguage', selectedText);
     }
 
-    // --- 🔴 NEW: Load Saved Language on Page Start ---
+    //Load Saved Language on Page Start
     const savedLanguage = localStorage.getItem('selectedLanguage');
     if (savedLanguage) {
         setActiveLanguage(savedLanguage);
@@ -85,3 +89,46 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+
+async function fetchAndApplyTranslations(languageName) {
+    try {
+        const apiUrl = `${window.location.origin}/api/translations`;
+        // 1. Initiate the POST request to your backend controller
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
+          
+            body: JSON.stringify({ targetLang: languageName }) 
+        });
+        
+      
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! Status: ${response.status}`);
+        }
+        const translations = await response.json();
+        
+
+        for (const key in translations) {
+
+            const element = document.querySelector(`[translateRef="${key}"]`);
+            
+            if (element) {
+
+                element.textContent = translations[key];
+            }
+        }
+        
+        console.log(`Successfully applied translations for: ${languageName}`);
+
+    } catch (error) {
+        console.error("Translation Load Error:", error);
+        
+
+        // back to English or the previous language.
+        alert(`Sorry, we couldn't load the ${languageName} translation. Please try again.`);
+    }
+}

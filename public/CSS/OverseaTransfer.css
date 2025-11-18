@@ -27,6 +27,7 @@ body {
 
 /* -------- HEADERS -------- */
 h2 {
+  padding-top: 100px;
   font-size: 20px;
   color: #333;
   margin-bottom: 10px;
@@ -88,7 +89,6 @@ button.next:hover,
 }
 
 
-
 .nav-buttons {
   display: flex;
   justify-content: space-between;
@@ -139,6 +139,13 @@ button.next:hover,
   margin-bottom: 10px;
 }
 
+.overlay-content h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
 .close-btn {
   margin-top: 15px;
   padding: 10px 20px;
@@ -159,3 +166,22 @@ button.next:hover,
   color: #555;
   margin-top: 4px;
 }
+
+#successOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+}
+
+#successOverlay.active {
+    display: flex;
+}
+
+

@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const cors = require('cors'); 
 const path = require("path");
 const session = require("express-session");
+
 dotenv.config();
 
 //Initialize Express App
@@ -78,6 +79,9 @@ app.get('/api/cards/active/user/:userId', cardController.findCardsByUserId);
 app.post('/api/send-otp', otpController.sendOtp);
 app.post('/api/verify-otp', otpController.verifyOtp);
 
+// == Translation routes ==
+app.post('/api/translations', translationController.getTranslations);
+
 // Oversea Transfer Routes
 app.get("/api/countries", bankController.fetchCountries);
 app.get("/api/banks/:country", bankController.fetchBanks);
@@ -91,6 +95,10 @@ app.get("/api/rate", exchangeRateController.fetchExchangeRate);
 app.get('/', (req, res) => {
     res.send('How did we get here?');
 });
+
+// Watson Assistant Routes
+const watsonRoutes = require('./routes/api/watson');
+app.use('/api/watson', watsonRoutes);
 
 
 const server = app.listen(port, () => {
