@@ -2,14 +2,14 @@ const cardModel = require('../Models/cardModel');
 
 // POST /card/
 async function createCard(req, res) {
-    const { cardNo, userId, accountNo, expiryDate, pin } = req.body;
-    if (!cardNo || !userId || !accountNo || !expiryDate || !pin) {
+    const {userId, accountNo, expiryDate, pin } = req.body;
+    if ( !userId || !accountNo || !expiryDate || !pin) {
         return res.status(400).json({ message: "Missing required fields" });
     }
 
     try {
         // FIXED: Called the correct model function
-        const newCard = await cardModel.createCard({ cardNo, userId, accountNo, expiryDate, pin });
+        const newCard = await cardModel.createCard({userId, accountNo, expiryDate, pin });
         res.status(201).json({ message: "Card created", card: newCard });
     } catch (err) {
         // ADDED: Server-side logging

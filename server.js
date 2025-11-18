@@ -51,6 +51,7 @@ const transactionController = require("./controllers/transactionController");
 const bankController= require("./controllers/bankController");
 const blockchainUserController = require("./controllers/blockchainUserController");
 const exchangeRateController = require("./controllers/exchangeRateController");
+const translationController = require("./controllers/translationController");
 
 // Middlewares
 const  validateTransfer = require("./middleware/validateTransfer");
@@ -73,6 +74,9 @@ app.delete('/api/cards/:cardNo', cardController.deleteCard);
 app.get('/api/cards/active/user/:userId', cardController.findCardsByUserId);
 
 
+// == Account Routes ==
+app.post('/api/accounts', accountController.createAccount);
+app.get('/api/accounts/user/:userId', accountController.getAccountsByUserId);
 
 // == OTP Routes ==
 
