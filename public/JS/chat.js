@@ -59,28 +59,25 @@ function endSession() {
         initSession();
     }, 2000);
 }
-chatEl.addEventListener("click", (e) => {
-    if (e.target && e.target.tagName === "BUTTON") {
-        const buttonContainer = e.target.parentElement;
-        
-        if (buttonContainer.classList.contains("options")) {
-            const text = e.target.textContent;
+if (chatEl) {
+    chatEl.addEventListener("click", (e) => {
+        if (e.target && e.target.tagName === "BUTTON") {
+            const buttonContainer = e.target.parentElement;
             
-            // 1. Send the text to the bot
-            sendTextFromButton(text);
-
-            // 2. Remove the entire group of buttons from the screen
-            buttonContainer.remove();
-
-            // 3. Explicitly save history now so they don't come back on reload
-            saveHistory();
+            if (buttonContainer.classList.contains("options")) {
+                const text = e.target.textContent;
+                sendTextFromButton(text);
+                buttonContainer.remove();
+                saveHistory();
+            }
         }
-    }
-});
+    });
+}
 
 
 // create chat
 async function initSession() {
+    if (!chatEl) return;
 
     const existingId = localStorage.getItem(SESSION_KEY);
     const existingHistory = localStorage.getItem(HISTORY_KEY);
@@ -155,6 +152,7 @@ async function requestWelcome() {
 
 // messages
 function addMessage(text, from = "bot") {
+    if (!chatEl) return;
     const wrap = document.createElement("div");
     wrap.className = "msg " + from;
 
@@ -352,5 +350,28 @@ if (inputEl) {
         if (e.key === "Enter") sendText(inputEl.value);
     });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM fully loaded and parsed.");
+
+    const exitButton = document.getElementById("cancelYesBtn");
+
+
+    if (exitButton) {
+        console.log("Exit button found on this page. Attaching listener.");
+        
+        exitButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            
+            console.log("Exit button clicked. Ending session...");
+            endSession();
+
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 2000);
+        });
+    } 
+});
+
 
 initSession();
