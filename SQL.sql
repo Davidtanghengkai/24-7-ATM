@@ -33,7 +33,7 @@ CREATE TABLE Accounts (
 
 -- Creating the Card table
 CREATE TABLE Card (
-    CardNo INT PRIMARY KEY, -- Card number as the primary key
+    CardNo INT PRIMARY KEY IDENTITY(1,1), -- Card number as the primary key
     UserID INT, -- Reference to the User
     AccountNo INT, -- Reference to the Account
     status VARCHAR(50), -- Card status (active, blocked, etc.)
