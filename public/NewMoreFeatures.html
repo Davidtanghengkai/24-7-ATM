@@ -9,64 +9,67 @@
 <body>
     <div class="atm-container">
         
-        <!-- TOP RIGHT LINKS: Wrapped in a container -->
+        <!-- TOP RIGHT LINKS -->
         <div class="top-links">
             <a href="#" class="top-link" id="language-toggle">ENG</a>
             <span class="top-separator">|</span>
-            <a href="TransactionCancel.html" class="top-link">Exit</a>
+            <a href="TransactionCancel.html" class="top-link" translateRef="exitLink">Exit</a>
         </div>
         
-        <!-- TOP LEFT LINK: Positioned separately -->
-        <a href="NewHomePage.html" class="back-link">Back</a> 
+        <!-- TOP LEFT LINK -->
+        <a href="NewHomePage.html" class="back-link" translateRef="backLink">Back</a> 
         
         <main class="main-content">
-            <h1 class="greeting">
+            <h1 class="greeting" translateRef="menuGreeting">
                 Hello!<br>
                 What would you like to do today?
             </h1>
 
-            <h2 class="section-title">More Features</h2>
+            <h2 class="section-title" translateRef="moreFeaturesSectionTitle">More Features</h2>
 
             <div class="features-grid">
                 
                 <button class="feature-box">
                     <span class="icon">$</span>
-                    <span class="feature-text">Balance<br>Enquiry</span>
+                    <span class="feature-text" translateRef="balanceEnquiryFeature">Balance<br>Enquiry</span>
                 </button>
                 
                 <button class="feature-box">
                     <span class="icon">🧾</span>
-                    <span class="feature-text">Bill<br>Payment</span>
+                    <span class="feature-text" translateRef="billPaymentFeature">Bill<br>Payment</span>
                 </button>
                 
                 <button class="feature-box">
                     <span class="icon">☰</span>
-                    <span class="feature-text">Overseas<br>transfer</span>
+                    <span class="feature-text" translateRef="overseasTransferFeature">Overseas<br>transfer</span>
                 </button>
                 
                 <button class="feature-box">
                     <span class="icon">🔑</span>
-                    <span class="feature-text">CPF<br>Services</span>
+                    <span class="feature-text" translateRef="cpfServicesFeature">CPF<br>Services</span>
                 </button>
                 
                 <button class="feature-box">
                     <span class="icon">📈</span>
-                    <span class="feature-text">Investment<br>Services</span>
+                    <span class="feature-text" translateRef="investmentServicesFeature">Investment<br>Services</span>
                 </button>
                 
                 <button class="feature-box">
                     <span class="icon">⇄</span>
-                    <span class="feature-text">Transfer<br>Funds</span>
+
+                    <span class="feature-text" translateRef="transferFundsFeature">Transfer<br>Funds</span>
                 </button>
             </div>
         </main>
 
-        <button class="scroll-right-btn">&gt;</button>
+
+        <button class="scroll-right-btn" translateRef="scrollRight">&gt;</button>
         
         <div class="chat-icon">
             <span class="icon-bubble">💬</span>
         </div>
         
+        <!-- Language Modal (Standard) -->
         <div id="language-modal" class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
