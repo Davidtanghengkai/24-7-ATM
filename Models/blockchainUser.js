@@ -1,6 +1,6 @@
 const sql = require("mssql");
 const crypto = require("crypto");
-const config = require("../config/dbConfig");
+const config = require("../dbConfig");
 
 // Generate SHA-256 hash
 function generateIdentityHash(accountNo, bankName, country) {
