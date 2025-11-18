@@ -285,7 +285,7 @@
         }
       }
     },
-    "/api/otp/send": {
+    "/api/send-otp": {
       "post": {
         "description": "",
         "parameters": [
@@ -309,11 +309,35 @@
           "400": {
             "description": "Bad Request"
           },
-          "404": {
-            "description": "Not Found"
-          },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/verify-otp": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "otp": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           }
         }
       }

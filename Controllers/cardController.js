@@ -1,4 +1,4 @@
-const cardModel = require('../models/cardModel');
+const cardModel = require('../Models/cardModel');
 
 // POST /card/
 async function createCard(req, res) {

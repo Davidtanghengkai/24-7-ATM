@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overseas Transfer</title>
+  <link rel="stylesheet" href="CSS/OverseaTransfer.css">
+  <link rel="stylesheet" href="CSS/NewMoreFeatures.css">
+</head>
+<body>
+  <div class="atm-container">
+
+    <!-- TOP RIGHT LINKS: Wrapped in a container -->
+    <div class="top-links">
+        <a href="#" class="top-link" id="language-toggle">ENG</a>
+        <span class="top-separator">|</span>
+        <a href="TransactionCancel.html" class="top-link">Exit</a>
+    </div>
+    
+    <!-- TOP LEFT LINK: Positioned separately -->
+    <a href="NewHomePage.html" class="back-link">Back</a>
+
+    <!-- STEP 1 -->
+    <div class="step active" id="step1">
+      <h2>Please Select Your Bank Account</h2>
+
+      <div class="form-section">
+        <div class="form-row">
+          <label>Name</label>
+          <input type="text" id="username" class="input-box" placeholder="Your Name">
+        </div>
+
+        <div class="form-row">
+          <label>Bank Account No</label>
+          <input type="text" id="senderAccount" class="input-box" placeholder="e.g. 1001">
+        </div>
+      </div>
+        <div class="next-wrapper">
+          <button class="next-btn" id="next1">Next ></button>
+        </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" id="step2">
+      <h2>Please Select Country and Bank</h2>
+
+      <div class="form-section">
+        <div class="form-row">
+          <label>Select Country</label>
+          <select id="country" class="input-box"></select>
+        </div>
+
+        <div class="form-row">
+          <label>Select Bank</label>
+          <select id="bank" class="input-box"></select>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="back" id="back2">< Back</button>
+        <button class="next-btn" id="next2">Next ></button>
+      </div>
+    </div>
+
+
+
+    <!-- STEP 3 -->
+    <div class="step" id="step3">
+      <h2>Please Key in the Recipient’s Account Number</h2>
+
+      <div class="form-section">
+        <div class="form-row">
+          <label>Recipient’s Account Number</label>
+          <input type="text" id="receiverAccount" class="input-box" placeholder="Enter recipient account number">
+        </div>
+
+        <div class="form-row">
+          <label>Name</label>
+          <input type="text" id="receiverName" class="input-box" placeholder="Recipient name (optional)">
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="back" id="back3">< Back</button>
+        <button class="next-btn" id="next3">Next ></button>
+      </div>
+    </div>
+
+
+
+    <!-- STEP 4 -->
+    <div class="step" id="step4">
+      <h2>Please Type Amount to Transfer</h2>
+
+      <div class="form-section">
+        <div class="form-row">
+          <label>Amount (SGD)</label>
+          <input type="number" id="amount" class="input-box" min="1" placeholder="e.g. 200">
+          <span id="balanceInfo" class="balance-text">
+            Balance: Loading...
+          </span>
+        </div>
+
+        <div class="form-row">
+          <label>Exchange Rate</label>
+          <span id="rateText" style="font-size:16px; padding:10px 0;">Loading...</span>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="back" id="back4">< Back</button>
+        <button class="next-btn" id="next4">Next ></button>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step" id="step5">
+      <h2>Transfer Summary</h2>
+
+      <div class="form-section">
+        <div class="confirm-box" id="summary"></div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="back" id="back5">< Back</button>
+        <button class="next-btn" id="confirmTransfer">Transfer</button>
+      </div>
+    </div>
+
+    <pre id="result"></pre>
+
+    <div class="chat-icon">
+        <span class="icon-bubble">💬</span>
+    </div>
+    
+    <div id="language-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="language-grid">
+                <a href="#" class="language-option">English ✔</a>
+                <a href="#" class="language-option">Chinese</a>
+                <a href="#" class="language-option">Tamil</a>
+                <a href="#" class="language-option">Malay</a>
+                <a href="#" class="language-option">Japanese</a>
+                <a href="#" class="language-option">Korean</a>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- ERROR OVERLAY -->
+  <div id="errorOverlay" class="overlay">
+    <div class="overlay-content">
+      <h3>Error</h3>
+      <p id="overlayMessage"></p>
+      <button id="closeOverlay" class="close-btn">OK</button>
+    </div>
+  </div>
+
+  <div id="successOverlay" class="overlay">
+    <div class="overlay-content">
+      <h3></h3>
+      <h2>Transfer Successful</h2>
+      <p id="successMessage">Your overseas transfer has been completed.</p>
+
+      <button id="closeSuccess" class="close-btn">OK</button>
+    </div>
+  </div>
+
+  <script src="JS/OverseaTransfer.js"></script>
+  <script src="JS/language_modal.js"></script>
+</body>
+</html>

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OCBC ATM Innovation</title>
-    <link rel="stylesheet" href="CSS/Index.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OCBC ATM Innovation</title>
+  <link rel="stylesheet" href="CSS/index.css" />
+  <link rel="stylesheet" href="CSS/chat.css" />
 </head>
 
 <body>
@@ -32,7 +33,7 @@
                 <strong translateRef="createCardTitle">Create Card</strong><br>
                 <span translateRef="createCardSubtitle">make new card</span>
             </button>
-            <button class="feature-btn">
+            <button onclick="window.location.href='CreateCardPage.html'>
                 <strong translateRef="governmentPayoutTitle">Government Payout</strong>
             </button>
         </section>
@@ -52,9 +53,13 @@
                 </div>
             </div>
         </div>
-        <script src="JS/language_modal.js"></script>
-        <script src="JS/index.js"></script>
+        
     </div>
+    <div id="chat-root"></div>
+  </div>
+  <script src="JS/index.js"></script>
+  <script src="JS/language_modal.js"></script> 
+  <script src="JS/widget_loader.js" defer></script>
 </body>
 
 </html>

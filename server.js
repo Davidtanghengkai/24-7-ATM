@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const cors = require('cors'); 
 const path = require("path");
 const session = require("express-session");
+
 dotenv.config();
 
 //Initialize Express App
@@ -46,7 +47,13 @@ const userController = require('./Controllers/userController');
 const cardController = require('./Controllers/cardController');
 const otpController = require('./Controllers/otpController');
 const accountController = require('./Controllers/accountController');
-const translationController = require('./Controllers/translationController');
+const transactionController = require("./controllers/transactionController");
+const bankController= require("./controllers/bankController");
+const blockchainUserController = require("./controllers/blockchainUserController");
+const exchangeRateController = require("./controllers/exchangeRateController");
+
+// Middlewares
+const  validateTransfer = require("./middleware/validateTransfer");
 
 //Routes
 
@@ -75,12 +82,23 @@ app.post('/api/verify-otp', otpController.verifyOtp);
 // == Translation routes ==
 app.post('/api/translations', translationController.getTranslations);
 
-
+// Oversea Transfer Routes
+app.get("/api/countries", bankController.fetchCountries);
+app.get("/api/banks/:country", bankController.fetchBanks);
+app.post("/api/transfer", validateTransfer, transactionController.createOverseasTransaction);
+app.post("/api/blockchain-user", blockchainUserController.addBlockchainUser);
+app.get("/api/accounts/:accountNo/balance", accountController.fetchBalance);
+//Exchange rate proxy endpoint
+app.get("/api/rate", exchangeRateController.fetchExchangeRate);
 
 // --- Base Route Just In Case ---
 app.get('/', (req, res) => {
     res.send('How did we get here?');
 });
+
+// Watson Assistant Routes
+const watsonRoutes = require('./routes/api/watson');
+app.use('/api/watson', watsonRoutes);
 
 
 const server = app.listen(port, () => {
