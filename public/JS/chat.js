@@ -59,6 +59,24 @@ function endSession() {
         initSession();
     }, 2000);
 }
+chatEl.addEventListener("click", (e) => {
+    if (e.target && e.target.tagName === "BUTTON") {
+        const buttonContainer = e.target.parentElement;
+        
+        if (buttonContainer.classList.contains("options")) {
+            const text = e.target.textContent;
+            
+            // 1. Send the text to the bot
+            sendTextFromButton(text);
+
+            // 2. Remove the entire group of buttons from the screen
+            buttonContainer.remove();
+
+            // 3. Explicitly save history now so they don't come back on reload
+            saveHistory();
+        }
+    }
+});
 
 
 // create chat
@@ -158,7 +176,6 @@ function addOptions(options) {
     options.forEach(opt => {
         const btn = document.createElement("button");
         btn.textContent = opt.label;
-        btn.onclick = () => sendTextFromButton(opt.label);
         wrap.appendChild(btn);
     });
 
