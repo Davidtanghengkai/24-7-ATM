@@ -5,9 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Overseas Transfer</title>
   <link rel="stylesheet" href="CSS/OverseaTransfer.css">
+  <link rel="stylesheet" href="CSS/NewMoreFeatures.css">
 </head>
 <body>
   <div class="atm-container">
+
+    <!-- TOP RIGHT LINKS: Wrapped in a container -->
+    <div class="top-links">
+        <a href="#" class="top-link" id="language-toggle">ENG</a>
+        <span class="top-separator">|</span>
+        <a href="TransactionCancel.html" class="top-link">Exit</a>
+    </div>
+    
+    <!-- TOP LEFT LINK: Positioned separately -->
+    <a href="NewHomePage.html" class="back-link">Back</a>
 
     <!-- STEP 1 -->
     <div class="step active" id="step1">
@@ -118,7 +129,27 @@
 
     <pre id="result"></pre>
 
+    <div class="chat-icon">
+        <span class="icon-bubble">💬</span>
+    </div>
+    
+    <div id="language-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="language-grid">
+                <a href="#" class="language-option">English ✔</a>
+                <a href="#" class="language-option">Chinese</a>
+                <a href="#" class="language-option">Tamil</a>
+                <a href="#" class="language-option">Malay</a>
+                <a href="#" class="language-option">Japanese</a>
+                <a href="#" class="language-option">Korean</a>
+            </div>
+        </div>
+    </div>
   </div>
+
   <!-- ERROR OVERLAY -->
   <div id="errorOverlay" class="overlay">
     <div class="overlay-content">
@@ -127,6 +158,18 @@
       <button id="closeOverlay" class="close-btn">OK</button>
     </div>
   </div>
+
+  <div id="successOverlay" class="overlay">
+    <div class="overlay-content">
+      <h3></h3>
+      <h2>Transfer Successful</h2>
+      <p id="successMessage">Your overseas transfer has been completed.</p>
+
+      <button id="closeSuccess" class="close-btn">OK</button>
+    </div>
+  </div>
+
   <script src="JS/OverseaTransfer.js"></script>
+  <script src="JS/language_modal.js"></script>
 </body>
 </html>

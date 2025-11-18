@@ -2,7 +2,7 @@ const { verifyBlockchainUser } = require("../Models/blockchainUser");
 const { createTransaction } = require("../Models/transactionModel");
 const { getExchangeRate } = require("../Models/exchangeRate");
 const { getBalance, updateBalance } = require("../Models/accountModel");
-
+const { getLastBlockHash, createBlock } = require("../Models/blockchainModel");
 async function createOverseasTransaction(req, res) {
   try {
     const {
