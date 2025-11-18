@@ -47,13 +47,17 @@ const userController = require('./Controllers/userController');
 const cardController = require('./Controllers/cardController');
 const otpController = require('./Controllers/otpController');
 const accountController = require('./Controllers/accountController');
-const transactionController = require("./controllers/transactionController");
 const bankController= require("./controllers/bankController");
 const blockchainUserController = require("./controllers/blockchainUserController");
 const exchangeRateController = require("./controllers/exchangeRateController");
+const translationController = require('./Controllers/translationController');
+
+// 🔴 FIX: Added missing import for transactionController
+// Ensure you have a transactionController.js file in your Controllers folder!
+const transactionController = require('./Controllers/transactionController'); 
 
 // Middlewares
-const  validateTransfer = require("./middleware/validateTransfer");
+const validateTransfer = require("./middleware/validateTransfer");
 
 //Routes
 
@@ -75,7 +79,6 @@ app.get('/api/cards/active/user/:userId', cardController.findCardsByUserId);
 
 
 // == OTP Routes ==
-
 app.post('/api/send-otp', otpController.sendOtp);
 app.post('/api/verify-otp', otpController.verifyOtp);
 
@@ -85,7 +88,10 @@ app.post('/api/translations', translationController.getTranslations);
 // Oversea Transfer Routes
 app.get("/api/countries", bankController.fetchCountries);
 app.get("/api/banks/:country", bankController.fetchBanks);
+
+// This line was causing the crash because transactionController wasn't imported
 app.post("/api/transfer", validateTransfer, transactionController.createOverseasTransaction);
+
 app.post("/api/blockchain-user", blockchainUserController.addBlockchainUser);
 app.get("/api/accounts/:accountNo/balance", accountController.fetchBalance);
 //Exchange rate proxy endpoint
