@@ -2,6 +2,7 @@ const faceModal = document.getElementById('face-modal');
 const video = document.getElementById('video');
 const statusText = document.getElementById('status');
 
+//#region Face Scanning Logic
 document.getElementById("startFaceBtn").addEventListener("click", async () => {
     faceModal.classList.add('active');
 
@@ -20,8 +21,9 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
             return;
         }
 
-        statusText.textContent = "✅ Face verified! UserID: " + result.userId;
+        statusText.textContent = "✅ Face verified! Welcome!";
         console.log("Verified User ID:", result.userId);
+        localStorage.setItem("userId", result.userId);
     }, 800);
 });
 
@@ -225,6 +227,11 @@ async function checkDistance(fullDetection) {
     const box = fullDetection.detection.box;
     return box.width > 280; // too close
 }
+
+//#endregion
+
+
+
 
 // -------------------- Global Error Catch --------------------
 window.addEventListener('error', ev => {
