@@ -13,24 +13,24 @@
 
         <div class="main-wrapper">
 
-            <h1 class="greeting">
+            <h1 class="greeting" translateRef="cancelConfirmation">
                 Are you sure you want to cancel the transaction?
             </h1>
-            <h2 class="sub-greeting">
+            <h2 class="sub-greeting" translateRef="cancelQuery">
                 Is there anything else you would like to do?
             </h2>
             <div class="button-group">
-                <button class="cash-btn" onclick ="window.location.href = 'index.html'">No</button>
-                <button class="cash-btn" onclick="window.history.back()">Yes</button>
+                <button id="cancelYesBtn" class="cash-btn" translateRef="cancelYes">No</button>
+                <button id="cancelNoBtn" class="cash-btn" onclick="window.history.back()" translateRef="cancelNo">Yes</button>
             </div>
 
 
-    
-
+            
                 <div class="chat-icon">
                     <span class="icon-bubble">💬</span>
                 </div>
         </div>
     </div>
+    <script src="JS/chat.js"></script>
 </body>
 </html>
