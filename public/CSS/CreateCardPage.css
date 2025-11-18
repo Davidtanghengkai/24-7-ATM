@@ -216,10 +216,6 @@ body {
     background-color: #EF1815;
 }
 
-
-
-
-
 /* --- Face Modal --- */
 
 .face-modal-overlay {
@@ -227,7 +223,7 @@ body {
     inset: 0; /* covers entire viewport */
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5); /* page outside modal is translucent */
+    background-color: rgba(0, 0, 0, 0.7); /* page outside modal is translucent */
     display: none;
     justify-content: center;
     align-items: center;
@@ -240,92 +236,6 @@ body {
 }
 
 .face-modal-content {
-    background-color: rgba(255, 255, 255, 0.98);
-    width: 50vw; /* takes up 50% of the viewport width */
-    max-width: 900px;
-    height: 50vh; /* takes up 50% of the viewport height */
-    min-width: 320px;
-    min-height: 280px;
-    border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    padding: 20px;
-    box-sizing: border-box;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* Title centered at the top of the modal */
-.face-modal-header {
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    z-index: 10;
-    width: calc(100% - 64px); /* leave room for side buttons */
-    pointer-events: none; /* keep header non-interfering with close button */
-}
-
-.face-modal-header .face-modal-title {
-    margin: 0;
-    font-size: 1.5rem; /* bigger title */
-    font-weight: 700;
-    color: #333;
-    pointer-events: auto; /* allow selection if needed */
-}
-
-/* Close button sits at the top-right inside the modal */
-.close-face-modal {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    font-size: 1.2em;
-    font-weight: bold;
-    cursor: pointer;
-    color: #555;
-    padding: 6px 8px;
-    border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
-    background: transparent;
-    z-index: 20;
-}
-
-.close-face-modal:hover {
-    background-color: #EF1815;
-    color: white;
-}
-/* Body centered within the modal - stacked as a column */
-.face-modal-body {
-    margin-top: 60px; /* make room for the top-centered title */
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column; /* column layout instead of row */
-    justify-content: flex-start;
-    align-items: stretch;
-    text-align: center;
-    overflow: hidden;
-    gap: 12px;
-    min-height: 0; /* allow children to shrink properly in flex container */
-}
-
-/* Full-page overlay */
-.face-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.7);
-    display: none;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    z-index: 9999;
-}
-
-.face-modal-content{
     width: 70%;
     height: 80%;
     background-color: rgba(255, 255, 255, 0.827);
@@ -334,44 +244,86 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 20px; /* Add padding here for better spacing */
+    box-sizing: border-box;
+    position: relative; /* Needed for absolute positioning of close button */
 }
 
+.face-modal-content h1, .face-modal-content p {
+    text-align: center;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.face-modal-content .face-modal-title {
+    font-size: 1.8em;
+    color: #333;
+}
+
+/* Styling for the main video/canvas elements inside the verification modal */
 .face-modal-content video, .face-modal-content canvas { 
-    border-radius:10px; 
-    margin-top:10px;
- }
+    border-radius: 10px; 
+    margin-top: 10px;
+    /* Ensure responsiveness for the main video */
+    max-width: 100%;
+    height: auto; 
+    display: block;
+}
+
+/* Close button sits at the top-right inside the modal */
+.close-face-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    color: #555;
+    padding: 6px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+    background: transparent;
+    border: none;
+    z-index: 20;
+}
+
+.close-face-modal:hover {
+    background-color: #EF1815;
+    color: white;
+}
 
 /* --- Registration Modal Styling --- */
 
 .registration-modal-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.75); /* Slightly darker for more focus */
+    background-color: rgba(0, 0, 0, 0.75);
     display: none;
     justify-content: center;
     align-items: center;
     z-index: 4000;
-    backdrop-filter: blur(4px); /* Added a subtle blur for depth */
+    backdrop-filter: blur(4px);
 }
 
 /* Modal content box */
 .registration-modal-content {
-    background-color: #ffffff; /* Solid white background */
+    background-color: #ffffff;
     width: 90%;
-    max-width: 500px; /* Slimmer max-width for better form focus */
+    max-width: 500px;
     padding: 30px;
-    border-radius: 12px; /* Slightly more rounded corners */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); /* Stronger shadow */
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     display: flex;
     flex-direction: column;
     position: relative;
+    box-sizing: border-box;
 }
 
 .registration-modal-content h1 {
     font-size: 1.8em;
-    color: #000000; /* Black for better contrast */
+    color: #000000;
     text-align: center;
-    margin-bottom: 25px; /* Increased space after title */
+    margin-bottom: 25px;
     font-weight: 700;
 }
 
@@ -379,18 +331,19 @@ body {
 .registration-modal-content form {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Use gap to manage vertical spacing between form groups */
+    gap: 15px; /* Ensures good spacing between form groups */
 }
 
 .registration-modal-content label {
     font-size: 1em;
     color: #444;
     font-weight: 600;
-    margin-bottom: 0; /* Managed by form gap */
+    /* Re-enabling margin-top to separate label from previous input */
+    margin-top: 5px; 
 }
 
 .registration-modal-content input {
-    padding: 12px; /* Slightly more padding */
+    padding: 12px;
     font-size: 1.1em;
     border: 1px solid #ccc;
     border-radius: 6px;
@@ -400,14 +353,49 @@ body {
 }
 
 .registration-modal-content input:focus {
-    border-color: #EF1815; /* OCBC primary color on focus */
+    border-color: #EF1815;
     box-shadow: 0 0 0 2px rgba(239, 24, 21, 0.2);
     outline: none;
 }
 
+/* Video element styles (FIXED: Restored flex for label and using object-fit: contain) */
+
+/* Ensure the video container has the correct size and allows vertical stacking */
+.registration-modal-content .video-container {
+    width: 100%;
+    /* Reverted to auto height with max-height to ensure the label is visible */
+    height: auto; 
+    max-height: 330px; /* Slight increase to ensure 4:3 video fits comfortably */
+    margin-bottom: 20px;
+    
+    /* Display properties to show the label and video stacked */
+    display: flex;
+    flex-direction: column; 
+    
+    overflow: hidden; 
+    position: relative; /* Remove for simpler flow */
+    padding-bottom: 0; /* Remove padding hack */
+    
+    /* Added margin-top to create space after the IC number input */
+    margin-top: 15px; 
+}
+
+/* Style the video element to fill the container width and maintain aspect ratio */
+#face-registration-video {
+    width: 100%;
+    height: auto; /* Scales height proportionally */
+    display: block; 
+    transform: scaleX(-1); /* To mirror the camera feed */
+    border-radius: 8px;
+    margin-top: 5px; /* Small separation between label and video */
+    
+    /* KEY CHANGE: Contain ensures the entire video frame is visible (no cropping) */
+    object-fit: contain; 
+}
+
 /* Specific styling for the Submit button */
 .registration-modal-content button[type="submit"] {
-    margin-top: 15px; /* Added margin above the button */
+    margin-top: 20px; /* Increased margin to push button away from video */
     padding: 15px 20px;
     background-color: #EF1815;
     color: white;
@@ -429,13 +417,13 @@ body {
     position: absolute;
     top: 10px;
     right: 15px;
-    font-size: 2em; /* Bigger 'x' for easy clicking */
+    font-size: 2em;
     font-weight: 300;
     cursor: pointer;
     color: #888;
     background: transparent;
     border: none;
-    line-height: 1; /* Ensures perfect centering of the X */
+    line-height: 1;
     padding: 5px;
 }
 

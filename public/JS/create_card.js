@@ -6,11 +6,15 @@ const MAX_NON_MATCH_COUNT = 3; // How many times we can fail a check before swit
 
 let modelsLoaded = false; // Flag to ensure models only load once
 let recognitionStarted = false; // Flag to prevent multiple detection loops
-let detectionInterval = null; // The main loop handler for real-time detection
-let overlayCanvas = null; // Canvas used to draw the detection box over the video
+let detectionInterval = null; // The main loop handler for real-time detection (for initial face check)
+let overlayCanvas = null; // Canvas used to draw the detection box over the video (for initial face check)
 let sampleDescriptor = null; // The known face reference for comparison
 let nonMatchCount = 0; // Tracks consecutive non-matches for the transition logic
 
+// ---------------- New: Global State for Registration ----------------
+let registrationDetectionInterval = null;
+let registrationOverlayCanvas = null;
+let mediaStream = null; // Stores the camera stream object
 
 // DOM Setup and Initialization: Runs when the page is ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -20,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const videoEl = document.getElementById('video');
     const closeFaceBtn = document.getElementById('close-face-modal') || document.querySelector('.close-face-modal');
     const closeRegistrationBtn = document.getElementById('close-registration-modal'); 
-    let mediaStream = null; // Stores the camera stream object
 
     // Find the main "Face ID" card button
     const faceCard = Array.from(document.querySelectorAll('.verification-card'))
@@ -30,28 +33,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     // Camera and Modal Handling Functions
-    // Starts the camera and pipes the video to the specified element
     window.startCamera = async function(targetVideoEl) {
         try {
-            // Use 'playsinline' for iOS compatibility
+            if (mediaStream) window.stopCamera(); // Ensure previous stream is stopped
             mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
             targetVideoEl.srcObject = mediaStream;
             await targetVideoEl.play();
         } catch (err) {
             console.error('Unable to access camera:', err);
             alert('Cannot access camera. Please allow camera permission or use a supported device.');
-            // Close the modal gracefully if the camera fails
             if (targetVideoEl === videoEl && window.closeFaceModal) window.closeFaceModal(); 
+            throw err;
         }
     }
 
-    // Stops the camera and cleans up the media stream
     window.stopCamera = function() {
         if (mediaStream) {
             mediaStream.getTracks().forEach(t => t.stop());
             mediaStream = null;
         }
-        // Also clean up all possible video elements
         const videos = [videoEl, document.getElementById('face-registration-video')];
         videos.forEach(v => {
             if (v) {
@@ -61,66 +61,59 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Base function to show the Face Verification modal
     window.openFaceModal = function() {
         if (!faceModal) return;
         faceModal.style.display = 'flex';
     }
 
-    // Base function to hide the Face Verification modal
     window.closeFaceModal = function() {
         if (!faceModal) return;
         faceModal.style.display = 'none';
         window.stopCamera();
     }
     
-    // Opens the Registration modal (for new users)
+    // CORRECTED: Simplified registration modal opening to rely on runRegistrationScan for start
     window.openRegistrationModal = function() {
         if (!registrationModal) return;
-        // Always close the verification modal first
         if (window.closeFaceModal) window.closeFaceModal(); 
-        
         registrationModal.style.display = 'flex';
-        
         const regVideoEl = document.getElementById('face-registration-video');
         if (regVideoEl) {
-            window.startCamera(regVideoEl); 
-            // NOTE: You would typically start a separate registration loop here to capture the new face
+            window.startCamera(regVideoEl).then(() => {
+                // Now runRegistrationScan will start the robust checkVideoReady loop
+                runRegistrationScan();
+            }).catch(err => {
+                console.error("Camera failed to start for registration:", err);
+            });
         } else {
              console.warn('Registration video element (ID: face-registration-video) not found.');
         }
     }
 
-    // Closes the Registration modal
     window.closeRegistrationModal = function() {
         if (!registrationModal) return;
         registrationModal.style.display = 'none';
         window.stopCamera();
     }
     
-    // Make key elements accessible globally for the core logic
     window.videoEl = videoEl;
     window.faceModal = faceModal;
     window.registrationModal = registrationModal;
 
-    // Event Listeners: Attaching functionality to buttons and clicks
-    // Clicking the "Face ID" card opens the verification process
     if (faceCard) {
         faceCard.addEventListener('click', (e) => {
             e.preventDefault();
-            window.openFaceModal(); // Calls the HOOKED function below
+            window.openFaceModal();
         });
     }
 
-    // Clicking the "x" button in the verification modal
     if (closeFaceBtn) {
         closeFaceBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            window.closeFaceModal(); // Calls the HOOKED function
+            window.closeFaceModal();
         });
     }
     
-    // Clicking the "x" button in the registration modal
     if (closeRegistrationBtn) {
         closeRegistrationBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -128,22 +121,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Clicking outside the verification modal closes it (via CSS face-modal-overlay listener)
     if (faceModal) {
         faceModal.addEventListener('click', (e) => {
-            // Check if the click target is the overlay itself (not the content)
             if (e.target === faceModal) window.closeFaceModal();
         });
     }
     
-    // Clicking outside the registration modal closes it
     if (registrationModal) {
         registrationModal.addEventListener('click', (e) => {
             if (e.target === registrationModal) window.closeRegistrationModal();
         });
     }
 
-    // Pressing 'Escape' closes any open modal
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             window.closeFaceModal();
@@ -151,11 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Modal Hooks: Adding setup/cleanup logic to modal open/close functions
-    const baseOpenFaceModal = window.openFaceModal;
+    // Initial Face Check Cleanup Override
     const baseCloseFaceModal = window.closeFaceModal;
-
-    // Hook Close Face Modal (stops the loop and cleans up canvas)
     window.closeFaceModal = function closeFaceModalWithCleanup() {
         try {
             if (detectionInterval) {
@@ -166,52 +152,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 overlayCanvas.parentNode.removeChild(overlayCanvas);
                 overlayCanvas = null;
             }
-            recognitionStarted = false; // Allow the process to start again
-            nonMatchCount = 0; // Reset failed attempt counter
+            recognitionStarted = false;
+            nonMatchCount = 0;
+            const videoEl = document.getElementById('video');
+            if (videoEl) videoEl.removeEventListener('playing', initFaceRecognition); 
         } catch (e) {
             console.warn('Error cleaning up recognition:', e);
         }
         baseCloseFaceModal(); 
     };
 
-    // Hook Open Face Modal (starts the detection process)
+    const baseOpenFaceModal = window.openFaceModal;
     window.openFaceModal = function openFaceModalWithInit() {
         baseOpenFaceModal();
-        // Give the modal a slight delay to render before starting heavy tasks
         setTimeout(() => initFaceRecognition(), 200);
     };
-
-    // Initial Load: Preload models when the script runs
-    try {
-        initFaceRecognition(); 
-    } catch (e) {
-        console.warn('initFaceRecognition call deferred/executed:', e);
-    }
+    
+    // Registration Check Cleanup Override
+    const baseCloseRegistrationModal = window.closeRegistrationModal;
+    window.closeRegistrationModal = function closeRegistrationModalWithCleanup() {
+        try {
+            if (registrationDetectionInterval) {
+                clearInterval(registrationDetectionInterval);
+                registrationDetectionInterval = null;
+            }
+            if (registrationOverlayCanvas && registrationOverlayCanvas.parentNode) {
+                registrationOverlayCanvas.parentNode.removeChild(registrationOverlayCanvas);
+                registrationOverlayCanvas = null;
+            }
+            const regVideoEl = document.getElementById('face-registration-video');
+            // Remove the playing event listener that might be waiting
+            if(regVideoEl) regVideoEl.removeEventListener('playing', startRegistrationDetection);
+        } catch (e) {
+            console.warn('Error cleaning up registration recognition:', e);
+        }
+        baseCloseRegistrationModal(); 
+    };
 });
 
-
-// Face Recognition Core Logic: The real-time face verification engine
+// Face Recognition Core Logic (Initial Check)
 async function initFaceRecognition() {
     const videoEl = window.videoEl; 
     const faceModal = window.faceModal; 
     const statusText = document.getElementById('status');
-    
-    // Check if the required elements are present
     if (!window.faceapi || !videoEl || !statusText) {
         if (statusText) statusText.textContent = 'Setup Error: Missing face-api or DOM elements.';
         return;
     }
     
-    // Don't start if a process is already running
     if (recognitionStarted) return;
     recognitionStarted = true;
 
     if (statusText) statusText.textContent = 'Loading models...';
 
-    // Load models only if they haven't been loaded before
     if (!modelsLoaded) {
         try {
-            // NOTE: Ensure these paths are correct relative to where the JS is run
             await Promise.all([
                 faceapi.nets.tinyFaceDetector.loadFromUri('/cam_model'),
                 faceapi.nets.faceLandmark68Net.loadFromUri('/cam_model'),
@@ -227,15 +222,19 @@ async function initFaceRecognition() {
     }
 
     if (statusText) statusText.textContent = 'Models loaded. Starting camera...';
-
-    await window.startCamera(videoEl);
+    // Use the startCamera function which is async
+    try {
+        await window.startCamera(videoEl);
+    } catch (e) {
+        recognitionStarted = false;
+        return;
+    }
     
     if (statusText) statusText.textContent = 'Camera ready. Position face in the center...';
 
-    // Load the stored reference descriptor (the "existing member" face)
     if (!sampleDescriptor) {
         try {
-            // NOTE: Ensure this sample image path is correct
+            // NOTE: Ensure you have a 'sample_face.jpg' at /public/photos/
             const sampleImg = await faceapi.fetchImage('/public/photos/sample_face.jpg');
             const sd = await faceapi
                 .detectSingleFace(sampleImg, new faceapi.TinyFaceDetectorOptions())
@@ -249,14 +248,10 @@ async function initFaceRecognition() {
         }
     }
 
-    // Function to run once the video starts playing
     const onPlaying = async () => {
-        // Setup the canvas layer for drawing the face box
         if (overlayCanvas && overlayCanvas.parentNode) overlayCanvas.parentNode.removeChild(overlayCanvas);
         overlayCanvas = faceapi.createCanvasFromMedia(videoEl);
-        // Insert the canvas right after the video element
         videoEl.parentNode.insertBefore(overlayCanvas, videoEl.nextSibling);
-
         overlayCanvas.style.position = 'absolute';
         overlayCanvas.style.pointerEvents = 'none';
         overlayCanvas.style.zIndex = '9999';
@@ -264,32 +259,25 @@ async function initFaceRecognition() {
         const overlayParent = videoEl.parentNode;
         const parentStyle = window.getComputedStyle(overlayParent);
         if (parentStyle.position === 'static') { overlayParent.style.position = 'relative'; }
-        
-        // Ensures the canvas is aligned precisely over the video element
+
         function updateCanvasPosition() {
             const rect = videoEl.getBoundingClientRect();
             const parentRect = overlayParent.getBoundingClientRect();
-            
-            // Calculate relative position within the parent container
             const left = rect.left - parentRect.left + overlayParent.scrollLeft;
             const top = rect.top - parentRect.top + overlayParent.scrollTop;
-            
             overlayCanvas.style.left = left + 'px';
             overlayCanvas.style.top = top + 'px';
             overlayCanvas.style.width = rect.width + 'px';
             overlayCanvas.style.height = rect.height + 'px';
-            
             const displaySize = {
                 width: videoEl.videoWidth || Math.round(rect.width),
                 height: videoEl.videoHeight || Math.round(rect.height)
             };
-            
             const dpr = window.devicePixelRatio || 1;
             overlayCanvas.width = Math.round(displaySize.width * dpr);
             overlayCanvas.height = Math.round(displaySize.height * dpr);
-            
             const ctx = overlayCanvas.getContext('2d');
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // Apply high-DPI scaling
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             faceapi.matchDimensions(overlayCanvas, displaySize);
             return displaySize;
         }
@@ -299,12 +287,9 @@ async function initFaceRecognition() {
         window.addEventListener('scroll', updateCanvasPosition);
 
         if (detectionInterval) clearInterval(detectionInterval);
-        
-        nonMatchCount = 0; // Reset failed counter
+        nonMatchCount = 0;
 
-        // Start the main detection loop
         detectionInterval = setInterval(async () => {
-            // Check if the modal has been closed
             if (!faceModal || faceModal.style.display === 'none') {
                 clearInterval(detectionInterval);
                 detectionInterval = null;
@@ -313,14 +298,11 @@ async function initFaceRecognition() {
             }
 
             currentDisplay = updateCanvasPosition();
-
-            // Detect face, landmarks, and descriptor
             const detections = await faceapi
                 .detectAllFaces(videoEl, new faceapi.TinyFaceDetectorOptions())
                 .withFaceLandmarks()
                 .withFaceDescriptors();
 
-            // Resize and draw the detection box
             const resized = faceapi.resizeResults(detections, currentDisplay);
             const ctx = overlayCanvas.getContext('2d');
             ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
@@ -328,17 +310,15 @@ async function initFaceRecognition() {
 
             if (!detections || detections.length === 0) {
                 if (statusText) statusText.textContent = 'No face detected.';
-                nonMatchCount = 0; // Reset counter if no face is visible
+                nonMatchCount = 0;
                 return;
             }
-            
-            // Focus on the first detected face
+
             const det = resized[0];
             const box = det.detection.box;
             const estimatedMeters = estimateDistanceFromFaceBox(box.width, currentDisplay.width);
             const faceCrop = cropFaceCanvas(videoEl, box);
 
-            // Run anti-spoofing and blur checks simultaneously
             const [spoofDetected, blurry] = await Promise.all([
                 isScreenSpoof(faceCrop),
                 Promise.resolve(isFaceBlurry(faceCrop, 40)),
@@ -356,28 +336,22 @@ async function initFaceRecognition() {
                 return;
             }
 
-            // Check against the sample face
             if (sampleDescriptor) {
                 const distance = faceapi.euclideanDistance(detections[0].descriptor, sampleDescriptor.descriptor);
                 
                 if (distance < MATCH_THRESHOLD) {
-                    // --- MATCH FOUND: Existing Member ---
                     nonMatchCount = 0; 
-                    
-                    // Check if the distance is also correct (user is not too close/far, using OPTIMAL constants)
                     if (!isNaN(estimatedMeters) && estimatedMeters >= OPTIMAL_DISTANCE_MIN && estimatedMeters <= OPTIMAL_DISTANCE_MAX) {
                         if (statusText) statusText.textContent = '✅ Existing member found! Welcome back.';
-                        
-                        // Success! Stop detection and close modal
                         if (detectionInterval) {
                             clearInterval(detectionInterval);
                             detectionInterval = null;
                             recognitionStarted = false; 
                             window.closeFaceModal(); 
-                            // TODO: Add success redirect here, e.g., window.location.href = '/public/NewHomePage.html'; 
+                            // TODO: Add redirect/login logic here
+                            // window.location.href = 'ExistingUserPage.html'; 
                         }
                     } else if (statusText) {
-                        // Match found, but physical distance is wrong
                         const distanceMsg = isNaN(estimatedMeters) ? '' : `Estimated distance: ${estimatedMeters.toFixed(2)} m.`;
                         if (estimatedMeters > OPTIMAL_DISTANCE_MAX) {
                             statusText.textContent = `❌ Match found, but too far. Move closer. ${distanceMsg}`;
@@ -386,24 +360,17 @@ async function initFaceRecognition() {
                         }
                     }
                 } else {
-                    // --- NO MATCH FOUND: Potential New Member ---
                     nonMatchCount++;
-                    
                     if (nonMatchCount < MAX_NON_MATCH_COUNT) {
-                        // Display message and wait for next check
                         if (statusText) statusText.textContent = `❌ Face not recognized. Retrying (${nonMatchCount}/${MAX_NON_MATCH_COUNT}). Move closer/adjust angle.`;
                     } else {
-                        // Max failed checks reached, transition to registration
                         if (statusText) statusText.textContent = `❌ No existing member found after multiple tries. Starting registration...`;
-                        
-                        // Stop verification and open registration
                         if (detectionInterval) {
                             clearInterval(detectionInterval);
                             detectionInterval = null;
                             recognitionStarted = false; 
-
                             window.closeFaceModal(); 
-                            window.openRegistrationModal(); // Transition!
+                            window.openRegistrationModal();
                         }
                     }
                 }
@@ -411,14 +378,12 @@ async function initFaceRecognition() {
                 if (statusText) statusText.textContent = 'Face detected. Cannot check membership (no reference image).';
                 nonMatchCount = 0;
             }
-        }, 1000); // Check every 1 second
+        }, 1000);
     };
 
-    // Attach the playing function to the video element
     videoEl.removeEventListener('playing', onPlaying); 
     videoEl.addEventListener('playing', onPlaying);
-    
-    // Safety check: If the 'playing' event is missed, manually start the loop
+    // Fallback to start detection if 'playing' event was missed
     setTimeout(() => {
         if (videoEl.readyState >= 3 && !detectionInterval) {
             console.warn("Video 'playing' event missed. Forcing detection start.");
@@ -427,14 +392,218 @@ async function initFaceRecognition() {
     }, 500);
 }
 
+// ---------------- Registration Scan Logic ----------------
 
-// Anti-spoofing and Utility Functions: These keep the process secure and clean
-// Main function to check for screen-based spoofing (photo/video of a face)
+// Function to handle the real-time detection for the registration modal
+async function startRegistrationDetection() {
+    const regVideoEl = document.getElementById('face-registration-video');
+    const statusText = document.getElementById('status-reg'); 
+    
+    if (!window.faceapi || !regVideoEl || !statusText) {
+        if (statusText) statusText.textContent = 'Setup Error: Missing face-api or DOM elements.';
+        return;
+    }
+    
+    if (registrationDetectionInterval) clearInterval(registrationDetectionInterval);
+    
+    if (!modelsLoaded) {
+        statusText.textContent = 'Loading models for registration...';
+        try {
+            await Promise.all([
+                faceapi.nets.tinyFaceDetector.loadFromUri('/cam_model'),
+                faceapi.nets.faceLandmark68Net.loadFromUri('/cam_model'),
+                faceapi.nets.faceRecognitionNet.loadFromUri('/cam_model'),
+            ]);
+            modelsLoaded = true;
+        } catch (err) {
+            console.error('Failed to load face-api models for registration', err);
+            if (statusText) statusText.textContent = '❌ Failed loading models. Check /cam_model path in console.';
+            return;
+        }
+    }
+
+    if (statusText) statusText.textContent = 'Models loaded. Please wait for camera feed...';
+
+    // --- Core Detection Logic Function ---
+    const coreDetectionLoop = async () => {
+        // Setup canvas for drawing bounding box (Only run this once)
+        if (!registrationOverlayCanvas) {
+            if (registrationOverlayCanvas && registrationOverlayCanvas.parentNode) registrationOverlayCanvas.parentNode.removeChild(registrationOverlayCanvas);
+            registrationOverlayCanvas = faceapi.createCanvasFromMedia(regVideoEl);
+            // Correctly position canvas near the video element
+            regVideoEl.parentNode.insertBefore(registrationOverlayCanvas, regVideoEl.nextSibling);
+            registrationOverlayCanvas.style.position = 'absolute';
+            registrationOverlayCanvas.style.pointerEvents = 'none';
+        }
+
+        function updateRegCanvasPosition() {
+            const rect = regVideoEl.getBoundingClientRect();
+            const parentRect = regVideoEl.parentNode.getBoundingClientRect();
+            // Calculate relative position to parent
+            const left = rect.left - parentRect.left + regVideoEl.parentNode.scrollLeft;
+            const top = rect.top - parentRect.top + regVideoEl.parentNode.scrollTop;
+            registrationOverlayCanvas.style.left = left + 'px';
+            registrationOverlayCanvas.style.top = top + 'px';
+            registrationOverlayCanvas.style.width = rect.width + 'px';
+            registrationOverlayCanvas.style.height = rect.height + 'px';
+            const displaySize = {
+                width: regVideoEl.videoWidth || Math.round(rect.width),
+                height: regVideoEl.videoHeight || Math.round(rect.height)
+            };
+            const dpr = window.devicePixelRatio || 1;
+            registrationOverlayCanvas.width = Math.round(displaySize.width * dpr);
+            registrationOverlayCanvas.height = Math.round(displaySize.height * dpr);
+            const ctx = registrationOverlayCanvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            faceapi.matchDimensions(registrationOverlayCanvas, displaySize);
+            return displaySize;
+        }
+
+        let currentDisplay = updateRegCanvasPosition();
+        window.removeEventListener('resize', updateRegCanvasPosition);
+        window.removeEventListener('scroll', updateRegCanvasPosition);
+        window.addEventListener('resize', updateRegCanvasPosition);
+        window.addEventListener('scroll', updateRegCanvasPosition);
+
+
+        // Start the real-time detection loop
+        registrationDetectionInterval = setInterval(async () => {
+            if (!document.getElementById('registration-modal') || document.getElementById('registration-modal').style.display === 'none') {
+                clearInterval(registrationDetectionInterval);
+                registrationDetectionInterval = null;
+                return;
+            }
+
+            currentDisplay = updateRegCanvasPosition();
+            const detections = await faceapi
+                .detectAllFaces(regVideoEl, new faceapi.TinyFaceDetectorOptions())
+                .withFaceLandmarks()
+                .withFaceDescriptors();
+
+            const resized = faceapi.resizeResults(detections, currentDisplay);
+            const ctx = registrationOverlayCanvas.getContext('2d');
+            ctx.clearRect(0, 0, registrationOverlayCanvas.width, registrationOverlayCanvas.height);
+            faceapi.draw.drawDetections(registrationOverlayCanvas, resized); // Draw the box
+
+            if (!detections || detections.length === 0) {
+                if (statusText) statusText.textContent = '❌ No face detected. Please position your face.';
+                return;
+            }
+            
+            // --- Face Check Logic (Distance, Blur, Spoof) ---
+            const det = resized[0];
+            const box = det.detection.box;
+            const estimatedMeters = estimateDistanceFromFaceBox(box.width, currentDisplay.width);
+            const faceCrop = cropFaceCanvas(regVideoEl, box);
+
+            const [spoofDetected, blurry] = await Promise.all([
+                isScreenSpoof(faceCrop),
+                Promise.resolve(isFaceBlurry(faceCrop, 40)),
+            ]);
+
+            if (spoofDetected) {
+                if (statusText) statusText.textContent = '❌ Spoof detected (screen/photo). Please present a live face.';
+                return;
+            }
+
+            if (blurry) {
+                if (statusText) statusText.textContent = '❌ Face too blurry. Improve lighting/focus. Est: ' + estimatedMeters.toFixed(2) + ' m.';
+                return;
+            }
+
+            // Check distance
+            if (isNaN(estimatedMeters) || estimatedMeters < OPTIMAL_DISTANCE_MIN || estimatedMeters > OPTIMAL_DISTANCE_MAX) {
+                const distanceMsg = isNaN(estimatedMeters) ? 'Check distance.' : `Estimated distance: ${estimatedMeters.toFixed(2)} m.`;
+                if (estimatedMeters > OPTIMAL_DISTANCE_MAX) {
+                    statusText.textContent = `❌ Too far. Move closer. ${distanceMsg}`;
+                } else {
+                    statusText.textContent = `❌ Too close. Move back. ${distanceMsg}`;
+                }
+                return;
+            }
+            
+            // --- SUCCESS CONDITION: Face is clear, aligned, and live ---
+            if (statusText) statusText.textContent = '✅ Face alignment successful! Complete the form to register.';
+            clearInterval(registrationDetectionInterval);
+            registrationDetectionInterval = null;
+            
+            // Store the new descriptor globally for future checks
+            sampleDescriptor = detections[0].descriptor; 
+            
+            alert('Your face is successfully scanned and recorded! Please complete the form.');
+            
+        }, 1000); // Check every 1 second
+    };
+    // --- End Core Detection Logic Function ---
+
+
+    // MODIFIED: Use a loop to wait for the video to be ready (Robust Check)
+    const maxAttempts = 10;
+    let attempts = 0;
+
+    const checkVideoReady = () => {
+        // Check if video is loaded AND has dimensions
+        if (regVideoEl.readyState >= 3 && regVideoEl.videoWidth > 0) {
+            if (statusText) statusText.textContent = 'Camera feed active. Align face now...';
+            coreDetectionLoop();
+        } else if (attempts < maxAttempts) {
+            attempts++;
+            if (statusText) statusText.textContent = `Camera feed loading... (Attempt ${attempts}/${maxAttempts})`;
+            setTimeout(checkVideoReady, 300); // Retry every 300ms
+        } else {
+             if (statusText) statusText.textContent = '❌ Failed to start camera feed. Check permissions/console.';
+        }
+    };
+
+    // Use event listeners and fallbacks to trigger the robust check
+    regVideoEl.removeEventListener('playing', checkVideoReady); 
+    regVideoEl.addEventListener('playing', checkVideoReady);
+
+    // If already playing (sometimes happens before event is attached)
+    if (regVideoEl.readyState >= 3) {
+        checkVideoReady();
+    }
+}
+
+
+// Hook registration modal to automatically start scan and handle form submission
+function runRegistrationScan() {
+    startRegistrationDetection();
+    
+    // Form submission logic
+    const registrationForm = document.getElementById('registration-form');
+    registrationForm.onsubmit = function(event) {
+        event.preventDefault();
+        
+        if (registrationDetectionInterval) {
+            alert("Please successfully align your face before submitting the registration form.");
+            return;
+        }
+
+        if (!sampleDescriptor) {
+            alert("Face data not captured. Please retry the face scan using the 'Scan Your Face Again' area.");
+            return;
+        }
+
+        // --- Final Registration Success Logic ---
+        const formData = new FormData(registrationForm);
+        const name = formData.get('name');
+        
+        // This simulates a successful submission and redirect
+        alert(`✅ Registration for ${name} complete! You can now log in with Face ID.`);
+        window.closeRegistrationModal();
+        
+        // --- CORRECTED REDIRECT TO /public/LoginPage.html ---
+        window.location.href = '/public/LoginPage.html'; 
+    }
+}
+
+
+// Utility & Anti-Spoofing Functions 
 async function isScreenSpoof(faceCanvas) {
     try {
         const ctx = faceCanvas.getContext('2d', { willReadFrequently: true });
         const imageData = ctx.getImageData(0, 0, faceCanvas.width, faceCanvas.height);
-        // Check for common screen artifacts simultaneously
         const [screenPatterns, hasPixelGrid, refreshArtifacts] = await Promise.all([
             detectScreenPatterns(imageData),
             checkPixelGrid(imageData),
@@ -447,7 +616,6 @@ async function isScreenSpoof(faceCanvas) {
     }
 }
 
-// Looks for Moire patterns common when photographing a screen
 function detectScreenPatterns(imageData) {
     const { data, width, height } = imageData;
     let moireScore = 0;
@@ -455,23 +623,19 @@ function detectScreenPatterns(imageData) {
     for (let y = 2; y < height - 2; y += sampleStep) {
         for (let x = 2; x < width - 2; x += sampleStep) {
             const i = (y * width + x) * 4;
-            // Compare adjacent pixels for sharp, regular color shifts
             const rightDiff =
                 Math.abs(data[i] - data[i + 4]) + Math.abs(data[i + 1] - data[i + 5]) + Math.abs(data[i + 2] - data[i + 6]);
             const bottomDiff =
                 Math.abs(data[i] - data[i + width * 4]) +
                 Math.abs(data[i + 1] - data[i + width * 4 + 1]) +
                 Math.abs(data[i + 2] - data[i + width * 4 + 2]);
-            if (rightDiff > 35 && bottomDiff > 35) {
-                moireScore += 1.2;
-            }
+            if (rightDiff > 35 && bottomDiff > 35) moireScore += 1.2;
         }
     }
     const threshold = (width * height) / (sampleStep * sampleStep * 10);
     return moireScore > threshold;
 }
 
-// Checks for distinct pixel grids/subpixels (less reliable, but adds security)
 function checkPixelGrid(imageData) {
     const { data, width, height } = imageData;
     const gridSize = 3;
@@ -483,117 +647,56 @@ function checkPixelGrid(imageData) {
             const rDiff = Math.abs(data[i] - data[nextPixel]);
             const gDiff = Math.abs(data[i + 1] - data[nextPixel + 1]);
             const bDiff = Math.abs(data[i + 2] - data[nextPixel + 2]);
-            if (rDiff > 140 && gDiff > 140 && bDiff > 140) {
-                gridMatches++;
-            }
+            if (rDiff > 140 && gDiff > 140 && bDiff > 140) gridMatches++;
         }
     }
     return gridMatches > (width * height) / (gridSize * gridSize * 3);
 }
 
-// Detects screen refresh artifacts by comparing two quick frames
 async function detectRefreshArtifacts(canvas) {
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
     const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
-    
-    // Capture Frame 1
     tempCtx.drawImage(canvas, 0, 0);
     const frame1 = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
-    
-    // Wait a very short time (simulating a small screen refresh interval)
     await new Promise((r) => setTimeout(r, 50)); 
-    
-    // Capture Frame 2
     tempCtx.drawImage(canvas, 0, 0);
     const frame2 = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
-    
-    let changedPixels = 0;
-    // Compare pixel data. A real, static screen image won't change, but a live video feed might.
+    let diffCount = 0;
     for (let i = 0; i < frame1.data.length; i += 4) {
-        if (Math.abs(frame1.data[i] - frame2.data[i]) > 20) changedPixels++;
+        const dR = Math.abs(frame1.data[i] - frame2.data[i]);
+        const dG = Math.abs(frame1.data[i + 1] - frame2.data[i + 1]);
+        const dB = Math.abs(frame1.data[i + 2] - frame2.data[i + 2]);
+        if (dR + dG + dB > 15) diffCount++;
     }
-    // If a significant percentage of pixels changed, it's likely a live screen feed
-    return changedPixels > canvas.width * canvas.height * 0.2; 
+    return diffCount > (canvas.width * canvas.height * 0.03);
 }
 
-// Checks if the captured face image is too blurry
-function isFaceBlurry(imageElement, threshold = 40) {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = imageElement.width;
-    canvas.height = imageElement.height;
-    ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-    
-    // Convert image to grayscale (required for Laplacian method)
+function isFaceBlurry(faceCanvas, threshold = 40) {
+    const ctx = faceCanvas.getContext('2d', { willReadFrequently: true });
+    const { data, width, height } = ctx.getImageData(0, 0, faceCanvas.width, faceCanvas.height);
+    let sum = 0;
     for (let i = 0; i < data.length; i += 4) {
-        const r = data[i],
-            g = data[i + 1],
-            b = data[i + 2];
-        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-        data[i] = data[i + 1] = data[i + 2] = gray;
+        sum += (data[i] + data[i + 1] + data[i + 2]) / 3;
     }
-    
-    // Calculate the Laplacian variance (a measure of image sharpness)
-    let laplacianSum = [];
-    for (let y = 1; y < canvas.height - 1; y++) {
-        for (let x = 1; x < canvas.width - 1; x++) {
-            const idx = (y * canvas.width + x) * 4;
-            const center = data[idx];
-            const top = data[idx - canvas.width * 4];
-            const bottom = data[idx + canvas.width * 4];
-            const left = data[idx - 4];
-            const right = data[idx + 4];
-            const laplacian = 4 * center - top - bottom - left - right;
-            laplacianSum.push(laplacian);
-        }
-    }
-    const mean = laplacianSum.reduce((a, b) => a + b, 0) / laplacianSum.length;
-    const variance = laplacianSum.reduce((a, b) => a + (b - mean) ** 2, 0) / laplacianSum.length;
-    
-    // If variance is low, the image is blurry
-    return variance < threshold;
+    const avg = sum / (width * height);
+    return avg < threshold;
 }
 
-// Crops the face out of the video stream into its own canvas
-function cropFaceCanvas(video, box) {
-    const faceCanvas = document.createElement('canvas');
-    const fctx = faceCanvas.getContext('2d');
-    faceCanvas.width = box.width;
-    faceCanvas.height = box.height;
-    fctx.drawImage(
-        video,
-        box.x,
-        box.y,
-        box.width,
-        box.height,
-        0,
-        0,
-        box.width,
-        box.height
-    );
-    return faceCanvas;
+function cropFaceCanvas(videoEl, box) {
+    const canvas = document.createElement('canvas');
+    canvas.width = box.width;
+    canvas.height = box.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(videoEl, box.x, box.y, box.width, box.height, 0, 0, box.width, box.height);
+    return canvas;
 }
 
-// Calculates the camera's focal length (needed for distance estimation)
-function getFocalLengthFromFov(videoWidthPx, fovDeg = 60) {
-    const fovRad = (fovDeg * Math.PI) / 180;
-    return videoWidthPx / 2 / Math.tan(fovRad / 2);
+function estimateDistanceFromFaceBox(faceWidthPx, videoWidthPx, faceRealWidthM = 0.16) {
+    if (!faceWidthPx || !videoWidthPx) return NaN;
+    const fov = 60 * (Math.PI / 180);
+    const perceivedWidthRatio = faceWidthPx / videoWidthPx;
+    const distance = faceRealWidthM / (2 * Math.tan(fov / 2) * perceivedWidthRatio);
+    return distance;
 }
-
-// Estimates the real-world distance of the user from the screen
-function estimateDistanceFromFaceBox(boxWidthPx, videoWidthPx, knownFaceWidthMeters = 0.16, fovDeg = 60, focalLengthPx = null) {
-    if (!boxWidthPx || !videoWidthPx) return NaN;
-    const focal = focalLengthPx || getFocalLengthFromFov(videoWidthPx, fovDeg);
-    // Formula: Distance = (Known Width * Focal Length) / Measured Width
-    return (knownFaceWidthMeters * focal) / boxWidthPx;
-}
-
-// Utility to display errors on the modal's status text
-window.addEventListener('error', (ev) => {
-    const st = document.getElementById('status');
-    if (st) st.textContent = 'Error: ' + (ev && ev.message ? ev.message : 'unknown');
-});
