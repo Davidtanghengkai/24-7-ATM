@@ -255,31 +255,32 @@ async function sendText(text) {
             window.location.href = "/NewHomePage.html";
         }
 
-        // //show xchange rate
-        // if (topIntent === "action_8922_intent_11929") {  // <-- replace with your real Watson intent id
-        // // You can parse currencies from entities later; for now, use defaults:
-        // const base   = "SGD";
-        // const target = "USD";
+        //show xchange rate
+        if (topIntent === "action_8922_intent_11929") {  // <-- replace with your real Watson intent id
+        // You can parse currencies from entities later; for now, use defaults:
+        const base   = "SGD";
+        const target = "USD";
 
-        // try {
-        //     const fxRes  = await fetch(`/api/rate?base=${(base)}&target=${(target)}`);
-        //     const fxData = await fxRes.json();
-        //     console.log("FX data:", fxData);
+        try {
+            const fxRes  = await fetch(`/api/rate?base=${(base)}&target=${(target)}`);
+            const fxData = await fxRes.json();
+            console.log("FX data:", fxData);
 
-        //     if (!fxRes.ok || !fxData.rate) {
-        //     addMessage("Sorry, I couldn’t fetch the latest conversion rate.", "bot");
-        //     return;
-        //     }
+            if (!fxRes.ok || !fxData.rate) {
+            addMessage("Sorry, I couldn’t fetch the latest conversion rate.", "bot");
+            return;
+            }
 
-        //     const rate = fxData.rate;
-        //     addMessage(`💱 1 ${base} = ${rate.toFixed(4)} ${target}`, "bot");
-        //     return;
-        // } catch (err) {
-        //     console.error("FX fetch error:", err);
-        //     addMessage("There was a problem getting conversion rates.", "bot");
-        //     return;
-        // }
-        // }
+            const rate = fxData.rate;
+            addMessage(`💱 1 ${base} = ${rate.toFixed(4)} ${target}`, "bot");
+            return;
+        } catch (err) {
+            console.error("FX fetch error:", err);
+            addMessage("There was a problem getting conversion rates.", "bot");
+            return;
+        }
+        
+        }
 
         if (topIntent === "General_Ending") {
             renderOutput(data, false);
