@@ -1,13 +1,2 @@
-const express = require("express");
-const sql = require("mssql");
-const dotenv = require("dotenv");
-
-
-dotenv.config();
-
-
-const app = express();
-const port = process.env.PORT || 3000;
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
+//this is just for the others incase their still using app.js
+// to be fully converted into server.js

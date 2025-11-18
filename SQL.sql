@@ -10,6 +10,7 @@ CREATE TABLE User (
     name VARCHAR(255),
     DOB DATE,
     nationalID VARCHAR(50),
+    Email VARCHAR(255) UNIQUE,
 );
 
 -- Creating the Biometrics table
@@ -43,7 +44,7 @@ CREATE TABLE Card (
     FOREIGN KEY (AccountNo) REFERENCES Accounts(AccountNo) -- Foreign Key referencing Accounts table
 );
 
--- 1️⃣ Insert into Users table
+-- Insert into Users table
 INSERT INTO Users (Name, Dob, nationalId)
 VALUES 
 ('John Tan', 'Software Engineer', 'S1234567A'),

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATM More Features Screen</title>
+    <link rel="stylesheet" href="CSS/otp.css">
+</head>
+<body>
+    <div class="atm-container">
+        
+        <main id="email-step" class="main-content">
+            <h1 class="greeting">
+                Please enter your email to receive the OTP
+            </h1>
+            <form id="otp-form" class="otp-form">
+                <input type="email" id="email-input" class="email-input" placeholder="you@example.com" required>
+            </form>
+            <div class="buttons">
+                <button id="cancel" class="SBbtn" onclick="window.history.back()">Cancel</button>
+                <button id="OTP" type="submit" form="otp-form" class="SBbtn">Send OTP</button>
+            </div>
+        </main>
+        
+        
+        <main id="otp-step" class="main-content hidden">
+            <h1 class="greeting">
+                Please enter the OTP sent to
+                <br>
+                <strong id="user-email-display">you@example.com</strong>
+            </h1>
+            <form id="verify-form" class="otp-form">
+                <input type="text" id="otp-input" class="email-input" placeholder="123456" required>
+            </form>
+            <div class="buttons">
+                <button id="cancel-otp" class="SBbtn" onclick="window.history.back()">Cancel</button>
+                <button id="verify-btn" type="submit" form="verify-form" class="SBbtn">Verify OTP</button>
+            </div>
+        </main>
+        <div id="language-modal" class="modal-overlay">
+            </div>
+
+    </div> <script src="JS/language_modal.js"></script> 
+    
+    <script src="JS/otp.js"></script> 
+    </body>
+</html>
