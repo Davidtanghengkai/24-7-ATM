@@ -241,3 +241,7 @@ body {
     color: white;
     background-color: #EF1815; 
 }
+
+.hidden {
+    display: none;
+}

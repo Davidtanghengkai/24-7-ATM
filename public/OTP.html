@@ -9,17 +9,7 @@
 <body>
     <div class="atm-container">
         
-        <!-- TOP RIGHT LINKS: Wrapped in a container -->
-        <div class="top-links">
-            <a href="#" class="top-link" id="language-toggle">ENG</a>
-            <span class="top-separator">|</span>
-            <a href="#" class="top-link">Exit</a>
-        </div>
-        
-        <!-- TOP LEFT LINK: Positioned separately -->
-        <a onclick="window.history.back()" class="back-link">Back</a> 
-        
-        <main class="main-content">
+        <main id="email-step" class="main-content">
             <h1 class="greeting">
                 Please enter your email to receive the OTP
             </h1>
@@ -27,28 +17,31 @@
                 <input type="email" id="email-input" class="email-input" placeholder="you@example.com" required>
             </form>
             <div class="buttons">
-            <button id="cancel" class="SBbtn" onclick="window.history.back()">Cancel</button>
-            <button id="OTP" type="submit" form="otp-form" class="SBbtn">Send OTP</button>
+                <button id="cancel" class="SBbtn" onclick="window.history.back()">Cancel</button>
+                <button id="OTP" type="submit" form="otp-form" class="SBbtn">Send OTP</button>
             </div>
         </main>
-    
         
-        <div id="language-modal" class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span class="close-modal">&times;</span>
-                </div>
-                <div class="language-grid">
-                    <a href="#" class="language-option">English ✔</a>
-                    <a href="#" class="language-option">Chinese</a>
-                    <a href="#" class="language-option">Tamil</a>
-                    <a href="#" class="language-option">Malay</a>
-                    <a href="#" class="language-option">Japanese</a>
-                    <a href="#" class="language-option">Korean</a>
-                </div>
+        
+        <main id="otp-step" class="main-content hidden">
+            <h1 class="greeting">
+                Please enter the OTP sent to
+                <br>
+                <strong id="user-email-display">you@example.com</strong>
+            </h1>
+            <form id="verify-form" class="otp-form">
+                <input type="text" id="otp-input" class="email-input" placeholder="123456" required>
+            </form>
+            <div class="buttons">
+                <button id="cancel-otp" class="SBbtn" onclick="window.history.back()">Cancel</button>
+                <button id="verify-btn" type="submit" form="verify-form" class="SBbtn">Verify OTP</button>
             </div>
-        </div>
-    </div>
-    <script src="JS/language_modal.js"></script> 
-</body>
+        </main>
+        <div id="language-modal" class="modal-overlay">
+            </div>
+
+    </div> <script src="JS/language_modal.js"></script> 
+    
+    <script src="JS/otp.js"></script> 
+    </body>
 </html>
