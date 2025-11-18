@@ -288,9 +288,15 @@ async function sendTextFromButton(text) {
         const data = await res.json();
         console.log("Watson response (from button):", data);
 
-        if (!res.ok) {
+         if (!res.ok) {
             const raw = JSON.stringify(data);
-            addMessage("Assistant error charlie: " + (data.error || raw), "bot");
+            console.log(data.error || raw);
+            if (data.error && data.error.toLowerCase().includes("invalid session")) {
+                addMessage("Session expired. Starting a new session...", "bot");
+                endSession();
+                return;
+            }
+            addMessage("Assistant error beta: " + (data.error || raw), "bot");
             return;
         }
         const topIntent = data.output?.intents?.[0]?.intent;
