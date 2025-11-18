@@ -76,8 +76,8 @@ class TranslationModel {
             verifyOtpButton: 'Verify OTP',
             cancelConfirmation: 'Are you sure you want to cancel the transaction?',
             cancelQuery: 'Is there anything else you would like to do?',
-            cancelNo: 'No',
-            cancelYes: 'Yes'
+            cancelYes: 'No',
+            cancelNo: 'Yes'
         };
 
         // Return source strings directly for English

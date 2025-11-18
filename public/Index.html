@@ -15,7 +15,7 @@
             <div class="top-links">
                 <a href="#" class="top-link" id="language-toggle">ENG</a>
                 <span class="top-separator">|</span>
-                <a href="#" class="top-link" translateRef="exitLink">Exit</a>
+                <a href="TransactionCancel.html" class="top-link" translateRef="exitLink" >Exit</a>
             </div>
             <img src="photos/ocbc_banner_1.png" alt="OCBC Purpose Banner" class="banner-img" />
         </section>
@@ -29,14 +29,15 @@
                 <strong translateRef="loginWithoutCardTitle">Login without Card</strong><br>
                 <span translateRef="loginWithoutCardSubtitle">via Multi-Factor Authentication</span>
             </button>
-            <button class="feature-btn">
+            <button class="feature-btn" onclick="window.location.href='CreateCardPage.html'">
                 <strong translateRef="createCardTitle">Create Card</strong><br>
                 <span translateRef="createCardSubtitle">make new card</span>
             </button>
-            <button onclick="window.location.href='CreateCardPage.html'">
+            <button class="feature-btn">
                 <strong translateRef="governmentPayoutTitle">Government Payout</strong>
             </button>
         </section>
+        
 
         <div id="language-modal" class="modal-overlay">
             <div class="modal-content">
@@ -52,10 +53,12 @@
                     <a href="#" class="language-option">Korean</a>
                 </div>
             </div>
+            
         </div>
-        
+       
+        <div id="chat-root"></div>
     </div>
-    <div id="chat-root"></div>
+    
   </div>
   <script src="JS/index.js"></script>
   <script src="JS/language_modal.js"></script> 
