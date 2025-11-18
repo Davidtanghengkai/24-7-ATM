@@ -12,52 +12,58 @@
         <div class="top-links">
             <a href="#" class="top-link" id="language-toggle">ENG</a>
             <span class="top-separator">|</span>
-            <a href="TransactionCancel.html" class="top-link">Exit</a>
-        </div>
 
-        <!--<a href="#" class="back-link">Back</a> Dont uncomment i just need this for reference-->
+            <a href="TransactionCancel.html" class="top-link" translateRef="exitLink">Exit</a>
+        </div>
 
         <div class="main-wrapper">
             
             <div class="left-pane">
-                <h1 class="greeting">
+ 
+                <h1 class="greeting" translateRef="menuGreeting">
                     Hello!<br>
                     What would you like to do today?
                 </h1>
                 
                 <section class="cash-section">
-                    <h2>Get Cash</h2>
+
+                    <h2 translateRef="getCashHeader">Get Cash</h2>
                     <div class="quick-cash-grid">
                         <button class="cash-btn">$50</button>
                         <button class="cash-btn">$80</button>
                         <button class="cash-btn">$100</button>
                         <button class="cash-btn">$200</button>
                     </div>
-                    <button class="cash-btn other-amount-btn">Other Cash Amount</button>
+
+                    <button class="cash-btn other-amount-btn" translateRef="otherAmountButton">Other Cash Amount</button>
                 </section>
             </div>
 
             <div class="right-pane">
-                <h2>Other Services</h2>
+
+                <h2 translateRef="otherServicesHeader">Other Services</h2>
                 
                 <div class="services-grid">
                     <button class="service-card">
                         <span class="icon">$</span>
-                        <span>Balance<br>Inquiry</span>
+
+                        <span translateRef="balanceInquiryCard">Balance<br>Inquiry</span>
                     </button>
                     <button class="service-card">
                         <span class="icon">💳</span>
-                        <span>Create a<br>Card</span>
+
+                        <span translateRef="createCardCard">Create a<br>Card</span>
                     </button>
                 </div>
 
-                <a href="NewMoreFeatures.html" class="more-services-link">More services &gt;</a>
+
+                <a href="NewMoreFeatures.html" class="more-services-link" translateRef="moreServicesLink">More services &gt;</a>
 
                 <div id="chat-root"></div>
             </div>
         </div>
 
-        <!-- FIX 2: Added the language modal structure -->
+        
         <div id="language-modal" class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
@@ -74,8 +80,8 @@
             </div>
         </div>
 
+
     </div>
-    <!-- FIX 3: Added the script link -->
     <script src="JS/language_modal.js"></script> 
     <script src="JS/widget_loader.js" defer></script>
 </body>

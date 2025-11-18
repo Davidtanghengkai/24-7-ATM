@@ -7,42 +7,39 @@
   <link rel="stylesheet" href="CSS/index.css" />
   <link rel="stylesheet" href="CSS/chat.css" />
 </head>
+
 <body>
-  <div class="atm-container">
+    <div class="atm-container">
 
+        <section class="banner">
+            <div class="top-links">
+                <a href="#" class="top-link" id="language-toggle">ENG</a>
+                <span class="top-separator">|</span>
+                <a href="TransactionCancel.html" class="top-link" translateRef="exitLink" >Exit</a>
+            </div>
+            <img src="photos/ocbc_banner_1.png" alt="OCBC Purpose Banner" class="banner-img" />
+        </section>
 
-    <!-- Banner 1 -->
-    <section class="banner">
-      <div class="top-links">
-            <a href="#" class="top-link" id="language-toggle">ENG</a>
-            <span class="top-separator">|</span>
-            <a href="#" class="top-link">Exit</a>
-      </div>
-      <img src="photos/ocbc_banner_1.png" alt="OCBC Purpose Banner" class="banner-img" />
-    
-    </section>
+        <section class="banner">
+            <img src="photos/ocbc_banner_2.jpg" alt="OCBC App Banner" class="banner-img" />
+        </section>
 
-    <!-- Banner 2 -->
-    <section class="banner">
-      <img src="photos/ocbc_banner_2.jpg" alt="OCBC App Banner" class="banner-img" />
-    </section>
+        <section class="features">
+            <button class="feature-btn" onclick="window.location.href='LoginPage.html'">
+                <strong translateRef="loginWithoutCardTitle">Login without Card</strong><br>
+                <span translateRef="loginWithoutCardSubtitle">via Multi-Factor Authentication</span>
+            </button>
+            <button class="feature-btn" onclick="window.location.href='CreateCardPage.html'">
+                <strong translateRef="createCardTitle">Create Card</strong><br>
+                <span translateRef="createCardSubtitle">make new card</span>
+            </button>
+            <button class="feature-btn">
+                <strong translateRef="governmentPayoutTitle">Government Payout</strong>
+            </button>
+        </section>
+        
 
-    <!-- Features Section -->
-    <section class="features">
-      <button class="feature-btn" onclick="window.location.href='LoginPage.html'">
-        <strong>Login without Card</strong><br>
-        <span>via Multi-Factor Authentication</span>
-      </button>
-      <button class="feature-btn" onclick="window.location.href='CreateCardPage.html'">
-        <strong>Create Card</strong><br>
-        <span>make new card</span>
-      </button>
-      <button class="feature-btn">
-        <strong>Government Payout</strong>
-      </button>
-    </section>
-
-    <div id="language-modal" class="modal-overlay">
+        <div id="language-modal" class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="close-modal">&times;</span>
@@ -56,10 +53,14 @@
                     <a href="#" class="language-option">Korean</a>
                 </div>
             </div>
+            
         </div>
-    <div id="chat-root"></div>
+       
+        <div id="chat-root"></div>
+    </div>
+    
   </div>
-
+  <script src="JS/index.js"></script>
   <script src="JS/language_modal.js"></script> 
   <script src="JS/widget_loader.js" defer></script>
 </body>

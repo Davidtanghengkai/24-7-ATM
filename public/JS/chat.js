@@ -59,10 +59,25 @@ function endSession() {
         initSession();
     }, 2000);
 }
+if (chatEl) {
+    chatEl.addEventListener("click", (e) => {
+        if (e.target && e.target.tagName === "BUTTON") {
+            const buttonContainer = e.target.parentElement;
+            
+            if (buttonContainer.classList.contains("options")) {
+                const text = e.target.textContent;
+                sendTextFromButton(text);
+                buttonContainer.remove();
+                saveHistory();
+            }
+        }
+    });
+}
 
 
 // create chat
 async function initSession() {
+    if (!chatEl) return;
 
     const existingId = localStorage.getItem(SESSION_KEY);
     const existingHistory = localStorage.getItem(HISTORY_KEY);
@@ -137,6 +152,7 @@ async function requestWelcome() {
 
 // messages
 function addMessage(text, from = "bot") {
+    if (!chatEl) return;
     const wrap = document.createElement("div");
     wrap.className = "msg " + from;
 
@@ -158,7 +174,6 @@ function addOptions(options) {
     options.forEach(opt => {
         const btn = document.createElement("button");
         btn.textContent = opt.label;
-        btn.onclick = () => sendTextFromButton(opt.label);
         wrap.appendChild(btn);
     });
 
@@ -365,5 +380,28 @@ if (inputEl) {
         if (e.key === "Enter") sendText(inputEl.value);
     });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM fully loaded and parsed.");
+
+    const exitButton = document.getElementById("cancelYesBtn");
+
+
+    if (exitButton) {
+        console.log("Exit button found on this page. Attaching listener.");
+        
+        exitButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            
+            console.log("Exit button clicked. Ending session...");
+            endSession();
+
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 2000);
+        });
+    } 
+});
+
 
 initSession();

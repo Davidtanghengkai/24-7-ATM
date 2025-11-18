@@ -245,3 +245,72 @@ body {
 .hidden {
     display: none;
 }
+
+
+
+.modal-overlay {
+    position: absolute;
+    /* Position the modal under the ENG link (top: 60px) */
+    top: 60px;
+    right: 40px;
+    z-index: 2000;
+    
+    display: none; 
+}
+
+.modal-overlay.active {
+    display: block; 
+}
+
+.modal-content {
+    background-color: white;
+    padding: 15px 20px; 
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 180px; 
+    border: 2px solid #EF1815; 
+}
+
+.modal-header {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 5px;
+}
+
+.close-modal {
+    font-size: 1.4em;
+    font-weight: bold;
+    cursor: pointer;
+    color: #555;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.close-modal:hover {
+    background-color: #EF1815;
+    color: white;
+}
+
+.language-grid {
+    display: flex; 
+    flex-direction: column; 
+    gap: 5px; 
+    padding: 10px 0 5px 0;
+}
+
+.language-option {
+    text-decoration: none;
+    color: black;
+    font-size: 1.1em; 
+    font-weight: normal;
+    padding: 5px 10px; 
+    text-align: left;
+    transition: color 0.1s, background-color 0.1s;
+    border-radius: 4px;
+}
+
+.language-option:hover {
+    color: white;
+    background-color: #EF1815; 
+}

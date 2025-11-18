@@ -62,3 +62,7 @@ package-lock.json
 #.env and DB Config files
 .env
 DbConfig.js
+
+# Google Application Credentials
+secureFolder/
+myatmproject-5425b7865e14.json
