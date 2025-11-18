@@ -24,8 +24,10 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
         } else {
             // user exists → load accounts → create card normally
             const userId = scan.userId;
+            console.log("Verified User ID:", userId);
+            statusText.textContent = "✅ Face verified! Welcome!";
             localStorage.setItem("userId", userId);
-            var accounts = await loadAccountsForExistingUser(userId);
+            await loadAccountsForExistingUser(userId);
 
         }
     }, 800);
@@ -328,7 +330,9 @@ async function loadAccountsForExistingUser(userId) {
 
     list.innerHTML = "Loading accounts...";
 
-    const response = await fetch(`/api/accounts/${userId}`);
+
+    const response = await fetch(`/api/accounts/user/${userId}`);
+    console.log("Accounts response:", response);
     const accounts = await response.json(); // expected: [{accountId, balance, accountType}, ...]
 
     list.innerHTML = "";

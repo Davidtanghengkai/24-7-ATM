@@ -139,7 +139,7 @@ async function identifyUser(descriptor) {
             }
         });
 
-        return bestDistance < 0.6 ? bestMatch : null; // threshold
+        return bestDistance < 0.45 ? bestMatch : null; // threshold
     } catch (err) {
         console.error("Error fetching biometrics:", err);
         return null;
