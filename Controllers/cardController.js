@@ -1,4 +1,4 @@
-const cardModel = require('../models/cardModel');
+const cardModel = require('../Models/cardModel');
 
 // POST /card/
 async function createCard(req, res) {
@@ -17,6 +17,7 @@ async function createCard(req, res) {
         res.status(500).json({ message: "Error creating card", error: err.message });
     }
 }
+
 
 // GET /card/:cardNo
 async function getCardByNo(req, res) {
@@ -111,21 +112,23 @@ async function deleteCard(req, res) {
 // --- MISSING CONTROLLERS ADDED ---
 
 // GET /card/active/user/:userId
-async function findActiveCardByUserId(req, res) {
+async function findCardsByUserId(req, res) {
     // ADDED: NaN validation
-    const userId = parseInt(req.params.userId, 10);
-    if (isNaN(userId)) {
-        return res.status(400).json({ message: "Invalid user ID" });
+    const userId = parseInt(req.params.userId);
+    const accountNo = parseInt(req.params.accountNo);
+
+    if (isNaN(userId) || isNaN(accountNo)) {
+        return res.status(400).json({ message: "Invalid user ID or account number" });
     }
 
     try {
-        const card = await cardModel.findActiveCardByUserId(userId);
+        const card = await cardModel.findCardByUserId(userId);
         if (!card) {
             return res.status(404).json({ message: "No active card found" });
         }
         res.status(200).json(card);
     } catch (err) {
-        // ADDED: Server-side logging
+        
         console.error("Error in findActiveCardByUserId controller:", err);
         res.status(500).json({ message: "Error finding active card", error: err.message });
     }
@@ -138,6 +141,5 @@ module.exports = {
     getCardsForUser,
     changeStatus,
     deleteCard,
-    findActiveCardByUserId
-
+    findCardsByUserId
 };
