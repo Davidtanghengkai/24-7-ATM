@@ -79,6 +79,9 @@ app.get('/api/cards/active/user/:userId', cardController.findCardsByUserId);
 app.post('/api/send-otp', otpController.sendOtp);
 app.post('/api/verify-otp', otpController.verifyOtp);
 
+// == Translation routes ==
+app.post('/api/translations', translationController.getTranslations);
+
 // Oversea Transfer Routes
 app.get("/api/countries", bankController.fetchCountries);
 app.get("/api/banks/:country", bankController.fetchBanks);

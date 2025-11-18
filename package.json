@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Davidtanghengkai/24-7-ATM#readme",
   "dependencies": {
+    "@google-cloud/translate": "^9.3.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
