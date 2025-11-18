@@ -122,7 +122,7 @@ async function findCardsByUserId(req, res) {
     }
 
     try {
-        const card = await cardModel.findCardByUserId(userId);
+        const card = await cardModel.findCardByUserId(userId, accountNo);
         if (!card) {
             return res.status(404).json({ message: "No active card found" });
         }

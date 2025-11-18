@@ -102,6 +102,9 @@ body {
     gap: 1.5rem;            /* Space between boxes */
     align-items: center;
     width: 100%;
+    max-height: 450px;
+    overflow-y: auto;
+    
 }
 
 .account-box {
@@ -127,14 +130,14 @@ body {
     border-color: #134c5f;
     background-color: #fafafe;
     box-shadow: 0 8px 20px rgba(19, 76, 95, 0.1);
-    transform: translateY(-2px);
+
 }
 
 /* --- LEFT SIDE: Icon & Text --- */
 .account-info {
     display: flex;
     align-items: center;
-    flex: 1; /* Takes up all available space on the left */
+    width: 200px;
 }
 
 .box-icon {
@@ -174,7 +177,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    
+    width: 350px;
     height: 70%; /* Height relative to the box to control separator line height */
     
     /* Vertical Separator Line */
@@ -283,51 +286,4 @@ body {
 .language-option:hover {
     color: white;
     background-color: #EF1815;
-}
-
-/* =========================================
-   7. RESPONSIVE DESIGN (Mobile Safety)
-   ========================================= */
-@media (max-width: 900px) {
-    .atm-container {
-        width: 95%;
-        height: 90vh;
-    }
-
-    .account-box {
-        flex-direction: column;
-        height: auto;
-        padding: 2rem;
-        gap: 1.5rem;
-        text-align: center;
-    }
-
-    .account-info {
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .box-icon {
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-
-    .text-details {
-        align-items: center;
-    }
-
-    .card-actions {
-        /* Remove separator on mobile */
-        border-left: none;
-        padding-left: 0;
-        margin-left: 0;
-        
-        width: 100%;
-        flex-direction: column; /* Stack buttons */
-        height: auto;
-    }
-
-    .select-card-btn {
-        width: 100%;
-    }
 }

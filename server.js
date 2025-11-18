@@ -71,7 +71,7 @@ app.get('/api/cards/:cardNo', cardController.getCardByNo);
 app.get('/api/cards/user/:userId', cardController.getCardsForUser);
 app.put('/api/cards/status/:cardNo', cardController.changeStatus);
 app.delete('/api/cards/:cardNo', cardController.deleteCard);
-app.get('/api/cards/active/user/:userId', cardController.findCardsByUserId);
+app.get('/api/cards/active/user/:userId/account/:accountNo', cardController.findCardsByUserId);
 
 
 // == Account Routes ==
