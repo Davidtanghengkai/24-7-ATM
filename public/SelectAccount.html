@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Account</title>
+    <link rel="stylesheet" href="CSS/selectAccount.css">
+</head>
+<body>
+
+    <h1>Select Your Account</h1>
+
+    <div id="account-container"></div>
+
+    <div class="chat-icon">
+        <span class="icon-bubble">💬</span>
+    </div>
+
+    <!-- Language Modal -->
+    <div id="language-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="language-grid">
+                <a href="#" class="language-option">English ✔</a>
+                <a href="#" class="language-option">Chinese</a>
+                <a href="#" class="language-option">Tamil</a>
+                <a href="#" class="language-option">Malay</a>
+                <a href="#" class="language-option">Japanese</a>
+                <a href="#" class="language-option">Korean</a>
+                <a href="#" class="language-option">Arabic</a>
+                <a href="#" class="language-option">Bengali</a>
+                <a href="#" class="language-option">Burmese</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIN Modal -->
+    <div class="pin-modal-overlay" id="pin-modal">
+        <div class="pin-modal-content">
+            <h2>Create Card PIN</h2>
+            <input type="password" id="new-card-pin" maxlength="6" placeholder="6-digit PIN">
+            <button onclick="submitCardPIN()">Create Card</button>
+        </div>
+    </div>
+
+    <script src="JS/selectAccount.js"></script>
+</body>
+</html>
