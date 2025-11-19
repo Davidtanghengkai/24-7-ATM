@@ -18,6 +18,10 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
 
         if (!result.success) {
             statusText.textContent = "❌ " + result.message;
+            // Show error message for 10 seconds, then close modal
+            setTimeout(() => {
+                closeFaceModal();
+            }, 6000);
             return;
         }
         const tokenRes = await fetch('/api/users/loginWithFace', {
@@ -94,31 +98,62 @@ async function loadFaceModels() {
 
 // -------------------- Main Face Scan --------------------
 async function scanUserFace(video) {
-    // 1. Detect face
-    const fullDetection = await faceapi
-    .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-    .withFaceLandmarks() // true = full 68-point landmarks
-    .withFaceDescriptor();
+    // 1. Detect face (retry loop so camera keeps scanning until a valid capture or timeout)
+    let fullDetection = null;
+    let detectionPassed = false;
+    let lastError = "Unable to capture a valid face. Please adjust your position and try again.";
+    const maxAttempts = 7;
+    const attemptDelay = 1000; // ms between attempts
 
-    if (!fullDetection) {
-        return { success: false, message: "No face detected. Try again." };
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        fullDetection = await faceapi
+            .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks() // true = full 68-point landmarks
+            .withFaceDescriptor();
+
+        if (!fullDetection) {
+            lastError = `No face detected (attempt ${attempt + 1}/${maxAttempts})`;
+            console.log(lastError + ", retrying...");
+            await new Promise(res => setTimeout(res, attemptDelay));
+            continue;
+        }
+
+        // 2. Blurriness check
+        if (isFaceBlurry(video)) {
+            lastError = `Image too blurry (attempt ${attempt + 1}/${maxAttempts})`;
+            console.log(lastError + ", retrying...");
+            await new Promise(res => setTimeout(res, attemptDelay));
+            continue;
+        }
+
+        // 3. Spoof check (blink + depth)
+        if (await spoofCheck(fullDetection, video)) {
+            lastError = `Spoof suspected (attempt ${attempt + 1}/${maxAttempts})`;
+            console.log(lastError + ", retrying...");
+            await new Promise(res => setTimeout(res, attemptDelay));
+            continue;
+        }
+
+        // 4. Distance check
+        if (await checkDistance(fullDetection)) {
+            lastError = `Too close to camera (attempt ${attempt + 1}/${maxAttempts})`;
+            console.log(lastError + ", retrying...");
+            await new Promise(res => setTimeout(res, attemptDelay));
+            continue;
+        }
+
+        // All checks passed
+        detectionPassed = true;
+        console.log(`Face scan attempt ${attempt + 1}/${maxAttempts}: Face detected and verified.`);
+        break;
     }
 
-    // 2. Blurriness check
-    if (isFaceBlurry(video)) {
-        return { success: false, message: "Image too blurry. Hold still." };
+    // If all attempts failed, return the last captured error message
+    if (!detectionPassed) {
+        console.warn("All face scan attempts failed:", lastError);
+        return { success: false, message: lastError };
     }
-
-    // 3. Spoof check (blink + depth)
-    if (await spoofCheck(fullDetection, video)) {
-        return { success: false, message: "Spoof detected. Use your real face." };
-    }
-
-    // 4. Distance check
-    if (await checkDistance(fullDetection)) {
-        return { success: false, message: "Move slightly farther from camera." };
-    }
-
+    
     // 5. Compare with database
     const userId = await identifyUser(fullDetection.descriptor);
     if (!userId) return { success: false, message: "No matching user found." };
@@ -140,6 +175,11 @@ async function identifyUser(descriptor) {
 
         let bestMatch = null;
         let bestDistance = 1.0;
+
+        if (!Array.isArray(dbFaces) || dbFaces.length === 0) {
+            console.log("No biometrics found. Treat as new user.");
+            return false; // no user found
+        }
 
         dbFaces.forEach(record => {
             const stored = new Float32Array(JSON.parse(record.bioData));

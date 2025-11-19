@@ -64,44 +64,49 @@
     </div>
 
 <div id="registration-modal" class="registration-modal-overlay">
-    <div class="registration-modal-content">
-        <button class="close-registration-modal" id="close-registration-modal">&times;</button>
-        
-        <div class="registration-modal-body">
-            <!-- Left side: Form -->
-            <div class="form-container">
-                <h1>New User Registration</h1>
-                <form id="registration-form">
-                    <label for="name">Full Name:</label>
-                    <input type="text" id="name" name="name" required>
+    <form id="registration-form" class="registration-form">
+    <h1 class="reg-title">Register New User</h1>
 
-                    <label for="dob">Date of Birth:</label>
-                    <input type="date" id="dob" name="dob" required>
+    <!-- Left column: inputs -->
+    <div class="form-left">
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" name="name" required>
 
-                    <label for="ic">IC Number:</label>
-                    <input type="text" id="ic" name="ic" required>
+      <label for="dob">Date of Birth:</label>
+      <input type="date" id="dob" name="dob" required>
 
-                    <fieldset class="account-type-fieldset">
-                        <legend>Account Type</legend>
-                        <label><input type="radio" name="accountType" value="savings" required> Savings</label>
-                        <label><input type="radio" name="accountType" value="business"> Business</label>
-                        <label><input type="radio" name="accountType" value="personal"> Personal Use</label>
-                    </fieldset>
+      <label for="ic">IC Number:</label>
+      <input type="text" id="ic" name="ic" required>
 
-                    <label for="pin">Card PIN (6 digits):</label>
-                    <input type="password" id="pin" name="pin" pattern="\d{6}" minlength="6" maxlength="6" placeholder="••••••" required>
-                    
-                    <button type="submit">Register</button>
-                </form>
-            </div>
+      <label for="accountType">Account Type</label>
+      <select id="accountType" name="accountType" required>
+        <option value="" disabled selected>Select account type</option>
+        <option value="savings">Savings</option>
+        <option value="business">Business</option>
+        <option value="personal">Personal Use</option>
+      </select>
 
-            <!-- Right side: Video -->
-            <div class="video-container">
-                <video id="video" autoplay muted playsinline></video>
-                <p id="status">Position your face within the frame</p>
-            </div>
-        </div>
+      <label for="email">Email Address:</label>
+      <input type="email" id="email" name="email" placeholder="example@email.com">
+
+      <label for="pin">New Card PIN (6 digits):</label>
+      <input type="password" id="pin" name="pin" pattern="\d{6}" minlength="6" maxlength="6" placeholder="••••••" required>
+
     </div>
+
+    <!-- Right column: video -->
+    <div class="form-right">
+      <label>Scan Your Face</label>
+      <div class="scan-box">
+        <video id="video1" autoplay muted playsinline></video>
+        <div class="scan-corners top-left"></div>
+        <div class="scan-corners top-right"></div>
+        <div class="scan-corners bottom-left"></div>
+        <div class="scan-corners bottom-right"></div>
+      </div>
+    </div>
+    <button type="submit" class="reg-btn">Register</button>
+  </form>
 </div>
 
 
