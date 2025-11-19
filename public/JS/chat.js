@@ -270,6 +270,10 @@ async function sendText(text) {
             window.location.href = "/NewHomePage.html";
         }
 
+        //redirect to overseas transfer page
+        if (topIntent === "action_15189_intent_26505") {
+            window.location.href = "/OverseasTransfer.html";
+        }
         //show xchange rate
         if (topIntent === "action_8922_intent_11929") {  // <-- replace with your real Watson intent id
         // You can parse currencies from entities later; for now, use defaults:
