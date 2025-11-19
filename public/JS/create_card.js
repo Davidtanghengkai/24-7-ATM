@@ -17,6 +17,7 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
 
         if (!scan.success) {
             if (scan.message === "No matching user found.") {
+                closeFaceModal();
                 await handleNewUserRegistration(video);
             } else {
                 alert(scan.message);
@@ -27,7 +28,7 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
             console.log("Verified User ID:", userId);
             statusText.textContent = "✅ Face verified! Welcome!";
             localStorage.setItem("userId", userId);
-            await loadAccountsForExistingUser(userId);
+            window.location.href = "/chooseCard.html";
 
         }
     }, 800);
@@ -146,7 +147,7 @@ async function identifyUser(descriptor) {
             }
         });
 
-        return bestDistance < 0.6 ? bestMatch : null; // threshold
+        return bestDistance < 0.45 ? bestMatch : null; // threshold
     } catch (err) {
         console.error("Error fetching biometrics:", err);
         return null;
@@ -238,13 +239,12 @@ async function checkDistance(fullDetection) {
 //registers new user
 async function handleNewUserRegistration(video) {
     const modal = document.getElementById("registration-modal");
-    modal.classList.add("active");
+    modal.style.display = "flex";
 
     const form = document.getElementById("registration-form");
 
     form.onsubmit = async (e) => {
         e.preventDefault();
-
         // 1. Collect form fields
         const name = document.getElementById("name").value.trim();
         const dob = document.getElementById("dob").value;
@@ -317,59 +317,13 @@ async function handleNewUserRegistration(video) {
 
         const card = await cardRes.json();
 
-        modal.classList.remove("active");
+        modal.style.display = "none";
         form.reset();
 
         alert(`User created.\nAccount ID: ${accountId}\nNew Card: ${card.cardId}`);
     };
 }
 
-async function loadAccountsForExistingUser(userId) {
-    const modal = document.getElementById("account-modal");
-    const list = document.getElementById("account-list");
-
-    list.innerHTML = "Loading accounts...";
-
-
-    const response = await fetch(`/api/accounts/user/${userId}`);
-    console.log("Accounts response:", response);
-    const accounts = await response.json(); // expected: [{accountId, balance, accountType}, ...]
-
-    list.innerHTML = "";
-
-    if (accounts.length === 0) {
-        list.innerHTML = "<p>No accounts found for this user.</p>";
-        return;
-    }
-
-    accounts.forEach(acc => {
-        const div = document.createElement("div");
-        div.classList.add("account-card");
-
-        div.innerHTML = `
-            <h3>${acc.accountType.toUpperCase()} Account</h3>
-            <p><strong>Account ID:</strong> ${acc.accountId}</p>
-            <p><strong>Balance:</strong> $${acc.balance.toFixed(2)}</p>
-            <button onclick="selectAccount(${acc.accountId})">Select Account</button>
-        `;
-
-        list.appendChild(div);
-    });
-
-    modal.classList.add("active");
-}
-
-document.getElementById("close-account-modal").onclick = () => {
-    document.getElementById("account-modal").classList.remove("active");
-}
-
-function selectAccount(accountId) {
-    localStorage.setItem("selectedAccountId", accountId);
-    document.getElementById("account-modal").classList.remove("active");
-
-    // Continue to card creation
-    console.log("Selected account:", accountId);
-}
 
 // Utility to display errors on the modal's status text
 window.addEventListener('error', (ev) => {
