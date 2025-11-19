@@ -20,7 +20,7 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
                 closeFaceModal();
                 await openRegistrationModal();
             } else {
-                alert(scan.message);
+                console.log(scan.message);
             }
         } else {
             // user exists → load accounts → create card normally
@@ -89,31 +89,61 @@ async function loadFaceModels() {
 }
 
 async function scanUserFace(video) {
-    // 1. Detect face
-    const fullDetection = await faceapi
-    .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-    .withFaceLandmarks() // true = full 68-point landmarks
-    .withFaceDescriptor();
+    let fullDetection = null;
+    let detectionPassed = false;
+    let lastError = "Unable to capture a valid face. Please adjust your position and try again.";
+    const maxAttempts = 7;
+    const attemptDelay = 1000; // ms between attempts
 
-    if (!fullDetection) {
-        return { success: false, message: "No face detected. Try again." };
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        fullDetection = await faceapi
+            .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks() // true = full 68-point landmarks
+            .withFaceDescriptor();
+
+        if (!fullDetection) {
+            lastError = `No face detected (attempt ${attempt + 1}/${maxAttempts})`;
+            console.log(lastError + ", retrying...");
+            await new Promise(res => setTimeout(res, attemptDelay));
+            continue;
+        }
+
+        // 2. Blurriness check
+        if (isFaceBlurry(video)) {
+            lastError = `Image too blurry (attempt ${attempt + 1}/${maxAttempts})`;
+            console.log(lastError + ", retrying...");
+            await new Promise(res => setTimeout(res, attemptDelay));
+            continue;
+        }
+
+        // 3. Spoof check (blink + depth)
+        if (await spoofCheck(fullDetection, video)) {
+            lastError = `Spoof suspected (attempt ${attempt + 1}/${maxAttempts})`;
+            console.log(lastError + ", retrying...");
+            await new Promise(res => setTimeout(res, attemptDelay));
+            continue;
+        }
+
+        // 4. Distance check
+        if (await checkDistance(fullDetection)) {
+            lastError = `Too close to camera (attempt ${attempt + 1}/${maxAttempts})`;
+            console.log(lastError + ", retrying...");
+            await new Promise(res => setTimeout(res, attemptDelay));
+            continue;
+        }
+
+        // All checks passed
+        detectionPassed = true;
+        console.log(`Face scan attempt ${attempt + 1}/${maxAttempts}: Face detected and verified.`);
+        break;
     }
 
-    // 2. Blurriness check
-    if (isFaceBlurry(video)) {
-        return { success: false, message: "Image too blurry. Hold still." };
+    // If all attempts failed, return the last captured error message
+    if (!detectionPassed) {
+        console.warn("All face scan attempts failed:", lastError);
+        return { success: false, message: lastError };
     }
-
-    // 3. Spoof check (blink + depth)
-    if (await spoofCheck(fullDetection, video)) {
-        return { success: false, message: "Spoof detected. Use your real face." };
-    }
-
-    // 4. Distance check
-    if (await checkDistance(fullDetection)) {
-        return { success: false, message: "Move slightly farther from camera." };
-    }
-
+    
     // 5. Compare with database
     const userId = await identifyUser(fullDetection.descriptor);
     if (!userId) return { success: false, message: "No matching user found." };
@@ -134,6 +164,11 @@ async function identifyUser(descriptor) {
 
         let bestMatch = null;
         let bestDistance = 1.0;
+
+        if (!Array.isArray(dbFaces) || dbFaces.length === 0) {
+            console.log("No biometrics found. Treat as new user.");
+            return false; // no user found
+        }
 
         dbFaces.forEach(record => {
             const stored = new Float32Array(JSON.parse(record.bioData));
@@ -236,31 +271,33 @@ async function checkDistance(fullDetection) {
     return box.width > 280; // too close
 }
 
-//registers new user
-const modal = document.getElementById("registration-modal");
-const closeBtn = document.getElementById("close-registration-modal");
+ 
+//#registers new user
+const modal2 = document.getElementById("registration-modal");
 const form = document.getElementById("registration-form");
 // Open modal and start camera
-async function openRegistrationModal() {
-    modal.style.display = "flex";
+const videoRes = document.getElementById("video1");
 
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-        await video.play();
-    } catch (err) {
-        console.error("Camera error:", err);
-        alert("Cannot access camera");
-    }
+async function openRegistrationModal() {
+    modal2.classList.add("active");
+
+    await startCamera(videoRes);
 }
 
-// Close modal and stop camera
-closeBtn.addEventListener("click", () => {
-    modal.style.display = "none";
-    if(video.srcObject){
-        video.srcObject.getTracks().forEach(track => track.stop());
-    }
+async function closeRegistrationModal() {
+    modal2.classList.remove("active");
+    stopCamera();
+}
+
+modal2.addEventListener('click', e => {
+    if (e.target === modal2) closeRegistrationModal();
 });
+
+// Escape key to close
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeRegistrationModal();
+});
+
 
 // Form submission
 form.onsubmit = async (e) => {
@@ -271,13 +308,14 @@ form.onsubmit = async (e) => {
     const dob = document.getElementById("dob").value;
     const ic  = document.getElementById("ic").value.trim();
     const pin = document.getElementById("pin").value;
-    const accountType = document.querySelector("input[name='accountType']:checked").value;
+    const accountType = document.getElementById("accountType").value;
+    const email = document.getElementById("email").value.trim();
 
     statusText.textContent = "Scanning face...";
 
     // Detect face
     const detection = await faceapi
-        .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+        .detectSingleFace(videoRes, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks()
         .withFaceDescriptor();
 
@@ -300,6 +338,7 @@ form.onsubmit = async (e) => {
                 name,
                 dob,
                 nationalID: ic,
+                Email: email,
                 bioType: "face",
                 BioData: JSON.stringify(descriptorArray)
             })
@@ -343,15 +382,18 @@ form.onsubmit = async (e) => {
         const cardData = await cardRes.json();
 
         statusText.textContent = "Registration complete!";
-        modal.style.display = "none";
+        modal2.style.display = "none";
         form.reset();
+        closeRegistrationModal();
 
-        if(video.srcObject){
-            video.srcObject.getTracks().forEach(track => track.stop());
+        if(videoRes.srcObject){
+            videoRes.srcObject.getTracks().forEach(track => track.stop());
         }
 
-        alert(
-            `User created!\nAccount No: ${accountNo}\nCard No: ${cardData.card.cardNo}`
+        window.location.href = "Index.html";
+
+        console.log(
+            `User created!\nAccount No: ${accountNo}\nCard No: ${cardData.card.CardNo}`
         );
 
     } catch (err) {
@@ -360,6 +402,7 @@ form.onsubmit = async (e) => {
         statusText.textContent = "Position your face within the frame";
     }
 };
+//#endregion
 
 // Utility to display errors on the modal's status text
 window.addEventListener('error', (ev) => {

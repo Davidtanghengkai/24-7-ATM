@@ -38,7 +38,7 @@ CREATE TABLE Card (
     AccountNo INT, -- Reference to the Account
     status VARCHAR(50), -- Card status (active, blocked, etc.)
     expiryDate DATE, -- Expiry date of the card
-    PIN VARCHAR(4), -- 4-digit PIN
+    PIN VARCHAR(6), -- 6-digit PIN
     createdTime DATETIME, -- Time the card was created
     FOREIGN KEY (UserID) REFERENCES User(id), -- Foreign Key referencing User table
     FOREIGN KEY (AccountNo) REFERENCES Accounts(AccountNo) -- Foreign Key referencing Accounts table
