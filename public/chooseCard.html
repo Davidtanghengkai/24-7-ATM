@@ -3,63 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create OCBC Card</title>
+    <title>Select OCBC Card</title>
     <link rel="stylesheet" href="CSS/chooseCard.css">
 </head>
 <body>
     <div class="atm-container">
+
+        <!-- Top Right -->
         <div class="top-links">
             <a href="#" class="top-link" id="language-toggle">Eng</a>
             <span class="top-separator">|</span>
             <a href="#" class="top-link">Exit</a>
         </div>
 
-        <a href="Index.html" class="back-link">Back</a> 
-        
+        <!-- Back -->
+        <a href="Index.html" class="back-link">Back</a>
+
+        <!-- MAIN CONTENT -->
         <main class="main-content">
+            <h1 class="page-title">Select Account</h1>
 
-            <h1 class="page-title">Select Account Type</h1>
-            
-            <div class="account-container">
-                
-                <div class="account-box">
-                    
-                    <div class="account-info">
-                        <div class="text-details">
-                            <h3>Savings Account</h3>
-                        </div>
-                    </div>
-
-                    <div class="card-actions">
-                        <button class="select-card-btn" onclick="window.location.href='NewHomePage.html'">Frank Card</button>
-                        <button class="select-card-btn" onclick="window.location.href='NewHomePage.html'">365 Card</button>
-                    </div>
-
-                </div>
-
-                <div class="account-box">
-                    
-                    <div class="account-info">
-                        <div class="text-details">
-                            <h3>Current Account</h3>
-                        </div>
-                    </div>
-
-                    <div class="card-actions">
-                        <button class="select-card-btn" onclick="window.location.href='NewHomePage.html'">Business Card</button>
-                        <button class="select-card-btn" onclick="window.location.href='NewHomePage.html'">Debit Card</button>
-                    </div>
-
-                </div>
-
+            <div class="account-container" id="account-container">
+                <!-- JS will load accounts here -->
             </div>
-
         </main>
 
        
 
         <div id="chat-root"></div>
 
+        <!-- Language Modal -->
         <div id="language-modal" class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
@@ -78,10 +51,12 @@
                 </div>
             </div>
         </div>
+
     </div>
 
     <script src="JS/language_modal.js"></script>
     <script src="JS/widget_loader.js" defer></script>
+    <script src="JS/chooseCard.js"></script>
 
 </body>
 </html>
