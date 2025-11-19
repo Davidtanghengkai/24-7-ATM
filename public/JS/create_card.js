@@ -18,7 +18,7 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
         if (!scan.success) {
             if (scan.message === "No matching user found.") {
                 closeFaceModal();
-                await handleNewUserRegistration(video);
+                await openRegistrationModal();
             } else {
                 alert(scan.message);
             }
@@ -28,7 +28,7 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
             console.log("Verified User ID:", userId);
             statusText.textContent = "✅ Face verified! Welcome!";
             localStorage.setItem("userId", userId);
-            window.location.href = "/chooseCard.html";
+            window.location.href = "selectAccount.html";
 
         }
     }, 800);
@@ -237,93 +237,129 @@ async function checkDistance(fullDetection) {
 }
 
 //registers new user
-async function handleNewUserRegistration(video) {
-    const modal = document.getElementById("registration-modal");
+const modal = document.getElementById("registration-modal");
+const closeBtn = document.getElementById("close-registration-modal");
+const form = document.getElementById("registration-form");
+// Open modal and start camera
+async function openRegistrationModal() {
     modal.style.display = "flex";
 
-    const form = document.getElementById("registration-form");
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        await video.play();
+    } catch (err) {
+        console.error("Camera error:", err);
+        alert("Cannot access camera");
+    }
+}
 
-    form.onsubmit = async (e) => {
-        e.preventDefault();
-        // 1. Collect form fields
-        const name = document.getElementById("name").value.trim();
-        const dob = document.getElementById("dob").value;
-        const ic  = document.getElementById("ic").value.trim();
+// Close modal and stop camera
+closeBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+    if(video.srcObject){
+        video.srcObject.getTracks().forEach(track => track.stop());
+    }
+});
 
-        const accountType = document.querySelector("input[name='accountType']:checked").value;
+// Form submission
+form.onsubmit = async (e) => {
+    e.preventDefault();
 
-        // 2. Capture new face descriptor from video
-        const detection = await faceapi
-            .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks()
-            .withFaceDescriptor();
+    // Collect form data
+    const name = document.getElementById("name").value.trim();
+    const dob = document.getElementById("dob").value;
+    const ic  = document.getElementById("ic").value.trim();
+    const pin = document.getElementById("pin").value;
+    const accountType = document.querySelector("input[name='accountType']:checked").value;
 
-        if (!detection) {
-            alert("No face detected. Try again.");
-            return;
-        }
+    statusText.textContent = "Scanning face...";
 
-        const descriptorArray = Array.from(detection.descriptor);
+    // Detect face
+    const detection = await faceapi
+        .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks()
+        .withFaceDescriptor();
 
-        const userBody = {
-            name,
-            dob,
-            nationalID: ic,
-            bioType: "face",
-            BioData: JSON.stringify(descriptorArray)
-        };
+    if (!detection) {
+        alert("No face detected. Try again.");
+        statusText.textContent = "Position your face within the frame";
+        return;
+    }
 
-        const createUser = await fetch("/api/users", {
+    const descriptorArray = Array.from(detection.descriptor);
+
+    statusText.textContent = "Creating user...";
+
+    try {
+        // 1. Create user
+        const createUserRes = await fetch("/api/users", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(userBody)
+            body: JSON.stringify({
+                name,
+                dob,
+                nationalID: ic,
+                bioType: "face",
+                BioData: JSON.stringify(descriptorArray)
+            })
         });
 
-        if (!createUser.ok) {
-            const err = await createUser.text();
-            alert("Error creating user: " + err);
-            return;
-        }
+        if (!createUserRes.ok) throw new Error(await createUserRes.text());
 
-        const created = await createUser.json();
-        const userId = created.userId;
-
+        const createdUser = await createUserRes.json();
+        const userId = createdUser.userId;
         localStorage.setItem("userId", userId);
 
-        // 4. Create account
+        statusText.textContent = "Creating account...";
+
+        // 2. Create account
         const accountRes = await fetch("/api/accounts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, accountType, initialDeposit: 0})
+            body: JSON.stringify({ userId, accountType, balance: 0 })
         });
 
-        const account = await accountRes.json();
-        const accountId = account.accountId;
-        const pin = document.getElementById("pin").value;
+        const accountData = await accountRes.json();
+        const accountNo = accountData.accountNo;
 
-        // 5. Create card for this account
+        statusText.textContent = "Creating card...";
+
+        // 3. Create card
         const expiry = new Date();
         expiry.setFullYear(expiry.getFullYear() + 5);
+
         const cardRes = await fetch("/api/cards", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-            userId,
-            accountNo: accountId,
-            expiryDate: expiry.toISOString(), // 5 years from now
-            pin: pin
+                userId,
+                accountNo,
+                expiryDate: expiry.toISOString().split("T")[0],
+                pin
             })
         });
 
-        const card = await cardRes.json();
+        const cardData = await cardRes.json();
 
+        statusText.textContent = "Registration complete!";
         modal.style.display = "none";
         form.reset();
 
-        alert(`User created.\nAccount ID: ${accountId}\nNew Card: ${card.cardId}`);
-    };
-}
+        if(video.srcObject){
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
 
+        alert(
+            `User created!\nAccount No: ${accountNo}\nCard No: ${cardData.card.cardNo}`
+        );
+
+    } catch (err) {
+        console.error(err);
+        alert("Error: " + err.message);
+        statusText.textContent = "Position your face within the frame";
+    }
+};
 
 // Utility to display errors on the modal's status text
 window.addEventListener('error', (ev) => {
