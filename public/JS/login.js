@@ -2,6 +2,7 @@ const faceModal = document.getElementById('face-modal');
 const video = document.getElementById('video');
 const statusText = document.getElementById('status');
 
+//#region Face Scanning Logic
 document.getElementById("startFaceBtn").addEventListener("click", async () => {
     faceModal.classList.add('active');
 
@@ -19,9 +20,24 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
             statusText.textContent = "❌ " + result.message;
             return;
         }
+        const tokenRes = await fetch('/api/users/loginWithFace', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: result.userId })
+        });
 
-        statusText.textContent = "✅ Face verified! UserID: " + result.userId;
+        const data = await tokenRes.json();
+        if (!tokenRes.ok) {
+            alert(data.message);
+            return;
+        }
+
+        localStorage.setItem('jwtToken', data.token);
+        localStorage.setItem('userId', data.userId);
+        statusText.textContent = "✅ Face verified! Welcome!";
         console.log("Verified User ID:", result.userId);
+        localStorage.setItem("userId", result.userId);
+        window.location.href = "/chooseCard.html";
     }, 800);
 });
 
@@ -137,7 +153,7 @@ async function identifyUser(descriptor) {
             }
         });
 
-        return bestDistance < 0.6 ? bestMatch : null; // threshold
+        return bestDistance < 0.45 ? bestMatch : null; // threshold
     } catch (err) {
         console.error("Error fetching biometrics:", err);
         return null;
@@ -225,6 +241,11 @@ async function checkDistance(fullDetection) {
     const box = fullDetection.detection.box;
     return box.width > 280; // too close
 }
+
+//#endregion
+
+
+
 
 // -------------------- Global Error Catch --------------------
 window.addEventListener('error', ev => {

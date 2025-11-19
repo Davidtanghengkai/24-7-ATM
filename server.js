@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const cors = require('cors'); 
 const path = require("path");
 const session = require("express-session");
+const jwt = require('jsonwebtoken');
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use(session({
         maxAge: 15 * 60 * 1000 // 15 minutes to match OTP expiry
     }
 }));
+
 
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -52,6 +54,7 @@ const bankController= require("./controllers/bankController");
 const blockchainUserController = require("./controllers/blockchainUserController");
 const exchangeRateController = require("./controllers/exchangeRateController");
 const translationController = require("./controllers/translationController");
+
 // Middlewares
 const  validateTransfer = require("./middleware/validateTransfer");
 
@@ -63,6 +66,7 @@ app.get('/api/users/:id', userController.getUserById);
 app.get('/api/users', userController.getAllUsers);
 app.get('/api/users/find', userController.findUserByEmail);
 app.get('/api/biometrics', userController.getAllBiometrics);
+app.post('/api/users/loginWithFace', userController.loginWithFace);
 
 // == Card Routes ==
 app.post('/api/cards', cardController.createCard);
@@ -70,9 +74,12 @@ app.get('/api/cards/:cardNo', cardController.getCardByNo);
 app.get('/api/cards/user/:userId', cardController.getCardsForUser);
 app.put('/api/cards/status/:cardNo', cardController.changeStatus);
 app.delete('/api/cards/:cardNo', cardController.deleteCard);
-app.get('/api/cards/active/user/:userId', cardController.findCardsByUserId);
+app.get('/api/cards/active/user/:userId/account/:accountNo', cardController.findCardsByUserId);
 
 
+// == Account Routes ==
+app.post('/api/accounts', accountController.createAccount);
+app.get('/api/accounts/user/:userId', accountController.getAccountsByUserId);
 
 // == OTP Routes ==
 
