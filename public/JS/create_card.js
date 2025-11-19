@@ -243,6 +243,16 @@ async function handleNewUserRegistration(video) {
 
     const form = document.getElementById("registration-form");
 
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        await video.play();
+    } catch (err) {
+        console.error("Camera error:", err);
+        alert("Cannot access camera");
+        return;
+    }
+
     form.onsubmit = async (e) => {
         e.preventDefault();
         // 1. Collect form fields
@@ -294,7 +304,7 @@ async function handleNewUserRegistration(video) {
         const accountRes = await fetch("/api/accounts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, accountType, initialDeposit: 0})
+            body: JSON.stringify({ userId, accountType, balance: 0})
         });
 
         const account = await accountRes.json();

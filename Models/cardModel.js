@@ -22,7 +22,7 @@ async function createCard(cardData) {
         request.input('userId', sql.Int, userId);
         request.input('accountNo', sql.Int, accountNo);
         request.input('expiryDate', sql.Date, expiryDate);
-        request.input('pin', sql.Char(64), pin); 
+        request.input('pin', sql.VarChar(6), pin);
 
         const result = await request.query(sqlStatement);
         return result.recordset[0]; // Return the new card
