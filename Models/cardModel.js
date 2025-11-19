@@ -7,7 +7,7 @@ const dbConfig = require('../dbConfig');
  * (UPDATED: Manages its own connection)
  */
 async function createCard(cardData) {
-    const { cardNo, userId, accountNo, expiryDate, pin } = cardData;
+    const { userId, accountNo, expiryDate, pin } = cardData;
     let connection; // Changed from 'pool'
     try {
         connection = await sql.connect(dbConfig); // Open connection

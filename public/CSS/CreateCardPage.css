@@ -337,103 +337,112 @@ body {
  }
 
 /* --- Registration Modal Styling --- */
-
 .registration-modal-overlay {
     position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.75); /* Slightly darker for more focus */
-    display: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: none; /* hidden by default */
     justify-content: center;
     align-items: center;
-    z-index: 4000;
-    backdrop-filter: blur(4px); /* Added a subtle blur for depth */
+    z-index: 1000;
+}
+#registration-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7); /* semi-transparent black */
+    display: none; /* shown via JS */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
-/* Modal content box */
+/* Modal content */
 .registration-modal-content {
-    background-color: #ffffff; /* Solid white background */
-    width: 90%;
-    max-width: 500px; /* Slimmer max-width for better form focus */
+    background-color: #fff;
+    width: 80%;
+    max-width: 900px;
+    height: 80%;
+    display: flex;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+/* Left: Form section */
+.registration-form-container {
+    flex: 1;
     padding: 30px;
-    border-radius: 12px; /* Slightly more rounded corners */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); /* Stronger shadow */
     display: flex;
     flex-direction: column;
-    position: relative;
+    gap: 15px;
+    overflow-y: auto;
 }
 
-.registration-modal-content h1 {
-    font-size: 1.8em;
-    color: #000000; /* Black for better contrast */
-    text-align: center;
-    margin-bottom: 25px; /* Increased space after title */
-    font-weight: 700;
-}
-
-/* Form element styling */
-.registration-modal-content form {
+/* Right: Video section */
+.registration-video-container {
+    flex: 1;
+    background-color: #222;
     display: flex;
-    flex-direction: column;
-    gap: 15px; /* Use gap to manage vertical spacing between form groups */
+    justify-content: center;
+    align-items: center;
 }
 
-.registration-modal-content label {
-    font-size: 1em;
-    color: #444;
-    font-weight: 600;
-    margin-bottom: 0; /* Managed by form gap */
+.registration-video-container video {
+    width: 90%;
+    height: auto;
+    border-radius: 10px;
 }
 
-.registration-modal-content input {
-    padding: 12px; /* Slightly more padding */
-    font-size: 1.1em;
+/* Form elements */
+#registration-form label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+#registration-form input[type="text"],
+#registration-form input[type="date"],
+#registration-form input[type="password"] {
+    padding: 8px;
+    font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 6px;
-    transition: border-color 0.2s, box-shadow 0.2s;
     width: 100%;
     box-sizing: border-box;
 }
 
-.registration-modal-content input:focus {
-    border-color: #EF1815; /* OCBC primary color on focus */
-    box-shadow: 0 0 0 2px rgba(239, 24, 21, 0.2);
-    outline: none;
+fieldset.account-type-fieldset {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 6px;
 }
 
-/* Specific styling for the Submit button */
-.registration-modal-content button[type="submit"] {
-    margin-top: 15px; /* Added margin above the button */
-    padding: 15px 20px;
-    background-color: #EF1815;
-    color: white;
-    font-size: 1.3em;
+fieldset.account-type-fieldset legend {
     font-weight: bold;
+}
+
+.account-option {
+    display: block;
+    margin: 5px 0;
+}
+
+#registration-form button[type="submit"] {
+    margin-top: 15px;
+    padding: 12px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s;
+    transition: background 0.3s;
 }
 
-.registration-modal-content button[type="submit"]:hover {
-    background-color: #D40F12;
-    transform: translateY(-1px);
-}
-
-/* Close button positioning and style */
-.registration-modal-content .close-registration-modal {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 2em; /* Bigger 'x' for easy clicking */
-    font-weight: 300;
-    cursor: pointer;
-    color: #888;
-    background: transparent;
-    border: none;
-    line-height: 1; /* Ensures perfect centering of the X */
-    padding: 5px;
-}
-
-.registration-modal-content .close-registration-modal:hover {
-    color: #EF1815;
+#registration-form button[type="submit"]:hover {
+    background-color: #0056b3;
 }
