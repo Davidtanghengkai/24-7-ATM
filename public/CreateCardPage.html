@@ -22,7 +22,7 @@
                 Please scan your face to check if you're an existing OCBC member
             </h1>
 
-            <div class="verification-grid">
+            <div id="startFaceBtn"class="verification-grid">
                 <button class="verification-card">
                     <div class="icon-container face-icon">
                         <img src="photos/face_id.png" alt="Face ID" class="verification-img">
@@ -48,9 +48,6 @@
                     <a href="#" class="language-option">Malay</a>
                     <a href="#" class="language-option">Japanese</a>
                     <a href="#" class="language-option">Korean</a>
-                    <a href="#" class="language-option">Arabic</a>
-                    <a href="#" class="language-option">Bengali</a>
-                    <a href="#" class="language-option">Burmese</a>
                 </div>
             </div>
         </div>
@@ -68,29 +65,49 @@
         </div>
     </div>
 
-    <div class="registration-modal-overlay" id="registration-modal">
-        <div class="registration-modal-content">
-            <button class="close-registration-modal" id="close-registration-modal">&times;</button>
-            <h1>New User Registration</h1>
-            
-            <form id="registration-form">
-                <label for="name">Full Name:</label>
-                <input type="text" id="name" name="name" required>
+   <!-- Registration Modal -->
+<div class="registration-modal-overlay" id="registration-modal">
+  <div class="registration-modal-content">
+    <button class="close-registration-modal" id="close-registration-modal">&times;</button>
+    <h1>New User Registration</h1>
+    
+    <form id="registration-form">
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" name="name" required>
 
-                <label for="dob">Date of Birth:</label>
-                <input type="date" id="dob" name="dob" required>
+      <label for="dob">Date of Birth:</label>
+      <input type="date" id="dob" name="dob" required>
 
-                <label for="ic">IC Number:</label>
-                <input type="text" id="ic" name="ic" required>
+      <label for="ic">IC Number:</label>
+      <input type="text" id="ic" name="ic" required>
 
-                <div class="video-container" style="width: 100%; height: auto; max-height: 200px; margin-bottom: 20px;">
-                    <label for="face-registration">Scan Your Face Again:</label>
-                </div>
-                
-                <button type="submit">Register</button>
-            </form>
-        </div>
-    </div>
+      <fieldset class="account-type-fieldset">
+        <legend>Account Type</legend>
+        <label class="account-option"><input type="radio" name="accountType" value="savings" required> Savings Account</label>
+        <label class="account-option"><input type="radio" name="accountType" value="business"> Business Account</label>
+        <label class="account-option"><input type="radio" name="accountType" value="personal"> Personal Use Account</label>
+      </fieldset>
+
+      <label for="pin">Card PIN (6 digits):</label>
+      <input
+        type="password"
+        id="pin"
+        name="pin"
+        pattern="\d{6}"
+        minlength="6"
+        maxlength="6"
+        placeholder="••••••"
+        required
+        title="Enter a 6-digit numeric PIN."
+      />
+      <small class="hint">Enter a 6-digit numeric PIN.</small>
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+</div>
+
+
 
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script src="JS/language_modal.js"></script>

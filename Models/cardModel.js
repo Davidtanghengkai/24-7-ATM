@@ -13,9 +13,9 @@ async function createCard(cardData) {
         connection = await sql.connect(dbConfig); // Open connection
         
         const sqlStatement = `
-            INSERT INTO Card (CardNo, UserID, AccountNo, status, expiryDate, PIN, createdTime)
+            INSERT INTO Card (UserID, AccountNo, status, expiryDate, PIN)
             OUTPUT INSERTED.*
-            VALUES (@cardNo, @userId, @accountNo, 'active', @expiryDate, @pin, GETDATE())`;
+            VALUES (@userId, @accountNo, 'active', @expiryDate, @pin)`;
 
         const request = connection.request(); // Create request from connection
         request.input('cardNo', sql.Int, cardNo);
@@ -140,7 +140,7 @@ async function deleteByCardNo(cardNo) {
  * Finds the newest, active card for a user.
  * (UPDATED: Manages its own connection)
  */
-async function findCardByUserId(userId) {
+async function findCardByUserId(userId,accountNo) {
     let pool;
         try {
             pool = await sql.connect(dbConfig);
@@ -162,6 +162,7 @@ async function findCardByUserId(userId) {
             if (pool) pool.close();
         }
 }
+
 
 
 module.exports = {
