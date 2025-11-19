@@ -37,6 +37,7 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
         statusText.textContent = "✅ Face verified! Welcome!";
         console.log("Verified User ID:", result.userId);
         localStorage.setItem("userId", result.userId);
+        window.location.href = "/chooseCard.html";
     }, 800);
 });
 
