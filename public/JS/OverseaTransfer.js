@@ -8,6 +8,15 @@ const resultBox = document.getElementById("result");
 let exchangeRate = 0;
 let toCurrency = "";
 
+document.addEventListener("DOMContentLoaded", () => {
+  const savedAccount = localStorage.getItem("selectedAccountNo");
+
+  if (savedAccount) {
+      const senderInput = document.getElementById("senderAccount");
+      senderInput.value = savedAccount;
+      senderInput.setAttribute("readonly", true);
+  }
+});
 // -------------------------------------------------
 // STEP NAVIGATION
 // -------------------------------------------------
@@ -38,15 +47,15 @@ function back() {
 // -------------------------------------------------
 document.getElementById("next1").onclick = () => {
   const username = document.getElementById("username").value.trim();
-  const sender = document.getElementById("senderAccount").value.trim();
+  const savedAccount = localStorage.getItem("selectedAccountNo");
 
   if (!username) {
     showError("Please fill in your name.");
     return;
   }
 
-  if (!sender) {
-    showError("Please enter your bank account number.");
+  if (!savedAccount) {
+   showError("No account selected. Please select an account first.");
     return;
   }
 
