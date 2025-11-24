@@ -80,7 +80,7 @@ app.get('/api/cards/active/user/:userId/account/:accountNo', cardController.find
 // == Account Routes ==
 app.post('/api/accounts', accountController.createAccount);
 app.get('/api/accounts/user/:userId', accountController.getAccountsByUserId);
-
+app.post("/api/accounts/deposit", accountController.addBalance);
 // == OTP Routes ==
 
 app.post('/api/send-otp', otpController.sendOtp);

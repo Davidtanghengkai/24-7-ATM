@@ -89,4 +89,28 @@ async function updateBalance(accountNo, amount) {
     }   
 }
 
-module.exports = { getBalance, updateBalance, createAccount, getAccountsByUserId };
+async function increaseBalance(accountNo, amount) {
+  try {
+    const conn = await sql.connect(config);
+
+    const result = await conn
+      .request()
+      .input("accountNo", sql.Int, accountNo)
+      .input("amount", sql.Decimal(18, 2), amount)
+      .query(
+        `UPDATE Accounts
+         SET Balance = Balance + @amount
+         WHERE AccountNo = @accountNo`
+      );
+
+    conn.close();
+
+    return result.rowsAffected[0] > 0;
+
+  } catch (err) {
+    console.error("Model Error (increaseBalance):", err);
+    throw err;
+  }
+}
+
+module.exports = { getBalance, updateBalance, createAccount, getAccountsByUserId, increaseBalance};

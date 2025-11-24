@@ -59,7 +59,40 @@ async function createAccount(req, res) {
     }
 }
 
+async function addBalance(req, res) {
+  try {
+    const { accountNo, amount } = req.body;
+
+    // 1. Validate request
+    if (!accountNo || !amount) {
+      return res.status(400).json({ message: "Missing accountNo or amount" });
+    }
+
+    if (amount <= 0) {
+      return res.status(400).json({ message: "Amount must be greater than 0" });
+    }
+
+    // 2. Call model
+    const success = await accountModel.increaseBalance(accountNo, amount);
+
+    if (!success) {
+      return res.status(404).json({ message: "Account not found" });
+    }
+
+    // 3. Success
+    return res.status(200).json({
+      message: "Balance updated successfully (deposit added)",
+      accountNo,
+      amount
+    });
+
+  } catch (error) {
+    console.error("Controller Error (addBalance):", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
     getAccountsByUserId,
-    createAccount, fetchBalance, updateAccountBalance
+    createAccount, fetchBalance, updateAccountBalance, addBalance
 };
