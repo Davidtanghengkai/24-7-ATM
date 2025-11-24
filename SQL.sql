@@ -1,8 +1,8 @@
 ﻿-- Create the Database
-CREATE DATABASE BankingSystem1;
+CREATE DATABASE BankingSystem2;
 
 -- Use the created database
-USE BankingSystem1;
+USE BankingSystem2;
 
 -- Creating the User table with a reference to the Biometrics table
 -- Creating the User table with a reference to the Biometrics table
@@ -41,7 +41,7 @@ CREATE TABLE Card (
     expiryDate DATE, -- Expiry date of the card
     PIN VARCHAR(6), -- 6-digit PIN
     createdTime DATETIME, -- Time the card was created
-	CardName VARCHAR(25) NOT NULL,
+	CardName VARCHAR(25) NOT NULL default 'Card',
     FOREIGN KEY (UserID) REFERENCES [User](id), -- Foreign Key referencing User table
     FOREIGN KEY (AccountNo) REFERENCES Accounts(AccountNo) -- Foreign Key referencing Accounts table
 );
@@ -58,10 +58,10 @@ VALUES
 select * from [User]
 -- 2️⃣ Insert into Accounts table
 INSERT INTO Accounts (userID, Balance, Type) VALUES
-(8, 1500.50, 'Savings'),
-(9, 250.75, 'Checking'),
-(10, 3200.00, 'Savings'),
-(11, 500.25, 'Checking')
+(1, 1500.50, 'Savings'),
+(2, 250.75, 'Checking'),
+(3, 3200.00, 'Savings'),
+(4, 500.25, 'Checking')
 
 -- Creating the Authlog table
 CREATE TABLE Authlog (
