@@ -270,7 +270,7 @@ body {
     color: #cc0000; /* red header */
 }
 
-#new-card-pin {
+#new-card-pin, #card-description {
     width: 100%;
     padding: 12px;
     font-size: 20px;
@@ -280,7 +280,7 @@ body {
     margin-bottom: 20px;
 }
 
-#new-card-pin:focus {
+#new-card-pin:focus, #card-description:focus {
     border-color: #cc0000;
     outline: none;
 }
