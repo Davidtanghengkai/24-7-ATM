@@ -119,6 +119,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         '<h1 class="greeting">✅ Success!</h1>' +
                         '<p style="text-align: center; font-size: 1.2rem;">You are now verified.</p>' +
                     '</main>';
+                await new Promise(resolve => setTimeout(resolve, 1500)); // Pause for 1.5 seconds
+                window.location.href = "chooseCard.html";
                 
             } else {
                 //server failure

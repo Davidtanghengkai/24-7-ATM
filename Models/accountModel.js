@@ -7,23 +7,22 @@ async function createAccount(accountData) {
     try {
         pool = await sql.connect(dbConfig);
         const sqlStatement = `
-            INSERT INTO Accounts (userId, accountType, balance)
-            OUTPUT INSERTED.accountNo
-            VALUES (@userId, @accountType, @balance)`;
-
-        //Creates account for user and return account number
+            INSERT INTO Accounts (userID, Balance, Type)
+            OUTPUT INSERTED.AccountNo
+            VALUES (@userId, @balance, @accountType)
+        `;
 
         const request = pool.request();
         request.input('userId', sql.Int, userId);
-        request.input('accountType', sql.VarChar, accountType);
         request.input('balance', sql.Decimal(18, 2), balance);
+        request.input('accountType', sql.VarChar, accountType);
+
         const result = await request.query(sqlStatement);
-        return result.recordset[0].accountNo;
+        return result.recordset[0].AccountNo; // note the exact casing
 
     } catch (err) {
         console.error("Error in accountModel.createAccount:", err);
         throw err;
-
     } finally {
         if (pool) pool.close();
     }
@@ -46,8 +45,6 @@ async function getAccountsByUserId(userId) {
         if (pool) pool.close();
     }
 }
-
-
 
 async function getBalance(accountNo) {
     let connection;
@@ -92,4 +89,28 @@ async function updateBalance(accountNo, amount) {
     }   
 }
 
-module.exports = { getBalance, updateBalance, createAccount, getAccountsByUserId };
+async function increaseBalance(accountNo, amount) {
+  try {
+    const conn = await sql.connect(dbConfig);
+
+    const result = await conn
+      .request()
+      .input("accountNo", sql.Int, accountNo)
+      .input("amount", sql.Decimal(18, 2), amount)
+      .query(
+        `UPDATE Accounts
+         SET Balance = Balance + @amount
+         WHERE accountNo = @accountNo`
+      );
+
+    conn.close();
+
+    return result.rowsAffected[0] > 0;
+
+  } catch (err) {
+    console.error("Model Error (increaseBalance):", err);
+    throw err;
+  }
+}
+
+module.exports = { getBalance, updateBalance, createAccount, getAccountsByUserId, increaseBalance};

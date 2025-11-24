@@ -179,93 +179,124 @@ body {
     text-decoration: underline;
 }
 
-/* --- Chat Icon (Re-used) --- */
-.chat-icon {
-    position: absolute; 
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    background-color: #e50000; /* Red background */
-    border-radius: 50%; 
+.left-overlay {
+    position: absolute;
+    top: 150px;
+    left: 0;
+    width: 50%;
+    height: 75%;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(4px);
+    padding: 40px;
+    border-radius: 12px;
+    display: none;
+    flex-direction: column;
+}
+
+.left-overlay.visible {
+    display: flex;
+}
+
+.overlay-section.hidden {
+    display: none;
+}
+
+.action-grid {
+    display: flex;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.action-card {
+    width: 220px;
+    height: 200px;
+    background: #f6f6f6;
+    border-radius: 20px;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 15px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+    transition: 0.2s ease;
+}
+
+.deposit-btn {
+    background-color: #e60000; /* Dark Teal */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 5pt;
+}
+
+.action-card:hover {
+    transform: translateY(-3px);
+    background: #ececec;
+}
+
+.action-icon {
+    width: 80px;
+    margin-bottom: 10px;
+}
+
+.hidden { display: none; }
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.45);
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    cursor: pointer;
-    z-index: 100; 
-}
-.icon-bubble { 
-    font-size: 2.5em; 
-    line-height: 1;
+    z-index: 200;
 }
 
-
-/* --- Modal Styling (Language Pop-up) --- */
-.modal-overlay {
-    position: absolute;
-    top: 60px;
-    right: 40px;
-    z-index: 2000;
-    
-    /* Initially hidden by default */
-    display: none; 
-}
-
-/* *** THE FIX: This rule makes the modal visible when JS adds 'active' *** */
-.modal-overlay.active {
-    display: block; 
+.modal.hidden {
+    display: none;
 }
 
 .modal-content {
-    background-color: white;
-    padding: 15px 20px; 
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    width: 180px; 
-    border: 2px solid #EF1815; 
+    background: white;
+    padding: 30px 40px;
+    border-radius: 12px;
+    text-align: center;
+    width: 340px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
 }
 
-.modal-header {
+.modal-buttons {
     display: flex;
-    justify-content: flex-end;
-    padding-bottom: 5px;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 25px;
 }
 
-.close-modal {
-    font-size: 1.4em;
-    font-weight: bold;
+.modal-btn {
+    padding: 12px 25px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
     cursor: pointer;
-    color: #555;
-    padding: 2px 6px;
-    border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
+    font-weight: bold;
 }
 
-.close-modal:hover {
-    background-color: #EF1815;
+.modal-btn.yes {
+    background: #e30000;
     color: white;
 }
 
-.language-grid {
-    display: flex; 
-    flex-direction: column; 
-    gap: 5px; 
-    padding: 10px 0 5px 0;
+.modal-btn.no {
+    background: #cccccc;
+    color: #222;
 }
 
-.language-option {
-    text-decoration: none;
-    color: black;
-    font-size: 1.1em; 
-    font-weight: normal;
-    padding: 5px 10px; 
-    text-align: left;
-    transition: color 0.1s, background-color 0.1s;
-    border-radius: 4px;
-}
-
-.language-option:hover {
-    color: white;
-    background-color: #EF1815; 
-}

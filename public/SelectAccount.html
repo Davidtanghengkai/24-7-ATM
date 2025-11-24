@@ -6,40 +6,60 @@
 </head>
 <body>
 
-    <h1>Select Your Account</h1>
+     <div class="atm-container">
 
-    <div id="account-container"></div>
+        <!-- Top Right -->
+        <div class="top-links">
+            <a href="#" class="top-link" id="language-toggle">Eng</a>
+            <span class="top-separator">|</span>
+            <a href="#" class="top-link">Exit</a>
+        </div>
 
-    <div class="chat-icon">
-        <span class="icon-bubble">💬</span>
-    </div>
+        <!-- Back -->
+        <a href="Index.html" class="back-link">Back</a>
 
-    <!-- Language Modal -->
-    <div id="language-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span class="close-modal">&times;</span>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <h1 class="page-title">Select Account</h1>
+
+            <div class="account-container" id="account-container">
+                <!-- JS will load accounts here -->
             </div>
-            <div class="language-grid">
-                <a href="#" class="language-option">English ✔</a>
-                <a href="#" class="language-option">Chinese</a>
-                <a href="#" class="language-option">Tamil</a>
-                <a href="#" class="language-option">Malay</a>
-                <a href="#" class="language-option">Japanese</a>
-                <a href="#" class="language-option">Korean</a>
-                <a href="#" class="language-option">Arabic</a>
-                <a href="#" class="language-option">Bengali</a>
-                <a href="#" class="language-option">Burmese</a>
+        </main>
+
+       
+
+        <div id="chat-root"></div>
+
+        <!-- Language Modal -->
+        <div id="language-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="language-grid">
+                    <a href="#" class="language-option">English ✔</a>
+                    <a href="#" class="language-option">Chinese</a>
+                    <a href="#" class="language-option">Tamil</a>
+                    <a href="#" class="language-option">Malay</a>
+                    <a href="#" class="language-option">Japanese</a>
+                    <a href="#" class="language-option">Korean</a>
+                    <a href="#" class="language-option">Arabic</a>
+                    <a href="#" class="language-option">Bengali</a>
+                    <a href="#" class="language-option">Burmese</a>
+                </div>
             </div>
         </div>
+
     </div>
+
 
     <!-- PIN Modal -->
     <div class="pin-modal-overlay" id="pin-modal">
         <div class="pin-modal-content">
             <h2>Create Card PIN</h2>
             <input type="password" id="new-card-pin" maxlength="6" placeholder="6-digit PIN">
-            <button onclick="submitCardPIN()">Create Card</button>
+            <button id="createCard">Create Card</button>
         </div>
     </div>
 

@@ -125,96 +125,6 @@ body {
     color: #555;
 }
 
-/* --- Chat Icon --- */
-.chat-icon {
-    position: absolute; 
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    background-color: #e50000; 
-    border-radius: 50%; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    cursor: pointer;
-    z-index: 100; 
-}
-
-.icon-bubble { 
-    font-size: 2.5em; 
-    color: white;
-}
-
-/* --- Modal Styling --- */
-.modal-overlay {
-    position: absolute;
-    top: 60px;
-    right: 40px;
-    z-index: 2000;
-    display: none;
-}
-
-.modal-overlay.active {
-    display: block;
-}
-
-.modal-content {
-    background-color: white;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    width: 180px;
-    border: 2px solid #EF1815;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: flex-end;
-    padding-bottom: 5px;
-}
-
-.close-modal {
-    font-size: 1.4em;
-    font-weight: bold;
-    cursor: pointer;
-    color: #555;
-    padding: 2px 6px;
-    border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-.close-modal:hover {
-    background-color: #EF1815;
-    color: white;
-}
-
-.language-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    padding: 10px 0 5px 0;
-}
-
-.language-option {
-    text-decoration: none;
-    color: black;
-    font-size: 1.1em;
-    padding: 5px 10px;
-    border-radius: 4px;
-    transition: color 0.1s, background-color 0.1s;
-}
-
-.language-option:hover {
-    color: white;
-    background-color: #EF1815;
-}
-
-
-
-
-
 /* --- Face Modal --- */
 
 .face-modal-overlay {
@@ -337,112 +247,116 @@ body {
  }
 
 /* --- Registration Modal Styling --- */
-.registration-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7);
-    display: none; /* hidden by default */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-#registration-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7); /* semi-transparent black */
-    display: none; /* shown via JS */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+#registration-modal {
+  position: fixed;           /* make it overlay the page */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: none;             /* hidden by default */
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.5); /* dark semi-transparent overlay */
+  z-index: 4000;             /* above other content, higher than face modal if needed */
 }
 
-/* Modal content */
-.registration-modal-content {
-    background-color: #fff;
-    width: 80%;
-    max-width: 900px;
-    height: 80%;
-    display: flex;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+#registration-modal.active {
+  display: flex;
 }
 
-/* Left: Form section */
-.registration-form-container {
-    flex: 1;
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    overflow-y: auto;
+/* 2-column form layout */
+.registration-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 30px;
+  row-gap: 15px;
+  width: 100%;
+  max-width: 900px;  /* constrain form inside container */
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-/* Right: Video section */
-.registration-video-container {
-    flex: 1;
-    background-color: #222;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* Form title spans both columns */
+.reg-title {
+  grid-column: 1 / span 2;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
 }
 
-.registration-video-container video {
-    width: 90%;
-    height: auto;
-    border-radius: 10px;
+/* Left column inputs */
+.form-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* Form elements */
-#registration-form label {
-    font-weight: bold;
-    margin-top: 10px;
+/* Right column video */
+.form-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
-#registration-form input[type="text"],
-#registration-form input[type="date"],
-#registration-form input[type="password"] {
-    padding: 8px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
+/* Inputs styling */
+.registration-form input,
+.registration-form select,
+.registration-form input[type="password"],
+.registration-form input[type="email"],
+.registration-form input[type="date"] {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box;
 }
 
-fieldset.account-type-fieldset {
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 6px;
+/* Scan box */
+.scan-box {
+  position: relative;
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 4/3;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-fieldset.account-type-fieldset legend {
-    font-weight: bold;
+.scan-box video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.account-option {
-    display: block;
-    margin: 5px 0;
+.scan-corners {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff4b4b;
 }
 
-#registration-form button[type="submit"] {
-    margin-top: 15px;
-    padding: 12px;
-    font-size: 1rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s;
+.top-left { top: 0; left: 0; border-right: none; border-bottom: none; }
+.top-right { top: 0; right: 0; border-left: none; border-bottom: none; }
+.bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; }
+.bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+/* Register button: must be a direct child of form */
+.reg-btn {
+  grid-column: 1 / span 2; /* spans both columns */
+  padding: 12px;
+  background: #d72626;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 15px;
 }
 
-#registration-form button[type="submit"]:hover {
-    background-color: #0056b3;
+.reg-btn:hover {
+  background: #b01f1f;
 }

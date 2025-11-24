@@ -1,11 +1,12 @@
 ﻿-- Create the Database
-CREATE DATABASE BankingSystem;
+CREATE DATABASE BankingSystem2;
 
 -- Use the created database
-USE BankingSystem;
+USE BankingSystem2;
 
 -- Creating the User table with a reference to the Biometrics table
-CREATE TABLE User (
+-- Creating the User table with a reference to the Biometrics table
+CREATE TABLE [User] (
     id INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented user ID
     name VARCHAR(255),
     DOB DATE,
@@ -19,7 +20,7 @@ CREATE TABLE Biometrics (
     userID INT NOT NULL, -- Reference to the User
     type VARCHAR(50), -- Type of biometric (fingerprint, face, etc.)
     bioData NVARCHAR(MAX) -- Stores the biometric data in binary format
-    Foreign KEY (userID) REFERENCES User(id) -- Foreign Key referencing User table
+    Foreign KEY (userID) REFERENCES [User](id) -- Foreign Key referencing User table
 );
 
 -- Creating the Accounts table
@@ -28,7 +29,7 @@ CREATE TABLE Accounts (
     userID INT, -- Reference to the User
     Balance DECIMAL(18, 2), -- Account balance
     Type VARCHAR(50), -- Type of account (savings, checking, etc.)
-    FOREIGN KEY (userID) REFERENCES User(id) -- Foreign Key referencing User table
+    FOREIGN KEY (userID) REFERENCES [User](id) -- Foreign Key referencing User table
 );
 
 -- Creating the Card table
@@ -38,28 +39,29 @@ CREATE TABLE Card (
     AccountNo INT, -- Reference to the Account
     status VARCHAR(50), -- Card status (active, blocked, etc.)
     expiryDate DATE, -- Expiry date of the card
-    PIN VARCHAR(4), -- 4-digit PIN
+    PIN VARCHAR(6), -- 6-digit PIN
     createdTime DATETIME, -- Time the card was created
-    FOREIGN KEY (UserID) REFERENCES User(id), -- Foreign Key referencing User table
+	CardName VARCHAR(25) NOT NULL default 'Card',
+    FOREIGN KEY (UserID) REFERENCES [User](id), -- Foreign Key referencing User table
     FOREIGN KEY (AccountNo) REFERENCES Accounts(AccountNo) -- Foreign Key referencing Accounts table
 );
 
--- Insert into Users table
-INSERT INTO Users (Name, Dob, nationalId)
-VALUES 
-('John Tan', 'Software Engineer', 'S1234567A'),
-('Mary Lim', 'Teacher', 'S2345678B'),
-('Ahmad Ali', 'Nurse', 'S3456789C'),
-('Siti Rahman', 'Bank Manager', 'S4567890D');
 
+-- Insert into Users table
+INSERT INTO [User] (Name, Dob, nationalId,Email)
+VALUES 
+('John Tan', GETDATE(), 'S1234567J','hi1@gmail.com'),
+('Mary Lim', GETDATE(), 'S2345678B','hi2@gmail.com'),
+('Ahmad Ali', GETDATE(), 'S3456789C','hi3@gmail.com'),
+('Siti Rahman', GETDATE(), 'S4567890D','hi4@gmail.com');
+
+select * from [User]
 -- 2️⃣ Insert into Accounts table
-INSERT INTO Accounts (userId, Balance, Type)
-VALUES
-(1, 5200.50, 'Savings'),
-(1, 1500.00, 'Current'),
-(2, 750.25, 'Savings'),
-(3, 13200.00, 'Fixed Deposit'),
-(4, 8900.10, 'Savings');
+INSERT INTO Accounts (userID, Balance, Type) VALUES
+(1, 1500.50, 'Savings'),
+(2, 250.75, 'Checking'),
+(3, 3200.00, 'Savings'),
+(4, 500.25, 'Checking')
 
 -- Creating the Authlog table
 CREATE TABLE Authlog (
@@ -71,10 +73,9 @@ CREATE TABLE Authlog (
     result VARCHAR(50), -- Result of the action (success, failure)
     reason VARCHAR(255), -- Reason for failure, if any
     timestamp DATETIME, -- Timestamp of the action
-    FOREIGN KEY (userID) REFERENCES User(id), -- Foreign Key referencing User table
+    FOREIGN KEY (userID) REFERENCES [User](id), -- Foreign Key referencing User table
     FOREIGN KEY (cardNo) REFERENCES Card(CardNo) -- Foreign Key referencing Card table
 );
-
 -- Creating the Bank table
 CREATE TABLE Bank (
     bankID INT PRIMARY KEY IDENTITY(1,1),
@@ -151,4 +152,5 @@ VALUES
 (99990000 ,'Bangkok Bank', 'Thailand', '19ac7c6d9f5cb3581ff2048385a4df5d78a401cda66a0458b93525410a9d03b5','9'),
 (12344321 ,'Kasikorn Bank', 'Thailand', '600857cdfa6a6c74127982075f4494570e2ec70872451a183ce98530335539ea','10'),
 (87654321 ,'BDO', 'Philippines', '26cf88ec9f61b4df2cf87bdc3d52a8d24121f1864993f5e76afb3060e528b2d2','11'),
-(90909090 ,'Metrobank', 'Philippines', '8e7c07235845b0c2ac89fb83feaae450808e53685aa8119d016d84146ffb86cf','12'),
+(90909090 ,'Metrobank', 'Philippines', '8e7c07235845b0c2ac89fb83feaae450808e53685aa8119d016d84146ffb86cf','12');
+
