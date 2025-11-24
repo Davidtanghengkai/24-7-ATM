@@ -126,9 +126,7 @@ async function fetchAndApplyTranslations(languageName) {
 
     } catch (error) {
         console.error("Translation Load Error:", error);
-        
 
-        // back to English or the previous language.
         alert(`Sorry, we couldn't load the ${languageName} translation. Please try again.`);
     }
 }
