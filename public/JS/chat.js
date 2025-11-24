@@ -17,7 +17,7 @@ const btn = document.getElementById("EndSessionBtn");
 // chatbot visibility
 
 // Chat is visible when the page loads
-let isChatOpen = true;
+let isChatOpen = false;
 
 if (chatToggle && chatWidget) {
     chatToggle.onclick = () => {

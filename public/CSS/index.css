@@ -17,6 +17,7 @@ body {
 .atm-container {
   background: white;
   width: 85%;
+  position: relative;
   max-width: 1100px;
   border-radius: 15px;
   overflow: hidden;
@@ -112,75 +113,7 @@ body {
   transform: translateY(-3px);
 }
 
-/* --- Modal Styling (Language Pop-up) --- */
-.modal-overlay {
-    /* This positions the dropdown relative to the .atm-container */
-    position: absolute;
-    top: 60px;  /* Adjust to sit just below the "ENG" link */
-    right: 40px; /* Aligns with the "ENG" link */
-    z-index: 2000; /* Sits on top of everything */
-    
-    /* Initially hidden by default */
-    display: none; 
-}
 
-/* *** This rule makes the modal visible when JS adds 'active' *** */
-.modal-overlay.active {
-    display: block; 
-}
-
-.modal-content {
-    background-color: white;
-    padding: 15px 20px; 
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    width: 180px; /* Width of the dropdown */
-    border: 2px solid #EF1815; /* Red border (adjust color as needed) */
-}
-
-.modal-header {
-    display: flex;
-    justify-content: flex-end; /* Pushes 'X' to the right */
-    padding-bottom: 5px;
-}
-
-.close-modal {
-    font-size: 1.4em;
-    font-weight: bold;
-    cursor: pointer;
-    color: #555;
-    padding: 2px 6px;
-    border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-.close-modal:hover {
-    background-color: #EF1815; /* Red background on hover */
-    color: white;
-}
-
-.language-grid {
-    display: flex; 
-    flex-direction: column; /* Stacks the links vertically */
-    gap: 5px; /* Space between each language */
-    padding: 10px 0 5px 0;
-}
-
-.language-option {
-    text-decoration: none;
-    color: black;
-    font-size: 1.1em; 
-    font-weight: normal;
-    padding: 5px 10px; 
-    text-align: left;
-    transition: color 0.1s, background-color 0.1s;
-    border-radius: 4px;
-}
-
-.language-option:hover {
-    color: white;
-    background-color: #EF1815; /* Red background on hover */
-}
 /* Responsive */
 @media (max-width: 768px) {
   .feature-btn {

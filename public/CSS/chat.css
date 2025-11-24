@@ -1,5 +1,5 @@
 /* Floating Toggle Button */
-#chat-toggle {
+/* #chat-toggle {
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -12,13 +12,13 @@
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   z-index: 10001;
-}
+} */
 
 /* Main Chat Widget */
 #chat-widget {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
+  position: absolute;
+  bottom: 90px;
+  right: 15px;
   width: 320px;
   height: 420px;
   background: #fff;
@@ -29,6 +29,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  display: none;
+
 }
 
 #chat-header {
