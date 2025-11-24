@@ -8,8 +8,8 @@ async function getExchangeRate(base, target) {
       url: "https://exchange-rates7.p.rapidapi.com/convert",
       params: { base, target },
       headers: {
-        "x-rapidapi-key": process.env.API_KEY,  // correct name
-        "x-rapidapi-host": "exchange-rates7.p.rapidapi.com"
+        "x-rapidapi-key": process.env.RAPIDCRAPI_KEY,  // correct name
+        "x-rapidapi-host": process.env.RAPIDCRAPI_HOST,
       }
     };
 
