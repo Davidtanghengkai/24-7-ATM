@@ -272,7 +272,7 @@ async function sendText(text) {
 
         //redirect to overseas transfer page
         if (topIntent === "action_15189_intent_26505") {
-            window.location.href = "/OverseasTransfer.html";
+            window.location.href = "/OverseaTransfer.html";
         }
         //show xchange rate
         if (topIntent === "action_8922_intent_11929") {  // <-- replace with your real Watson intent id
