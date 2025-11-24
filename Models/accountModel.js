@@ -91,7 +91,7 @@ async function updateBalance(accountNo, amount) {
 
 async function increaseBalance(accountNo, amount) {
   try {
-    const conn = await sql.connect(config);
+    const conn = await sql.connect(dbConfig);
 
     const result = await conn
       .request()
@@ -100,7 +100,7 @@ async function increaseBalance(accountNo, amount) {
       .query(
         `UPDATE Accounts
          SET Balance = Balance + @amount
-         WHERE AccountNo = @accountNo`
+         WHERE accountNo = @accountNo`
       );
 
     conn.close();
