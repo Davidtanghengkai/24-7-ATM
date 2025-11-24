@@ -96,24 +96,3 @@ body {
 
 
 
-
-/* --- Chat Icon (Re-used) --- */
-.chat-icon {
-    position: absolute; 
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    background-color: #e50000; /* Red background */
-    border-radius: 50%; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    cursor: pointer;
-    z-index: 100; 
-}
-.icon-bubble { 
-    font-size: 2.5em; 
-    line-height: 1;
-}
