@@ -58,7 +58,10 @@
     <div class="pin-modal-overlay" id="pin-modal">
         <div class="pin-modal-content">
             <h2>Create Card PIN</h2>
-            <input type="password" id="new-card-pin" maxlength="6" placeholder="6-digit PIN">
+            <input type="password" id="new-card-pin" maxlength="6" placeholder="6-digit PIN" required>
+
+            <h2>Card Description</h2>
+            <input type="text" id="card-description" maxlength="25" placeholder="E.g., My Travel Card" required>
             <button id="createCard">Create Card</button>
         </div>
     </div>

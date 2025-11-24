@@ -307,7 +307,8 @@ body {
 .registration-form select,
 .registration-form input[type="password"],
 .registration-form input[type="email"],
-.registration-form input[type="date"] {
+.registration-form input[type="date"],
+.registration-form input[type="text"] {
   width: 100%;
   padding: 8px;
   border-radius: 5px;

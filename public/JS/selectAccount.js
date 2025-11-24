@@ -84,6 +84,7 @@ document.addEventListener("click", (e) => {
 async function submitCardPIN() {
     
     const pin = document.getElementById("new-card-pin").value.trim();
+    const description = document.getElementById("card-description").value.trim();
     const userId = localStorage.getItem("userId");
 
     if (!pin || pin.length !== 6) {
@@ -101,7 +102,8 @@ async function submitCardPIN() {
             userId,
             accountNo: selectedAccountNo,
             expiryDate: expiry.toISOString(),
-            pin
+            pin,
+            description
         })
     });
     console.log("Create card response status:", res.status);

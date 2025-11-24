@@ -72,8 +72,8 @@ async function loadCards(accountNo) {
         cards.forEach(card => {
             const btn = document.createElement("button");
             btn.classList.add("card-btn");
-            btn.textContent = card.CardNo;
-            btn.onclick = () => selectCard(card.CardNo, accountNo);
+            btn.textContent = card.CardName;
+            btn.onclick = () => selectCard(card.CardNo, accountNo, card.PIN);
             area.appendChild(btn);
         });
 
@@ -83,11 +83,59 @@ async function loadCards(accountNo) {
 }
 
 // -------------------------------------------
-// SAVE SELECTED ACCOUNT + CARD
+// SAVE SELECTED ACCOUNT + CARD IF CORRECT PIN
 // -------------------------------------------
-function selectCard(cardId, accountNo) {
+
+const pinInput = document.getElementById("card-pin");
+const pinError = document.getElementById("pin-error");
+
+let currentSelection = null;   // store card info here
+const pinModal = document.getElementById('pin-modal');
+
+pinModal.addEventListener('click', e => {
+    if (e.target === pinModal){
+        document.getElementById("pin-modal").style.display = "none"
+    };
+});
+
+// Escape key to close
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        document.getElementById("pin-modal").style.display = "none"
+    };
+});
+
+
+function selectCard(cardId, accountNo, pin) {
+    currentSelection = { cardId, accountNo, pin, attempts: 0 };
+
+    pinInput.value = "";
+    pinError.textContent = "";
+
+    document.getElementById("pin-modal").style.display = "flex";
+
+};
+
+document.getElementById("confirmPin").addEventListener("click", (e) => {
+    e.preventDefault();
+    if (!currentSelection) return;
+
+    const enteredPin = pinInput.value;
+    const { cardId, accountNo, pin } = currentSelection;
+
+    if (enteredPin !== pin) {
+        currentSelection.attempts++;
+        pinError.textContent = "Incorrect PIN. Please try again.";
+
+        if (currentSelection.attempts >= 3) {
+            pinError.textContent = "Maximum attempts reached.";
+            document.getElementById("confirmPin").disabled = true;
+        }
+        return;
+    }
+
     localStorage.setItem("selectedCardId", cardId);
     localStorage.setItem("selectedAccountNo", accountNo);
 
     window.location.href = "NewHomePage.html";
-}
+});
