@@ -17,9 +17,10 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
 
         if (!scan.success) {
             if (scan.message === "No matching user found.") {
-                await handleNewUserRegistration(video);
+                closeFaceModal();
+                await openRegistrationModal();
             } else {
-                alert(scan.message);
+                console.log(scan.message);
             }
         } else {
             // user exists → load accounts → create card normally
@@ -27,7 +28,7 @@ document.getElementById("startFaceBtn").addEventListener("click", async () => {
             console.log("Verified User ID:", userId);
             statusText.textContent = "✅ Face verified! Welcome!";
             localStorage.setItem("userId", userId);
-            await loadAccountsForExistingUser(userId);
+            window.location.href = "selectAccount.html";
 
         }
     }, 800);
@@ -88,31 +89,61 @@ async function loadFaceModels() {
 }
 
 async function scanUserFace(video) {
-    // 1. Detect face
-    const fullDetection = await faceapi
-    .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-    .withFaceLandmarks() // true = full 68-point landmarks
-    .withFaceDescriptor();
+    let fullDetection = null;
+    let detectionPassed = false;
+    let lastError = "Unable to capture a valid face. Please adjust your position and try again.";
+    const maxAttempts = 7;
+    const attemptDelay = 1000; // ms between attempts
 
-    if (!fullDetection) {
-        return { success: false, message: "No face detected. Try again." };
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        fullDetection = await faceapi
+            .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks() // true = full 68-point landmarks
+            .withFaceDescriptor();
+
+        if (!fullDetection) {
+            lastError = `No face detected (attempt ${attempt + 1}/${maxAttempts})`;
+            console.log(lastError + ", retrying...");
+            await new Promise(res => setTimeout(res, attemptDelay));
+            continue;
+        }
+
+        // 2. Blurriness check
+        if (isFaceBlurry(video)) {
+            lastError = `Image too blurry (attempt ${attempt + 1}/${maxAttempts})`;
+            console.log(lastError + ", retrying...");
+            await new Promise(res => setTimeout(res, attemptDelay));
+            continue;
+        }
+
+        // 3. Spoof check (blink + depth)
+        if (await spoofCheck(fullDetection, video)) {
+            lastError = `Spoof suspected (attempt ${attempt + 1}/${maxAttempts})`;
+            console.log(lastError + ", retrying...");
+            await new Promise(res => setTimeout(res, attemptDelay));
+            continue;
+        }
+
+        // 4. Distance check
+        if (await checkDistance(fullDetection)) {
+            lastError = `Too close to camera (attempt ${attempt + 1}/${maxAttempts})`;
+            console.log(lastError + ", retrying...");
+            await new Promise(res => setTimeout(res, attemptDelay));
+            continue;
+        }
+
+        // All checks passed
+        detectionPassed = true;
+        console.log(`Face scan attempt ${attempt + 1}/${maxAttempts}: Face detected and verified.`);
+        break;
     }
 
-    // 2. Blurriness check
-    if (isFaceBlurry(video)) {
-        return { success: false, message: "Image too blurry. Hold still." };
+    // If all attempts failed, return the last captured error message
+    if (!detectionPassed) {
+        console.warn("All face scan attempts failed:", lastError);
+        return { success: false, message: lastError };
     }
-
-    // 3. Spoof check (blink + depth)
-    if (await spoofCheck(fullDetection, video)) {
-        return { success: false, message: "Spoof detected. Use your real face." };
-    }
-
-    // 4. Distance check
-    if (await checkDistance(fullDetection)) {
-        return { success: false, message: "Move slightly farther from camera." };
-    }
-
+    
     // 5. Compare with database
     const userId = await identifyUser(fullDetection.descriptor);
     if (!userId) return { success: false, message: "No matching user found." };
@@ -134,6 +165,11 @@ async function identifyUser(descriptor) {
         let bestMatch = null;
         let bestDistance = 1.0;
 
+        if (!Array.isArray(dbFaces) || dbFaces.length === 0) {
+            console.log("No biometrics found. Treat as new user.");
+            return false; // no user found
+        }
+
         dbFaces.forEach(record => {
             const stored = new Float32Array(JSON.parse(record.bioData));
             const distance = faceapi.euclideanDistance(descriptor, stored);
@@ -146,7 +182,7 @@ async function identifyUser(descriptor) {
             }
         });
 
-        return bestDistance < 0.6 ? bestMatch : null; // threshold
+        return bestDistance < 0.45 ? bestMatch : null; // threshold
     } catch (err) {
         console.error("Error fetching biometrics:", err);
         return null;
@@ -235,141 +271,138 @@ async function checkDistance(fullDetection) {
     return box.width > 280; // too close
 }
 
-//registers new user
-async function handleNewUserRegistration(video) {
-    const modal = document.getElementById("registration-modal");
-    modal.classList.add("active");
+ 
+//#registers new user
+const modal2 = document.getElementById("registration-modal");
+const form = document.getElementById("registration-form");
+// Open modal and start camera
+const videoRes = document.getElementById("video1");
 
-    const form = document.getElementById("registration-form");
+async function openRegistrationModal() {
+    modal2.classList.add("active");
 
-    form.onsubmit = async (e) => {
-        e.preventDefault();
+    await startCamera(videoRes);
+}
 
-        // 1. Collect form fields
-        const name = document.getElementById("name").value.trim();
-        const dob = document.getElementById("dob").value;
-        const ic  = document.getElementById("ic").value.trim();
+async function closeRegistrationModal() {
+    modal2.classList.remove("active");
+    stopCamera();
+}
 
-        const accountType = document.querySelector("input[name='accountType']:checked").value;
+modal2.addEventListener('click', e => {
+    if (e.target === modal2) closeRegistrationModal();
+});
 
-        // 2. Capture new face descriptor from video
-        const detection = await faceapi
-            .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks()
-            .withFaceDescriptor();
+// Escape key to close
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeRegistrationModal();
+});
 
-        if (!detection) {
-            alert("No face detected. Try again.");
-            return;
-        }
 
-        const descriptorArray = Array.from(detection.descriptor);
+// Form submission
+form.onsubmit = async (e) => {
+    e.preventDefault();
 
-        const userBody = {
-            name,
-            dob,
-            nationalID: ic,
-            bioType: "face",
-            BioData: JSON.stringify(descriptorArray)
-        };
+    // Collect form data
+    const name = document.getElementById("name").value.trim();
+    const dob = document.getElementById("dob").value;
+    const ic  = document.getElementById("ic").value.trim();
+    const pin = document.getElementById("pin").value;
+    const accountType = document.getElementById("accountType").value;
+    const email = document.getElementById("email").value.trim();
 
-        const createUser = await fetch("/api/users", {
+    statusText.textContent = "Scanning face...";
+
+    // Detect face
+    const detection = await faceapi
+        .detectSingleFace(videoRes, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+    if (!detection) {
+        alert("No face detected. Try again.");
+        statusText.textContent = "Position your face within the frame";
+        return;
+    }
+
+    const descriptorArray = Array.from(detection.descriptor);
+
+    statusText.textContent = "Creating user...";
+
+    try {
+        // 1. Create user
+        const createUserRes = await fetch("/api/users", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(userBody)
+            body: JSON.stringify({
+                name,
+                dob,
+                nationalID: ic,
+                Email: email,
+                bioType: "face",
+                BioData: JSON.stringify(descriptorArray)
+            })
         });
 
-        if (!createUser.ok) {
-            const err = await createUser.text();
-            alert("Error creating user: " + err);
-            return;
-        }
+        if (!createUserRes.ok) throw new Error(await createUserRes.text());
 
-        const created = await createUser.json();
-        const userId = created.userId;
-
+        const createdUser = await createUserRes.json();
+        const userId = createdUser.userId;
         localStorage.setItem("userId", userId);
 
-        // 4. Create account
+        statusText.textContent = "Creating account...";
+
+        // 2. Create account
         const accountRes = await fetch("/api/accounts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, accountType, initialDeposit: 0})
+            body: JSON.stringify({ userId, accountType, balance: 0 })
         });
 
-        const account = await accountRes.json();
-        const accountId = account.accountId;
-        const pin = document.getElementById("pin").value;
+        const accountData = await accountRes.json();
+        const accountNo = accountData.accountNo;
 
-        // 5. Create card for this account
+        statusText.textContent = "Creating card...";
+
+        // 3. Create card
         const expiry = new Date();
         expiry.setFullYear(expiry.getFullYear() + 5);
+
         const cardRes = await fetch("/api/cards", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-            userId,
-            accountNo: accountId,
-            expiryDate: expiry.toISOString(), // 5 years from now
-            pin: pin
+                userId,
+                accountNo,
+                expiryDate: expiry.toISOString().split("T")[0],
+                pin
             })
         });
 
-        const card = await cardRes.json();
+        const cardData = await cardRes.json();
 
-        modal.classList.remove("active");
+        statusText.textContent = "Registration complete!";
+        modal2.style.display = "none";
         form.reset();
+        closeRegistrationModal();
 
-        alert(`User created.\nAccount ID: ${accountId}\nNew Card: ${card.cardId}`);
-    };
-}
+        if(videoRes.srcObject){
+            videoRes.srcObject.getTracks().forEach(track => track.stop());
+        }
 
-async function loadAccountsForExistingUser(userId) {
-    const modal = document.getElementById("account-modal");
-    const list = document.getElementById("account-list");
+        window.location.href = "Index.html";
 
-    list.innerHTML = "Loading accounts...";
+        console.log(
+            `User created!\nAccount No: ${accountNo}\nCard No: ${cardData.card.CardNo}`
+        );
 
-
-    const response = await fetch(`/api/accounts/user/${userId}`);
-    console.log("Accounts response:", response);
-    const accounts = await response.json(); // expected: [{accountId, balance, accountType}, ...]
-
-    list.innerHTML = "";
-
-    if (accounts.length === 0) {
-        list.innerHTML = "<p>No accounts found for this user.</p>";
-        return;
+    } catch (err) {
+        console.error(err);
+        alert("Error: " + err.message);
+        statusText.textContent = "Position your face within the frame";
     }
-
-    accounts.forEach(acc => {
-        const div = document.createElement("div");
-        div.classList.add("account-card");
-
-        div.innerHTML = `
-            <h3>${acc.accountType.toUpperCase()} Account</h3>
-            <p><strong>Account ID:</strong> ${acc.accountId}</p>
-            <p><strong>Balance:</strong> $${acc.balance.toFixed(2)}</p>
-            <button onclick="selectAccount(${acc.accountId})">Select Account</button>
-        `;
-
-        list.appendChild(div);
-    });
-
-    modal.classList.add("active");
-}
-
-document.getElementById("close-account-modal").onclick = () => {
-    document.getElementById("account-modal").classList.remove("active");
-}
-
-function selectAccount(accountId) {
-    localStorage.setItem("selectedAccountId", accountId);
-    document.getElementById("account-modal").classList.remove("active");
-
-    // Continue to card creation
-    console.log("Selected account:", accountId);
-}
+};
+//#endregion
 
 // Utility to display errors on the modal's status text
 window.addEventListener('error', (ev) => {

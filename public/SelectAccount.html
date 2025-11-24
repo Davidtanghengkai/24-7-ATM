@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select OCBC Card</title>
-    <link rel="stylesheet" href="CSS/chooseCard.css">
+    <title>Select Account</title>
+    <link rel="stylesheet" href="CSS/selectAccount.css">
 </head>
 <body>
-    <div class="atm-container">
+
+     <div class="atm-container">
 
         <!-- Top Right -->
         <div class="top-links">
@@ -54,9 +53,16 @@
 
     </div>
 
-    <script src="JS/language_modal.js"></script>
-    <script src="JS/widget_loader.js" defer></script>
-    <script src="JS/chooseCard.js"></script>
 
+    <!-- PIN Modal -->
+    <div class="pin-modal-overlay" id="pin-modal">
+        <div class="pin-modal-content">
+            <h2>Create Card PIN</h2>
+            <input type="password" id="new-card-pin" maxlength="6" placeholder="6-digit PIN">
+            <button id="createCard">Create Card</button>
+        </div>
+    </div>
+
+    <script src="JS/selectAccount.js"></script>
 </body>
 </html>

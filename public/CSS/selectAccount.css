@@ -1,6 +1,3 @@
-/* =========================================
-   1. GLOBAL RESET & FONTS
-   ========================================= */
 * {
     margin: 0;
     padding: 0;
@@ -237,4 +234,70 @@ body {
 .language-option:hover {
     color: white;
     background-color: #EF1815;
+}
+
+
+
+/* ============================
+     PIN MODAL
+============================ */
+
+.pin-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.pin-modal-content {
+    background: white;
+    padding: 30px 25px;
+    border-radius: 14px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+}
+
+.pin-modal-content h2 {
+    margin: 0 0 15px;
+    color: #cc0000; /* red header */
+}
+
+#new-card-pin {
+    width: 100%;
+    padding: 12px;
+    font-size: 20px;
+    text-align: center;
+    border-radius: 8px;
+    border: 2px solid #ccc;
+    margin-bottom: 20px;
+}
+
+#new-card-pin:focus {
+    border-color: #cc0000;
+    outline: none;
+}
+
+.pin-modal-content button {
+    width: 100%;
+    padding: 12px;
+    background: #cc0000; /* red */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.pin-modal-content button:hover {
+    background: #b20000; /* darker red */
 }
