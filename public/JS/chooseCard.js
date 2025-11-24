@@ -126,6 +126,7 @@ document.getElementById("confirmPin").addEventListener("click", (e) => {
     if (enteredPin !== pin) {
         currentSelection.attempts++;
         pinError.textContent = "Incorrect PIN. Please try again.";
+        pinInput.value = "";
 
         if (currentSelection.attempts >= 3) {
             pinError.textContent = "Maximum attempts reached.";
