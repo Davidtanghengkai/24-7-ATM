@@ -308,11 +308,6 @@ function showSuccess(msg) {
   }
 }
 
-document.getElementById("confirmTransfer").addEventListener("click", () => {
-  document.getElementById("successOverlay").classList.add("active");
-});
-
-
 document.getElementById("closeSuccess").onclick = () => {
   document.getElementById("successOverlay").classList.remove("active");
 };
