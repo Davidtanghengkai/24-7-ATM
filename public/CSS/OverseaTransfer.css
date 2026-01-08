@@ -1,26 +1,9 @@
-body {
-  font-family: "Segoe UI", sans-serif;
-  background: #f0f0f0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
-
-.atm-container {
-  width: 700px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-  padding: 40px 60px;
-}
-
 /* -------- STEP CONTROL -------- */
 .step { 
   display: none; 
   flex-direction: column; 
   gap: 20px; 
+  margin: 40px;
 }
 
 .step.active { display: flex; }
@@ -183,5 +166,3 @@ button.next:hover,
 #successOverlay.active {
     display: flex;
 }
-
-

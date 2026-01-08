@@ -4,23 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATM Main Menu</title>
-    <link rel="stylesheet" href="CSS/NewHomePage.css">
-    <link rel="stylesheet" href="CSS/chat.css">
-    <link rel="stylesheet" href="CSS/ChatbotIcon.css">
-    <link rel="stylesheet" href="CSS/languageModal.css">
+    <link rel="stylesheet" type="text/css" href="CSS/index.css">
+    <link rel="stylesheet" type="text/css" href="CSS/chat.css">
+    <link rel="stylesheet" type="text/css" href="CSS/NewHomePage.css">
 </head>
 <body>
-    <div class="atm-container">
-        
+    <div class="atm-container"> 
         <div class="top-links">
             <a href="#" class="top-link" id="language-toggle">ENG</a>
             <span class="top-separator">|</span>
-
             <a href="TransactionCancel.html" class="top-link" translateRef="exitLink">Exit</a>
         </div>
 
         <div class="main-wrapper">
-            
             <div class="left-pane">
  
                <h1 class="greeting" translateRef="menuGreeting">
@@ -43,7 +39,6 @@
                             <span>Deposit Cash</span>
                         </button>
                     </div>
-
                 </section>
             </div>
 
@@ -64,71 +59,53 @@
                     </button>
                 </div>
 
-
                 <a href="NewMoreFeatures.html" class="more-services-link" translateRef="moreServicesLink">More services &gt;</a>
-
-                <div id="chat-root"></div>
             </div>
-        </div>
-        <div id="chat-toggle" class="chat-icon">
-            <span  class="icon-bubble">💬</span>
-        </div>
 
-        
-        <div id="language-modal" class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span class="close-modal">&times;</span>
+            <div id="left-overlay" class="left-overlay hidden">
+
+                <!-- Withdraw Section -->
+                <div id="withdraw-section" class="overlay-section hidden">
+                    <h2>Select Withdrawal Amount</h2>
+                    <div class="quick-cash-grid">
+                        <button class="cash-btn">$50</button>
+                        <button class="cash-btn">$80</button>
+                        <button class="cash-btn">$100</button>
+                        <button class="cash-btn">$200</button>
+                    </div>
+                    <button class="cash-btn other-amount-btn">Other Amount</button>
                 </div>
-                <div class="language-grid">
-                    <a href="#" class="language-option">English ✔</a>
-                    <a href="#" class="language-option">Chinese</a>
-                    <a href="#" class="language-option">Tamil</a>
-                    <a href="#" class="language-option">Malay</a>
-                    <a href="#" class="language-option">Japanese</a>
-                    <a href="#" class="language-option">Korean</a>
-                    <a href="#" class="language-option">Arabic</a>
-                    <a href="#" class="language-option">Bengali</a>
-                    <a href="#" class="language-option">Burmese</a>
+
+                <!-- Deposit Section -->
+                <div id="deposit-section" class="overlay-section hidden">
+                    <h2>Enter Amount to Deposit</h2>
+                    <input type="number" id="deposit-amount" placeholder="Enter amount" class="input-box"><br>
+                    <button id="deposit-confirm" class="deposit-btn">Deposit</button>
                 </div>
-            </div>
-        </div>
-        <div id="left-overlay" class="left-overlay hidden">
 
-            <!-- Withdraw Section -->
-            <div id="withdraw-section" class="overlay-section hidden">
-                <h2>Select Withdrawal Amount</h2>
-                <div class="quick-cash-grid">
-                    <button class="cash-btn">$50</button>
-                    <button class="cash-btn">$80</button>
-                    <button class="cash-btn">$100</button>
-                    <button class="cash-btn">$200</button>
-                </div>
-                <button class="cash-btn other-amount-btn">Other Amount</button>
             </div>
+            <!-- Success Modal -->
+            <div id="success-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h2>Deposit Successful!</h2>
+                    <p>Would you like to perform another action?</p>
 
-            <!-- Deposit Section -->
-            <div id="deposit-section" class="overlay-section hidden">
-                <h2>Enter Amount to Deposit</h2>
-                <input type="number" id="deposit-amount" placeholder="Enter amount" class="input-box"><br>
-                <button id="deposit-confirm" class="deposit-btn">Deposit</button>
-            </div>
-        </div>
-        <!-- Success Modal -->
-        <div id="success-modal" class="modal hidden">
-            <div class="modal-content">
-                <h2>Deposit Successful!</h2>
-                <p>Would you like to perform another action?</p>
-
-                <div class="modal-buttons">
-                    <button id="modal-yes" class="modal-btn yes">Yes</button>
-                    <button id="modal-no" class="modal-btn no">No</button>
+                    <div class="modal-buttons">
+                        <button id="modal-yes" class="modal-btn yes">Yes</button>
+                        <button id="modal-no" class="modal-btn no">No</button>
+                    </div>
                 </div>
             </div>
+
+            <div id="chat-toggle" class="chat-icon">
+                <span  class="icon-bubble">💬</span>
+            </div>
+
+            <div id="chat-root"></div>
         </div>
     </div>
 
-    <script src="JS/language_modal.js"></script> 
+    <script src="JS/index.js"></script> 
     <script src="JS/widget_loader.js" defer></script>
     <script src="JS/cash_action.js"></script>
 </body>
