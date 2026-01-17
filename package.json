@@ -33,5 +33,11 @@
     "nodemon": "^3.1.11",
     "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "chai": "^6.2.2",
+    "ethers": "^5.8.0",
+    "hardhat": "^2.28.0"
   }
 }

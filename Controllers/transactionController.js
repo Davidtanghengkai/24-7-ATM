@@ -1,36 +1,40 @@
 const { verifyBlockchainUser } = require("../Models/blockchainUser");
-const { createTransaction } = require("../Models/transactionModel");
+const { createTransaction: createOverseasTxnSQLChain } = require("../Models/transactionModel");
 const { getExchangeRate } = require("../Models/exchangeRate");
-const { getBalance, updateBalance } = require("../Models/accountModel");
-const { getLastBlockHash, createBlock } = require("../Models/blockchainModel");
+const { getBalance } = require("../Models/accountModel");
 async function createOverseasTransaction(req, res) {
   try {
     const {
       senderAccountNo,
       receiverAccountNo,
-      receiverBankID,
+      receiverBankID,      // your frontend naming
       receiverBankName,
       receiverCountry,
       amount,
       fromCurrency,
-      toCurrency         //Currency now comes from frontend
+      toCurrency
     } = req.body;
 
-    // 1. Validate
+    // 1) Validate (same scenario)
     if (
-      !senderAccountNo ||
-      !receiverAccountNo ||
-      !receiverBankID ||
+      senderAccountNo == null ||
+      receiverAccountNo == null ||
+      receiverBankID == null ||
       !receiverBankName ||
       !receiverCountry ||
-      !amount ||
+      amount == null ||
       !fromCurrency ||
-      !toCurrency        //Ensure currency is included
+      !toCurrency
     ) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // 2. Verify blockchain user
+    const amtNum = Number(amount);
+    if (!Number.isFinite(amtNum) || amtNum <= 0) {
+      return res.status(400).json({ message: "Invalid amount" });
+    }
+
+    // 2) Verify blockchain user (same scenario)
     const verify = await verifyBlockchainUser(
       receiverAccountNo,
       receiverBankName,
@@ -44,76 +48,64 @@ async function createOverseasTransaction(req, res) {
       });
     }
 
-    // 3. Check sender balance
+    // 3) Check sender balance (same scenario)
     const balance = await getBalance(senderAccountNo);
     if (balance === null) {
       return res.status(404).json({ message: "Sender account not found" });
     }
-
-    if (Number(amount) > Number(balance)) {
+    if (amtNum > Number(balance)) {
       return res.status(400).json({
         message: "Insufficient balance to complete this transaction"
       });
     }
-    
-    // 4. Fetch exchange rate
+
+    // 4) Fetch exchange rate (same scenario)
     const rate = await getExchangeRate(fromCurrency, toCurrency);
-    const totalConverted = (amount * rate).toFixed(2);
+    const rateNum = Number(rate);
+    if (!Number.isFinite(rateNum) || rateNum <= 0) {
+      return res.status(500).json({ message: "Exchange rate unavailable" });
+    }
 
-    // 5. Deduct balance
-    await updateBalance(senderAccountNo, amount);
+    const totalConverted = (amtNum * rateNum).toFixed(2);
 
-    // 6. Create transaction
-    await createTransaction({
-      senderAccountNo,
-      receiverAccountNo,
-      bankID: receiverBankID,
-      amount,
-      currency: toCurrency,
-      exchangeRate: rate,
-      txnType: "Overseas",
-      blockID: null
+    // 5) Create transaction (SQL + Smart Contract together)
+    //    NOTE: your SQL schema expects:
+    //    bankID, currency, exchangeRate
+    const result = await createOverseasTxnSQLChain({
+      senderAccountNo: Number(senderAccountNo),
+      receiverAccountNo: String(receiverAccountNo),
+      bankID: Number(receiverBankID),
+      amount: amtNum,
+      currency: String(toCurrency),
+      exchangeRate: rateNum,
+      txnType: "Overseas"
     });
 
-    // ------------------------------
-    // 7. BLOCKCHAIN LEDGER CREATION
-    // ------------------------------
-
-    // 7A — Get previous block hash
-    const previousHash = await getLastBlockHash();
-
-    // 7B — Prepare transactionData
-    const transactionData = JSON.stringify({
-      senderAccountNo,
-      receiverAccountNo,
-      receiverBankID,
-      amount,
-      currency: toCurrency,
-      exchangeRate: rate,
-      time: new Date()
-    });
-
-    // 7C — Create block
-    const block = await createBlock(previousHash, transactionData, "ATM001");
-
-    // --------------------------------
-
-    // 8. Success response
+    // 6) Response (keep same scenario fields + add chain proof)
     return res.status(201).json({
       message: "Transaction completed successfully",
       blockchainVerified: true,
-      rate,
+
+      rate: rateNum,
       senderAccountNo,
       receiverAccountNo,
       convertedAmount: `${totalConverted} ${toCurrency}`,
-      blockID: block.blockID,
-      blockHash: block.currentHash
-    });
 
-    
+      // NEW: on-chain proof fields
+      txnID: result.txnID,
+      reference: result.reference,
+      chainStatus: result.chainStatus,
+
+      // keep compatibility for your old UI labels (optional)
+      blockID: result.blockNumber || null,
+      blockHash: result.txHash || null
+    });
   } catch (err) {
-    console.error("❌ Controller Error:", err.message);
-    res.status(500).json({ error: "Failed to process transaction" });
+    console.error("❌ Controller Error:", err);
+    return res.status(500).json({
+      error: "Failed to process transaction",
+      detail: err.message
+    });
   }
 }
 
