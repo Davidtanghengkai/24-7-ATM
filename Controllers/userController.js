@@ -1,8 +1,11 @@
 const userModel = require('../Models/userModel');
+const { generateToken } = require('../middleware/authorization');
+const jwt = require('jsonwebtoken');
 
 // POST /user
 async function createUser(req, res) {
     const userData = req.body;
+    console.log("Incoming userData:", userData);
     try {
         const newUserId = await userModel.createUser(userData);
         res.status(201).json({ message: "User created successfully", userId: newUserId });
@@ -74,11 +77,36 @@ async function findUserByEmail(req, res) {
 
 async function getAllBiometrics(req, res) { //create biometric MVC
     try {
-        const biometrics = await userModel.getAllBiometrics(); //get all biometrics for face scanning function
-        res.status(200).json(biometrics);
+        const biometrics = await userModel.getAllBiometricsWithUser(); //get all biometrics for face scanning function
+        return res.status(200).json(biometrics);
     } catch (err) {
         console.error("Error in userController.getAllBiometrics:", err);
         res.status(500).json({ message: "Internal server error, Failed to get all biometrics" });
+    }
+}
+
+
+async function loginWithFace(req, res) {
+    console.log('Body received:', req.body);
+    const { userId } = req.body;
+    if (!userId) return res.status(400).json({ message: 'userId missing' });
+
+    try {
+        const user = await userModel.getUserById(userId);
+        console.log('User found:', user);
+
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const token = jwt.sign(
+            { userId: user.id }, 
+            process.env.JWT_SECRET || 'secret', 
+            { expiresIn: '1h' }
+        );
+
+        return res.status(200).json({ token, userId: user.id });
+    } catch (err) {
+        console.error('LoginWithFace error:', err);
+        return res.status(500).json({ message: 'Server error', error: err.message });
     }
 }
 
@@ -88,5 +116,6 @@ module.exports = {
     getUserById,
     getAllUsers,
     findUserByEmail,
-    getAllBiometrics
+    getAllBiometrics,
+    loginWithFace
 };

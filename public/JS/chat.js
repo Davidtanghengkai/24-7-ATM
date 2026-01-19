@@ -17,7 +17,7 @@ const btn = document.getElementById("EndSessionBtn");
 // chatbot visibility
 
 // Chat is visible when the page loads
-let isChatOpen = true;
+let isChatOpen = false;
 
 if (chatToggle && chatWidget) {
     chatToggle.onclick = () => {
@@ -59,10 +59,25 @@ function endSession() {
         initSession();
     }, 2000);
 }
+if (chatEl) {
+    chatEl.addEventListener("click", (e) => {
+        if (e.target && e.target.tagName === "BUTTON") {
+            const buttonContainer = e.target.parentElement;
+            
+            if (buttonContainer.classList.contains("options")) {
+                const text = e.target.textContent;
+                sendTextFromButton(text);
+                buttonContainer.remove();
+                saveHistory();
+            }
+        }
+    });
+}
 
 
 // create chat
 async function initSession() {
+    if (!chatEl) return;
 
     const existingId = localStorage.getItem(SESSION_KEY);
     const existingHistory = localStorage.getItem(HISTORY_KEY);
@@ -137,6 +152,7 @@ async function requestWelcome() {
 
 // messages
 function addMessage(text, from = "bot") {
+    if (!chatEl) return;
     const wrap = document.createElement("div");
     wrap.className = "msg " + from;
 
@@ -158,7 +174,6 @@ function addOptions(options) {
     options.forEach(opt => {
         const btn = document.createElement("button");
         btn.textContent = opt.label;
-        btn.onclick = () => sendTextFromButton(opt.label);
         wrap.appendChild(btn);
     });
 
@@ -249,9 +264,47 @@ async function sendText(text) {
 
 
         // redirect on specific intent
+
+        if (topIntent === "action_3978_intent_47611"){
+            window.location.href = "/CreateCardPage.html";
+        }
+        
+        //withdraw money directions
         if (topIntent === "action_39373_intent_26859") {
             window.location.href = "/NewHomePage.html";
         }
+
+        //redirect to overseas transfer page
+        if (topIntent === "action_15189_intent_26505") {
+            window.location.href = "/OverseaTransfer.html";
+        }
+        //show xchange rate
+        if (topIntent === "action_8922_intent_11929") {  // <-- replace with your real Watson intent id
+        // You can parse currencies from entities later; for now, use defaults:
+        const base   = "SGD";
+        const target = "USD";
+
+        try {
+            const fxRes  = await fetch(`/api/rate?base=${(base)}&target=${(target)}`);
+            const fxData = await fxRes.json();
+            console.log("FX data:", fxData);
+
+            if (!fxRes.ok || !fxData.rate) {
+            addMessage("Sorry, I couldn’t fetch the latest conversion rate.", "bot");
+            return;
+            }
+
+            const rate = fxData.rate;
+            addMessage(`💱 1 ${base} = ${rate.toFixed(4)} ${target}`, "bot");
+            return;
+        } catch (err) {
+            console.error("FX fetch error:", err);
+            addMessage("There was a problem getting conversion rates.", "bot");
+            return;
+        }
+        
+        }
+
         if (topIntent === "General_Ending") {
             renderOutput(data, false);
             endSession();
@@ -335,5 +388,28 @@ if (inputEl) {
         if (e.key === "Enter") sendText(inputEl.value);
     });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM fully loaded and parsed.");
+
+    const exitButton = document.getElementById("cancelYesBtn");
+
+
+    if (exitButton) {
+        console.log("Exit button found on this page. Attaching listener.");
+        
+        exitButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            
+            console.log("Exit button clicked. Ending session...");
+            endSession();
+
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 2000);
+        });
+    } 
+});
+
 
 initSession();

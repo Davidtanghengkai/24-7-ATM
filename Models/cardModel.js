@@ -7,31 +7,31 @@ const dbConfig = require('../dbConfig');
  * (UPDATED: Manages its own connection)
  */
 async function createCard(cardData) {
-    const { cardNo, userId, accountNo, expiryDate, pin } = cardData;
-    let connection; // Changed from 'pool'
+    const { userId, accountNo, expiryDate, pin, description } = cardData;
+    let pool;
     try {
-        connection = await sql.connect(dbConfig); // Open connection
-        
-        const sqlStatement = `
-            INSERT INTO Card (CardNo, UserID, AccountNo, status, expiryDate, PIN, createdTime)
-            OUTPUT INSERTED.*
-            VALUES (@cardNo, @userId, @accountNo, 'active', @expiryDate, @pin, GETDATE())`;
+        pool = await sql.connect(dbConfig);
 
-        const request = connection.request(); // Create request from connection
-        request.input('cardNo', sql.Int, cardNo);
+        const request = pool.request();
         request.input('userId', sql.Int, userId);
         request.input('accountNo', sql.Int, accountNo);
         request.input('expiryDate', sql.Date, expiryDate);
-        request.input('pin', sql.Char(64), pin); 
+        request.input('pin', sql.VarChar(6), pin);
+        request.input('description', sql.VarChar(50), description);
 
-        const result = await request.query(sqlStatement);
-        return result.recordset[0]; // Return the new card
+        const result = await request.query(`
+            INSERT INTO Card (UserID, AccountNo, status, expiryDate, PIN,createdTime, CardName)
+            OUTPUT INSERTED.*
+            VALUES (@userId, @accountNo, 'active', @expiryDate, @pin, GETDATE(), @description)
+        `);
+
+        return result.recordset[0];
 
     } catch (err) {
         console.error("Error in cardModel.createCard:", err);
         throw err;
     } finally {
-        if (connection) await connection.close(); // Close connection
+        if (pool)  await pool.close();
     }
 }
 
@@ -140,7 +140,7 @@ async function deleteByCardNo(cardNo) {
  * Finds the newest, active card for a user.
  * (UPDATED: Manages its own connection)
  */
-async function findCardByUserId(userId) {
+async function findCardByUserId(userId,accountNo) {
     let pool;
         try {
             pool = await sql.connect(dbConfig);
@@ -162,6 +162,7 @@ async function findCardByUserId(userId) {
             if (pool) pool.close();
         }
 }
+
 
 
 module.exports = {

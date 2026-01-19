@@ -4,20 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATM Login Verification</title>
-    <link rel="stylesheet" href="CSS/LoginPage.css">
+    <link rel="stylesheet" type="text/css" href="CSS/index.css">
+    <link rel="stylesheet" type="text/css" href="CSS/chat.css">
+    <link rel="stylesheet" type="text/css" href="CSS/LoginPage.css">
+</head>
 </head>
 <body>
     <div class="atm-container">
-        
         <!-- Top Links -->
         <div class="top-links">
             <a href="#" class="top-link" id="language-toggle">Eng</a>
             <span class="top-separator">|</span>
             <a href="TransactionCancel.html" class="top-link" translateRef="exitLink">Exit</a>
         </div>
-        
-        <!-- Back Link -->
-        <a class="back-link" onclick="window.history.back()" translateRef="backLink">Back</a> 
         
         <main class="main-content">
             <h1 class="greeting" translateRef="loginGreeting">
@@ -26,7 +25,6 @@
             </h1>
 
             <div class="verification-grid">
-                
                 <!-- OCBC App Card -->
                 <button class="verification-card" onclick="location.href='otp.html'">
                     <div class="icon-container ocbc-icon">
@@ -36,52 +34,38 @@
                 </button>
                 
                 <!-- Face ID Card -->
-                <button class="verification-card">
+                <button id="startFaceBtn" class="verification-card">
                     <div class="icon-container face-icon">
                         <img src="photos/face_id.png" alt="Face ID" class="verification-img"> 
                     </div>
                     <span class="card-text" translateRef="faceIdCard">Face ID</span>
                 </button>
+            </div>
 
+            <!-- Face Verification Modal (Content inside needs translation) -->
+            <div class = "face-modal-overlay" id="face-modal">
+                <div class="face-modal-content">
+                    <h1 class="face-modal-title" translateRef="faceVerificationTitle">Face Verification</h1>
+                    <p class="face-modal-instruction" translateRef="faceVerificationInstruction">Position your face within the frame</p>
+                    <video id="video" width="480" height="360" autoplay muted></video>
+                    <p id="status" translateRef="faceStatusScanning">Scanning...</p>
+                </div>
             </div>
         </main>
 
-        <!-- Chat Icon -->
-        <div class="chat-icon">
-            <span class="icon-bubble">💬</span>
-        </div>
-        
-        <!-- Language Modal (Standard content, not translated) -->
-        <div id="language-modal" class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span class="close-modal">&times;</span>
-                </div>
-                <div class="language-grid">
-                    <a href="#" class="language-option">English ✔</a>
-                    <a href="#" class="language-option">Chinese</a>
-                    <a href="#" class="language-option">Tamil</a>
-                    <a href="#" class="language-option">Malay</a>
-                    <a href="#" class="language-option">Japanese</a>
-                    <a href="#" class="language-option">Korean</a>
-                </div>
-            </div>
+        <a href="Index.html" class="back-btn" aria-label="Back">&larr;</a>
+
+        <div id="chat-toggle" class="chat-icon">
+            <span  class="icon-bubble">💬</span>
         </div>
 
-        <!-- Face Verification Modal (Content inside needs translation) -->
-        <div class = "face-modal-overlay" id="face-modal">
-            <div class="face-modal-content">
-                <h1 class="face-modal-title" translateRef="faceVerificationTitle">Face Verification</h1>
-                <p class="face-modal-instruction" translateRef="faceVerificationInstruction">Position your face within the frame</p>
-                <video id="video" width="480" height="360" autoplay muted></video>
-                <p id="status" translateRef="faceStatusScanning">Scanning...</p>
-            </div>
-        </div>
+        <div id="chat-root"></div>
     </div>
 
     <!-- JS file for modal functionality -->
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-    <script src="JS/language_modal.js"></script>
+    <script src="JS/index.js"></script>
     <script src="JS/login.js"></script>
+    <script src="JS/widget_loader.js" defer></script>
 </body>
 </html>

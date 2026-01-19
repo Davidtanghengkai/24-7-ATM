@@ -2,47 +2,60 @@ const sql = require('mssql');
 // 1. Corrected path
 const dbConfig = require('../dbConfig'); 
 
-
 async function createUser(userData) {
-    const { name, dob, nationalID, bioType, BioData } = userData;
+    console.log("Creating user with data:", userData);
+    const { name, dob, nationalID, Email, bioType, BioData } = userData;
     let pool;
     try {
         pool = await sql.connect(dbConfig);
 
-        const bioReq = pool.request();
-        bioReq.input("type", sql.VarChar, bioType);
-        bioReq.input("bioData", sql.VarChar, BioData);
-        //Insert bioData first to return biometricID
-        const bioResult = await bioReq.query(`
-            INSERT INTO Biometrics (type, bioData)
-            OUTPUT INSERTED.ID
-            VALUES (@type, @bioData)
+        // 1️⃣ Insert User first
+        const requestUser = pool.request();
+        requestUser.input('name', sql.VarChar, name);
+        requestUser.input('dob', sql.Date, dob);
+        requestUser.input('nationalID', sql.VarChar, nationalID);
+        requestUser.input('Email', sql.VarChar, Email);
+
+        const userResult = await requestUser.query(`
+            INSERT INTO [User] (name, DOB, nationalID, Email)
+            OUTPUT INSERTED.id
+            VALUES (@name, @dob, @nationalID, @Email)
         `);
 
-        const biometricID = bioResult.recordset[0].ID;
-        //insert User data now
-        const sqlStatement = `
-            INSERT INTO [User] (name, DOB, nationalID, biometricID)
-            OUTPUT INSERTED.id
-            VALUES (@name, @dob, @nationalID, @biometricID)`;
+        const userId = userResult.recordset[0].id;
 
-        const request = pool.request();
-        request.input('name', sql.VarChar, name);
-        request.input('dob', sql.Date, dob);
-        request.input('nationalID', sql.VarChar, nationalID);
-        request.input('biometricID', sql.Int, biometricID);
+        // 2️⃣ If biometric data is provided, insert it
+        if (bioType && BioData) {
+            const bioReq = pool.request();
+            let bioString;
 
-        const result = await request.query(sqlStatement);
-        return result.recordset[0].id; // Return the user ID
+            if (BioData instanceof Float32Array) {
+                bioString = JSON.stringify(Array.from(BioData));
+            } else if (typeof BioData === "string") {
+                bioString = BioData;
+            } else {
+                throw new Error("BioData must be a Float32Array or string");
+            }
+
+            bioReq.input("userID", sql.Int, userId);
+            bioReq.input("type", sql.VarChar, bioType);
+            bioReq.input("bioData", sql.NVarChar(sql.MAX), bioString);
+
+            await bioReq.query(`
+                INSERT INTO Biometrics (userID, type, bioData)
+                VALUES (@userID, @type, @bioData)
+            `);
+        }
+
+        return userId;
 
     } catch (err) {
-        console.error("Error in userModel.create:", err);
+        console.error("Error in userModel.createUser:", err);
         throw err;
     } finally {
         if (pool) pool.close();
     }
 }
-
 
 /**
  * Gets a single user by their ID.
@@ -113,17 +126,20 @@ const findUserByEmail = async (email) => {
 
 
 //Make biometrics MVC later
-async function getAllBiometrics() {
+async function getAllBiometricsWithUser() {
     let pool;
     try {
         pool = await sql.connect(dbConfig);
-        const result = await pool.request().query(`SELECT * FROM Biometrics`);
-        return result.recordset;
+        const result = await pool.request().query(`
+            SELECT b.ID AS biometricID, b.bioData, b.type, u.id AS userId
+            FROM Biometrics b
+            INNER JOIN [User] u ON b.userID = u.id
+        `);
+        return result.recordset || []; // always return an array so no errors
     } catch (err) {
-        console.error("Error in userModel.getAllBiometrics:", err);
+        console.error("Error in userModel.getAllBiometricsWithUser:", err);
         throw err;
-    }
-    finally {
+    } finally {
         if (pool) pool.close();
     }
 }
@@ -135,5 +151,5 @@ module.exports = {
     getUserById,
     getAllUsers,
     findUserByEmail,
-    getAllBiometrics
+    getAllBiometricsWithUser
 };

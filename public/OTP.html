@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATM OTP Verification</title>
-    <link rel="stylesheet" href="CSS/otp.css">
+    <link rel="stylesheet" type="text/css" href="CSS/index.css">
+    <link rel="stylesheet" type="text/css" href="CSS/chat.css">
+    <link rel="stylesheet" type="text/css" href="CSS/otp.css">
 </head>
 <body>
     <div class="atm-container">
-
-
         <div class="top-links">
             <a href="#" class="top-link" id="language-toggle">ENG</a>
             <span class="top-separator">|</span>
             <a href="TransactionCancel.html" class="top-link" translateRef="exitLink">Exit</a>
         </div>
-        
         
         <main id="email-step" class="main-content">
             <h1 class="greeting" translateRef="emailStepGreeting">
@@ -29,7 +28,6 @@
                 <button id="OTP" type="submit" form="otp-form" class="SBbtn" translateRef="sendOtpButton">Send OTP</button>
             </div>
         </main>
-        
         
         <main id="otp-step" class="main-content hidden">
             <h1 class="greeting" translateRef="otpStepGreeting">
@@ -46,25 +44,18 @@
             </div>
         </main>
 
-        <div id="language-modal" class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span class="close-modal">&times;</span>
-                </div>
-                <div class="language-grid">
-                    <a href="#" class="language-option">English ✔</a>
-                    <a href="#" class="language-option">Chinese</a>
-                    <a href="#" class="language-option">Tamil</a>
-                    <a href="#" class="language-option">Malay</a>
-                    <a href="#" class="language-option">Japanese</a>
-                    <a href="#" class="language-option">Korean</a>
-                </div>
-            </div>
+        <a href="LoginPage.html" class="back-btn" aria-label="Back">&larr;</a>
+
+        <div id="chat-toggle" class="chat-icon">
+            <span  class="icon-bubble">💬</span>
         </div>
+
+        <div id="chat-root"></div>
     </div>
 
-    <script src="JS/language_modal.js"></script>
-    <script src="JS/otp.js"></script> 
+    <script src="JS/index.js"></script>
+    <script src="JS/otp.js"></script>
+    <script src="JS/widget_loader.js" defer></script> 
 </body>
 
 </html>
