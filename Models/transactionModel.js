@@ -175,4 +175,80 @@ async function createTransaction(data) {
   }
 }
 
-module.exports = { createTransaction };
+async function createWithdrawal(data) {
+  const { accountNo, amount } = data;
+  let conn;
+  try {
+    conn = await sql.connect(dbConfig);
+    const request = conn.request();
+    request.input("accountNo", sql.Int, accountNo);
+    request.input("amount", sql.Decimal(18, 2), amount);
+    
+    // Using bankID = 1 as a default for ATM withdrawals
+    // receiverAccountNo = 'ATM'
+    const result = await request.query(`
+      INSERT INTO Transactions 
+        (senderAccountNo, receiverAccountNo, bankID, amount, currency, exchangeRate, totalConverted, status, txnType, timestamp)
+      VALUES 
+        (@accountNo, 'ATM', 1, @amount, 'SGD', 1.0, @amount, 'Confirmed', 'Withdrawal', GETDATE())
+    `);
+    
+    return { success: true };
+  } catch (err) {
+    console.error("Error in transactionModel.createWithdrawal:", err);
+    throw err;
+  } finally {
+    if (conn) await conn.close();
+  }
+}
+
+async function getTransactionsByAccount(accountNo) {
+  let conn;
+  try {
+    conn = await sql.connect(dbConfig);
+    const request = conn.request();
+    request.input("accountNo", sql.Int, accountNo);
+    
+    // Fetch transactions where the account is either the sender or the receiver
+    const result = await request.query(`
+      SELECT * FROM Transactions 
+      WHERE senderAccountNo = @accountNo OR receiverAccountNo = CAST(@accountNo AS VARCHAR(20))
+      ORDER BY timestamp DESC
+    `);
+    
+    return result.recordset;
+  } catch (err) {
+    console.error("Error in transactionModel.getTransactionsByAccount:", err);
+    throw err;
+  } finally {
+    if (conn) await conn.close();
+  }
+}
+
+async function createDeposit(data) {
+  const { accountNo, amount } = data;
+  let conn;
+  try {
+    conn = await sql.connect(dbConfig);
+    const request = conn.request();
+    request.input("accountNo", sql.Int, accountNo);
+    request.input("amount", sql.Decimal(18, 2), amount);
+    
+    // For deposits, sender is 'ATM' and receiver is the account
+    const result = await request.query(`
+      INSERT INTO Transactions 
+        (senderAccountNo, receiverAccountNo, bankID, amount, currency, exchangeRate, totalConverted, status, txnType, timestamp)
+      VALUES 
+        (1, CAST(@accountNo AS VARCHAR(20)), 1, @amount, 'SGD', 1.0, @amount, 'Confirmed', 'Deposit', GETDATE())
+    `);
+    
+    return { success: true };
+  } catch (err) {
+    console.error("Error in transactionModel.createDeposit:", err);
+    throw err;
+  } finally {
+    if (conn) await conn.close();
+  }
+}
+
+module.exports = { createTransaction, createWithdrawal, getTransactionsByAccount, createDeposit };
