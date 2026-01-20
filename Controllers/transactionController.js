@@ -1,5 +1,5 @@
 const { verifyBlockchainUser } = require("../Models/blockchainUser");
-const { createTransaction: createOverseasTxnSQLChain } = require("../Models/transactionModel");
+const { createTransaction: createOverseasTxnSQLChain, getTransactionsByAccount } = require("../Models/transactionModel");
 const { getExchangeRate } = require("../Models/exchangeRate");
 const { getBalance } = require("../Models/accountModel");
 async function createOverseasTransaction(req, res) {
@@ -109,4 +109,32 @@ async function createOverseasTransaction(req, res) {
   }
 }
 
-module.exports = { createOverseasTransaction };
+async function getHistory(req, res) {
+  try {
+    const { accountNo } = req.params;
+    if (!accountNo) {
+      return res.status(400).json({ message: "Missing accountNo" });
+    }
+
+    const transactions = await getTransactionsByAccount(accountNo);
+    
+    // Format transactions: negative for withdrawals/transfers out
+    const formatted = transactions.map(tx => {
+      const isSender = tx.senderAccountNo == accountNo;
+      const amount = Number(tx.amount);
+      
+      return {
+        ...tx,
+        displayAmount: isSender ? -amount : amount,
+        type: tx.txnType // 'Withdrawal', 'Overseas', etc.
+      };
+    });
+
+    res.json(formatted);
+  } catch (err) {
+    console.error("Controller Error (getHistory):", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+module.exports = { createOverseasTransaction, getHistory };
