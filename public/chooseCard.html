@@ -24,10 +24,37 @@
 
             <div class="account-container" id="account-container">
                 <!-- JS will load accounts here -->
+                <button class="account-button active" id="account1"><b>Account 1</b></button>
+                <button class="account-button" id="account2">Account 2</button>
+                <button class="account-button" id="account3">Account 3</button>
+                <button class="account-button" id="account4">Account 4</button>
+                <button class="account-button" id="account5">Account 5</button>
             </div>
+
+            <div class="account-details" id="account-details">
+                <!-- JS will load Account details here -->
+
+                <h2 class="account-no">Account No: ${acc.AccountNo}</h2>
+                <h3 class="account-type">Account type:{acc.Type}</h3>
+                <h3 class="account-balance">Balance: $${acc.Balance.toFixed(2)}</h3>
+
+                <h2 class="cards-title"><i>Select Card</i></h2>
+                <div class="cards-container" id="cards-container">
+                    <div class="cards-grid">
+                <button class="card-button" id="card1">Card 1</button>
+                <button class="card-button" id="card2">Card 2</button>
+                <button class="card-button" id="card3">Card 3</button>
+                <button class="card-button" id="card4">Card 4</button>
+                <button class="card-button" id="card5">Card 5</button>
+                    </div>
+
+                </div>
+
+            </div>
+            
         </main>
 
-        <a href="NewHomePage.html" class="back-btn" aria-label="Back">&larr;</a>
+        <a href="LoginPage.html" class="back-btn" aria-label="Back">&larr;</a>
 
         <div id="chat-toggle" class="chat-icon">
             <span  class="icon-bubble">💬</span>
