@@ -1,4 +1,5 @@
 const accountModel = require('../Models/accountModel');
+const transactionModel = require('../Models/transactionModel');
 
 
 async function fetchBalance(req, res) {
@@ -79,7 +80,10 @@ async function addBalance(req, res) {
       return res.status(404).json({ message: "Account not found" });
     }
 
-    // 3. Success
+    // 3. Log transaction
+    await transactionModel.createDeposit({ accountNo, amount });
+
+    // 4. Success
     return res.status(200).json({
       message: "Balance updated successfully (deposit added)",
       accountNo,
@@ -92,7 +96,52 @@ async function addBalance(req, res) {
   }
 }
 
+async function withdraw(req, res) {
+  try {
+    const { accountNo, amount } = req.body;
+
+    if (!accountNo || !amount) {
+      return res.status(400).json({ message: "Missing accountNo or amount" });
+    }
+
+    const amtNum = Number(amount);
+    if (isNaN(amtNum) || amtNum <= 0) {
+      return res.status(400).json({ message: "Amount must be greater than 0" });
+    }
+
+    // 1. Check balance
+    const balance = await accountModel.getBalance(accountNo);
+    if (balance === null) {
+      return res.status(404).json({ message: "Account not found" });
+    }
+
+    if (Number(balance) < amtNum) {
+      return res.status(400).json({ message: "Insufficient balance" });
+    }
+
+    // 2. Deduct balance
+    const success = await accountModel.updateBalance(accountNo, amtNum);
+
+    if (!success) {
+      return res.status(500).json({ message: "Failed to update balance" });
+    }
+
+    // 3. Log transaction
+    await transactionModel.createWithdrawal({ accountNo, amount: amtNum });
+
+    return res.status(200).json({
+      message: "Withdrawal successful",
+      accountNo,
+      amount: amtNum
+    });
+
+  } catch (error) {
+    console.error("Controller Error (withdraw):", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
     getAccountsByUserId,
-    createAccount, fetchBalance, updateAccountBalance, addBalance
+    createAccount, fetchBalance, updateAccountBalance, addBalance, withdraw
 };
