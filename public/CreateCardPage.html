@@ -4,6 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create OCBC Card</title>
+<<<<<<< HEAD
+    <link rel="stylesheet" href="CSS/CreateCardPage.css"> 
+</head>
+<body>
+    <div class="atm-container">
+        <div class="top-links">
+            <a href="#" class="top-link" id="language-toggle">Eng</a>
+            <span class="top-separator">|</span>
+            <a href="TransactionCancel.html" class="top-link">Exit</a>
+        </div>
+
+        <a href="Index.html" class="back-link">Back</a> 
+        
+        <main class="main-content">
+            <h1 class="greeting">
+                Hello!<br>
+                Please scan your face to check if you're an existing OCBC member
+            </h1>
+
+            <div class="verification-grid">
+                <button class="verification-card">
+                    <div class="icon-container face-icon">
+                        <img src="photos/face_id.png" alt="Face ID" class="verification-img">
+                    </div>
+                    <span class="card-text">Face ID</span>
+                </button>
+            </div>
+        </main>
+
+        <div class="chat-icon">
+            <span class="icon-bubble">💬</span>
+        </div>
+
+        <div id="language-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="language-grid">
+                    <a href="#" class="language-option">English ✔</a>
+                    <a href="#" class="language-option">Chinese</a>
+                    <a href="#" class="language-option">Tamil</a>
+                    <a href="#" class="language-option">Malay</a>
+                    <a href="#" class="language-option">Japanese</a>
+                    <a href="#" class="language-option">Korean</a>
+                </div>
+            </div>
+        </div>
+=======
     <link rel="stylesheet" type="text/css" href="CSS/index.css">
     <link rel="stylesheet" type="text/css" href="CSS/chat.css">
     <link rel="stylesheet" type="text/css" href="CSS/CreateCardPage.css">
@@ -15,6 +64,7 @@
         <a href="#" class="top-link" id="language-toggle">Eng</a>
         <span class="top-separator">|</span>
         <a href="TransactionCancel.html" class="top-link">Exit</a>
+>>>>>>> 166062eadc9ac3fddab718b2595d4f1374d92a48
     </div>
     
     <main class="main-content">
@@ -65,6 +115,17 @@
             <label for="dob">Date of Birth:</label>
             <input type="date" id="dob" name="dob" required>
 
+<<<<<<< HEAD
+                <div class="video-container" style="width: 100%; height: auto; max-height: 200px; margin-bottom: 20px;">
+                    <label for="face-registration">Scan Your Face Again:</label>
+                    <video id="face-registration-video" autoplay muted playsinline style="width: 50%; height: auto; transform: scaleX(-1); border-radius: 8px;"></video>
+                </div>
+                <p id="status-reg" style="text-align: center; font-weight: bold;">Starting scan...</p>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    </div>
+=======
             <label for="ic">IC Number:</label>
             <input type="text" id="ic" name="ic" required>
 
@@ -104,6 +165,7 @@
     </div>
 </div>
 
+>>>>>>> 166062eadc9ac3fddab718b2595d4f1374d92a48
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script src="JS/index.js"></script>
     <script src="JS/create_card.js"></script>
