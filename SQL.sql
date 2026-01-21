@@ -12,6 +12,8 @@ CREATE TABLE [User] (
     DOB DATE,
     nationalID VARCHAR(50),
     Email VARCHAR(255) UNIQUE,
+    AccessCode VARCHAR(50) UNIQUE,
+    LoginPin VARCHAR(255)
 );
 
 -- Creating the Biometrics table

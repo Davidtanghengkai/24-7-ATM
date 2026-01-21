@@ -104,3 +104,72 @@ body {
     font-weight: 600;
     box-shadow: 0 4px 15px rgba(212, 46, 46, 0.2);
 }
+
+
+/* --- Login Page (Screen 2) --- */
+
+.login-page-bg {
+    background-color: #ffffff !important;
+    justify-content: flex-start !important; 
+}
+
+.nav-header {
+    width: 100%;
+    padding: 20px 25px;
+    font-size: 1.4rem;
+    color: #333;
+}
+
+.login-form-container {
+    width: 88%;
+    margin-top: 30px;
+}
+
+.input-group {
+    margin-bottom: 45px;
+    border-bottom: 1px solid #dbdbdb; /* Subtle grey line */
+}
+
+.input-group input {
+    width: 100%;
+    border: none;
+    padding: 12px 0;
+    font-size: 1.1rem;
+    outline: none;
+    color: #333;
+    background: transparent;
+}
+
+.input-group input::placeholder {
+    color: #a0a0a0;
+}
+
+.action-container {
+    margin-top: 50px;
+    text-align: center;
+}
+
+.submit-login-btn {
+    width: 100%;
+    background-color: #d7e1e9; /* Matches the muted blue-grey in your photo */
+    color: #ffffff;
+    border: none;
+    padding: 14px 0;
+    border-radius: 4px; /* Flatter buttons in this screen */
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.trouble-text {
+    margin-top: 30px;
+    color: #2271b3; /* OCBC blue link color */
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.back {
+    font-size: 1.4rem;
+    color: #333;
+    cursor: pointer;
+}

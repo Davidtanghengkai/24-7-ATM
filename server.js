@@ -74,8 +74,10 @@ app.get('/api/users/find', userController.findUserByEmail);
 app.get('/api/biometrics', userController.getAllBiometrics);
 app.post('/api/users/loginWithFace', userController.loginWithFace);
 app.get('/mobile', (req, res) => {
-    res.sendFile(path.join(__dirname, 'WebSocket', 'MobIndex.html'));
+    res.sendFile(path.join(__dirname, 'public', 'MobIndex.html'));
 });
+app.post('/api/users/verifyMobLogin', userController.verifyMobLogin); 
+app.post('/api/users', userController.createUser);
 
 // == Card Routes ==
 app.post('/api/cards', cardController.createCard);
@@ -123,12 +125,9 @@ const server = app.listen(port, () => {
 });
 
 MobServer.listen(port, '0.0.0.0', () => {
-    console.log(`===============================================`);
-    console.log(`Server running on ${port}/Index.html`);
-    console.log(`API documentation: http://localhost:${port}/api-docs`);
+
     //REPLACE PART WITH YOUR IP ADDRESS
     //console.log(`Mobile Server running on:  http://<IP ADDRESS>:${port}/mobile`);
-    console.log(`===============================================`);
 });
 
 process.on("SIGINT", async () => {

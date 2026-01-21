@@ -144,6 +144,27 @@ async function getAllBiometricsWithUser() {
     }
 }
 
+//WebSocket function for mobile 
+async function verifyMobLogin(accessCode, loginPin) {
+    let pool;
+    try {
+        pool = await sql.connect(dbConfig);
+        const request = pool.request();
+        request.input('accessCode', sql.VarChar, accessCode);
+        request.input('loginPin', sql.VarChar, loginPin);
+
+        const query = "SELECT id, name FROM [User] WHERE accessCode = @accessCode AND LoginPin = @loginPin";
+        const result = await request.query(query);
+
+        return result.recordset[0]; 
+    } catch (err) {
+        throw new Error("Model Error: " + err.message);
+    } finally {
+        if (pool) await pool.close();
+    } 
+}
+
+
 
 
 module.exports = {
@@ -151,5 +172,6 @@ module.exports = {
     getUserById,
     getAllUsers,
     findUserByEmail,
-    getAllBiometricsWithUser
+    getAllBiometricsWithUser,
+    verifyMobLogin
 };

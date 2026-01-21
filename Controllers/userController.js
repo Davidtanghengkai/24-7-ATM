@@ -109,7 +109,37 @@ async function loginWithFace(req, res) {
         return res.status(500).json({ message: 'Server error', error: err.message });
     }
 }
+//WebSocket functions added here
+async function verifyMobLogin(req, res) {
+    const { LoginPin, accessCode } = req.body;
+    if (!LoginPin || !accessCode) {
+        return res.status(400).json({ message: 'LoginPin and accessCode are required' });
+    }
+    try {
+        const user = await userModel.verifyMobLogin(LoginPin, accessCode);[]
 
+        if (!user) {
+            return res.status(404).json({ message: "Invalid Access Code or Login Pin" });
+        }
+
+
+        const token = jwt.sign(
+            { userId: user.id },
+            process.env.JWT_SECRET || 'secret',
+            { expiresIn: '1h' }
+        );
+
+        res.status(200).json({ 
+            message: "Login successful", 
+            token, 
+            userId: user.id, 
+            userName: user.name 
+        });
+    } catch (err) {
+        console.error('VerifyMobLogin error:', err);
+        return res.status(500).json({ message: 'Server Login error', error: err.message });
+    }
+}
 
 module.exports = {
     createUser,
@@ -117,5 +147,6 @@ module.exports = {
     getAllUsers,
     findUserByEmail,
     getAllBiometrics,
-    loginWithFace
+    loginWithFace,
+    verifyMobLogin
 };
