@@ -263,3 +263,99 @@
 .reg-btn:hover {
   background: #b01f1f;
 }
+
+
+/* --- Registration Success Styling --- */
+.registration-success,
+.create-card-form {
+  display: none; /* hidden by default */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 500px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.registration-success.active,
+.create-card-form.active {
+  display: flex;
+}
+
+.success-title,
+.create-card-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.success-message,
+.access-code,
+.card-prompt {
+  font-size: 16px;
+  margin: 8px 0;
+}
+
+.access-code {
+  font-weight: 600;
+  color: #d72626;
+  font-size: 20px;
+}
+
+.success-btn,
+.no-btn,
+.create-card-btn {
+  padding: 10px 20px;
+  margin: 8px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.success-btn,
+.create-card-btn {
+  background-color: #d72626;
+  color: white;
+}
+
+.success-btn:hover,
+.create-card-btn:hover {
+  background-color: #b01f1f;
+}
+
+.no-btn {
+  background-color: #ccc;
+  color: #333;
+}
+
+.no-btn:hover {
+  background-color: #aaa;
+}
+
+/* Card form inputs */
+.create-card-form input[type="password"],
+.create-card-form input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .registration-form {
+    grid-template-columns: 1fr;
+  }
+
+  .form-right {
+    margin-top: 15px;
+  }
+}

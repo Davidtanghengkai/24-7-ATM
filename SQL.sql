@@ -31,6 +31,8 @@ CREATE TABLE Accounts (
     userID INT, -- Reference to the User
     Balance DECIMAL(18, 2), -- Account balance
     Type VARCHAR(50), -- Type of account (savings, checking, etc.)
+    AccountName VARCHAR(25) NOT NULL default 'Account',
+    Status VARCHAR(10) NOT NULL DEFAULT 'Active',
     FOREIGN KEY (userID) REFERENCES [User](id) -- Foreign Key referencing User table
 );
 
@@ -39,7 +41,7 @@ CREATE TABLE Card (
     CardNo INT PRIMARY KEY IDENTITY(1,1), -- Card number as the primary key
     UserID INT, -- Reference to the User
     AccountNo INT, -- Reference to the Account
-    status VARCHAR(50), -- Card status (active, blocked, etc.)
+    status VARCHAR(50) NOT NULL DEFAULT 'Active', -- Card status (active, blocked, etc.)
     expiryDate DATE, -- Expiry date of the card
     PIN VARCHAR(6), -- 6-digit PIN
     createdTime DATETIME, -- Time the card was created

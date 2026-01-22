@@ -1,24 +1,27 @@
 const sql = require("mssql");
 const dbConfig = require("../dbConfig");
 
+
 async function createAccount(accountData) {
-    const { userId, accountType, balance } = accountData;
+    const { userId, Balance, Type, AccountName, Status } = accountData; // match JS payload
     let pool;
     try {
         pool = await sql.connect(dbConfig);
         const sqlStatement = `
-            INSERT INTO Accounts (userID, Balance, Type)
+            INSERT INTO Accounts (userID, Balance, Type, AccountName, Status)
             OUTPUT INSERTED.AccountNo
-            VALUES (@userId, @balance, @accountType)
+            VALUES (@userId, @Balance, @Type, @AccountName, @Status)
         `;
 
         const request = pool.request();
         request.input('userId', sql.Int, userId);
-        request.input('balance', sql.Decimal(18, 2), balance);
-        request.input('accountType', sql.VarChar, accountType);
+        request.input('Balance', sql.Decimal(18, 2), Balance);
+        request.input('Type', sql.VarChar(50), Type);
+        request.input('AccountName', sql.VarChar(100), AccountName);
+        request.input('Status', sql.VarChar(20), Status);
 
         const result = await request.query(sqlStatement);
-        return result.recordset[0].AccountNo; // note the exact casing
+        return result.recordset[0].AccountNo;
 
     } catch (err) {
         console.error("Error in accountModel.createAccount:", err);
@@ -27,7 +30,6 @@ async function createAccount(accountData) {
         if (pool) pool.close();
     }
 }
-
 async function getAccountsByUserId(userId) {
     let pool;
     try {

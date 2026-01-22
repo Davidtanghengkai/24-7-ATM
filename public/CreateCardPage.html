@@ -68,6 +68,9 @@
             <label for="ic">IC Number:</label>
             <input type="text" id="ic" name="ic" required>
 
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" placeholder="example@email.com" required>
+
             <label for="accountType">Account Type</label>
             <select id="accountType" name="accountType" required>
                 <option value="" disabled selected>Select account type</option>
@@ -76,19 +79,17 @@
                 <option value="personal">Personal Use</option>
             </select>
 
-            <label for="email">Email Address:</label>
-            <input type="email" id="email" name="email" placeholder="example@email.com" required>
+            <label for="account-description">Account Description:</label>
+            <input type="text" id="account-description" name="account-description" maxlength="25" placeholder="e.g., My Primary Account" required>
 
-            <label for="pin">New Card PIN (6 digits):</label>
-            <input type="password" id="pin" name="pin" pattern="\d{6}" minlength="6" maxlength="6" placeholder="••••••" required>
+            <label for="pin">New Profile PIN (8 digits):</label>
+            <input type="password" id="profile-pin" name="profile-pin" pattern="\d{8}" minlength="8" maxlength="8" placeholder="••••••••" required>
 
             </div>
 
             <!-- Right column: video -->
             <div class="form-right">
-                <label for="card-description">Card Description:</label>
-                <input type="text" id="card-description" name="card-description" maxlength="25" placeholder="e.g., My Primary Card" required>
-
+                
             <label>Scan Your Face</label>
             <div class="scan-box">
                 <video id="video1" autoplay muted playsinline></video>
@@ -100,6 +101,28 @@
             <p id="status1">Scanning...</p>
             </div>
             <button type="submit" class="reg-btn">Register</button>
+        </form>
+
+        <form class="registration-success" id="registration-success">
+            <h1 class="success-title">Account Registration Successful!</h1>
+            <p class="success-message">Your OCBC Account has been created successfully.</p>
+            <p class="access-code" id="access-code"></p>
+            <p class="card-prompt">Would you like to add a new card to your account?</p>
+            <button type="button" class="success-btn" id="success-btn">Yes</button>
+            <button type="button" class="no-btn" id="no-btn">No</button>
+        </form>
+
+        <form class="create-card-form" id="create-card-form">
+            <h1 class="create-card-title">Create New OCBC Card</h1>
+
+            <label for="pin">New Card PIN (6 digits):</label>
+            <input type="password" id="pin" name="pin" pattern="\d{6}" minlength="6" maxlength="6" placeholder="••••••" required>
+
+            <label for="card-description">Card Description:</label>
+            <input type="text" id="card-description" name="card-description" maxlength="25" placeholder="e.g., My Primary Card" required>
+
+
+            <button type="submit" class="create-card-btn">Create Card</button>
         </form>
     </div>
 </div>
