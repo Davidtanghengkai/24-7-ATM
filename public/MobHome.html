@@ -39,10 +39,20 @@
             </div>
         </div>
 
-        <div class="content-card">
-            <div class="grey-img-placeholder">💳</div>
-            <p>No credit cards</p>
-            <a href="#">Check out our credit cards</a>
+                <div class="account-slider-container">
+            <div class="account-slider" id="accountSlider">
+                <div class="loading-spinner">Loading accounts...</div>
+            </div>
+        </div>
+
+        <div class="content-card" id="cardContentBox">
+            <div id="emptyState">
+                <div class="grey-img-placeholder">💳</div>
+                <p id="placeholderText">Select an account to see your cards</p>
+            </div>
+
+            <div id="cardList" style="display: none;">
+                </div>
         </div>
 
         <nav class="bottom-nav">
@@ -54,13 +64,6 @@
         </nav>
     </div>
 
-    <script>
-        document.getElementById('userName').innerText = localStorage.getItem('userName') || 'User';
-        
-        function logout() {
-            localStorage.clear();
-            window.location.href = '/mobile';
-        }
-    </script>
+    <script src="JS/MobHome.js"></script>
 </body>
 </html>
