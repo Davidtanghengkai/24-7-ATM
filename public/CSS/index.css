@@ -1,3 +1,4 @@
+/* Reset */
 * {
   margin: 0;
   padding: 0;
@@ -11,101 +12,95 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  padding: 20px;
 }
 
-/* White card container */
+/* ATM container */
 .atm-container {
-  background: white;
-  width: 85%;
-  position: relative;
-  max-width: 1100px;
+  background: #d9d9d9;
+  width: 1100px;
+  height: 700px;
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
   position: relative;
 }
 
-/* Banner sections */
+/* Banner (optional if you use it) */
 .banner {
   position: relative;
   width: 100%;
-}
-
-.top-links {
-    position: absolute;
-    top: 25px;
-    right: 40px;
-    z-index: 10; /* Ensures they are on top */
-    font-size: 1.1em;
-    color: #475066;
-}
-.top-link {
-    color: #333;
-    text-decoration: none;
-    margin: 0 8px;
-    font-weight: bold;
-}
-.top-link:hover {
-    text-decoration: underline;
-}
-.top-separator {
-    color: #475066;
+  overflow: hidden;
 }
 
 .banner-img {
   width: 100%;
   height: auto;
   display: block;
-  object-fit: contain; /* ensures full image visible */
+  object-fit: contain;
 }
 
-/* Language text */
-.lang {
+/* Top navigation links (top-right) */
+.top-links {
   position: absolute;
-  top: 15px;
-  right: 25px;
-  font-size: 0.9rem;
-  color: #222;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.7);
-  padding: 4px 8px;
-  border-radius: 6px;
+  top: 25px;
+  right: 40px;
+  z-index: 20;
+  font-size: 1.1em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+.top-link {
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.top-link:hover {
+  text-decoration: underline;
+}
+
+.top-separator {
+  color: #475066;
+}
+
+/* Features section (optional if you use buttons) */
 .features {
   display: flex;
-  justify-content: center;
+  margin-left:25px;
+  justify-content:flex-start;
   align-items: stretch;
   flex-wrap: wrap;
-  padding: 2rem 1.5rem;
   gap: 1.2rem;
+  padding: 2rem 1.5rem 3.5rem;
 }
 
 .feature-btn {
   background-color: #134c5f;
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 10px;
-  flex: 1 1 250px; /* all buttons same size */
+  flex: 1 1 250px;
   min-width: 250px;
   max-width: 300px;
-  text-align: center;
   padding: 1.3rem;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  text-align: center;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .feature-btn span {
-  display: block;
-  font-weight: 400;
-  font-size: 0.9rem;
-  opacity: 0.9;
   margin-top: 4px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  opacity: 0.9;
 }
 
 .feature-btn:hover {
@@ -113,10 +108,156 @@ body {
   transform: translateY(-3px);
 }
 
+/* =========================
+   Language Panel (IN-CONTAINER)
+   ========================= */
+.language-panel {
+  position: absolute;
+  top: 60px;         /* below top-links */
+  right: 30px;       /* align near top-right */
+  width: 420px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  display: none;     /* JS toggles to block */
+  z-index: 50;
+  overflow: hidden;
+}
+
+.language-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.language-title{
+  font-size: 14pt;
+  font-weight: 600;
+  padding-top: 6px;
+  color:#e50000;
+}
+
+.language-close {
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.language-close:hover {
+  background-color: #e50000;
+  color: #fff;
+}
+
+.language-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 16px;
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #134c5f;
+  font-weight: 600;
+  border: 1px solid #ddd;
+  background: #fafafa;
+  user-select: none;
+}
+
+.language-option.selected {
+  border-color: #e50000;     /* OCBC red */
+  color: #e50000;
+  background: #fff5f5;       /* subtle red tint */
+}
+
+.language-option:not(.selected):hover {
+  background: #f5f9fc;
+  border-color: #004b6e;
+}
+
+.back-btn {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+
+  background: #ffffff;
+  color: #004a4f;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 1.8em;
+  font-weight: 700;
+  text-decoration: none;
+
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  z-index: 20;
+}
+
+.back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.35);
+}
+
+.back-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
 
 /* Responsive */
 @media (max-width: 768px) {
   .feature-btn {
-    width: 90%;
+    max-width: 90%;
+  }
+
+  .top-links {
+    top: 12px;
+    right: 15px;
+    font-size: 1rem;
+  }
+
+  /* If you keep .lang badge */
+  .lang {
+    top: 12px;
+    left: 15px;
+    right: auto;
+  }
+
+  .language-panel {
+    top: 52px;
+    right: 15px;
+    width: min(420px, 92%);
+  }
+}
+
+@media (max-width: 520px) {
+  .language-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .language-panel {
+    right: 4%;
+    width: 92%;
   }
 }

@@ -264,6 +264,10 @@ async function sendText(text) {
 
 
         // redirect on specific intent
+
+        if (topIntent === "action_3978_intent_47611"){
+            window.location.href = "/CreateCardPage.html";
+        }
         
         //withdraw money directions
         if (topIntent === "action_39373_intent_26859") {

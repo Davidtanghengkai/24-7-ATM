@@ -4,15 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OCBC ATM Innovation</title>
-  <link rel="stylesheet" href="CSS/index.css" />
-  <link rel="stylesheet" href="CSS/chat.css" />
-  <link rel="stylesheet" href="CSS/ChatbotIcon.css" />
-    <link rel="stylesheet" href="CSS/languageModal.css" />
+  <link rel="stylesheet" type="text/css" href="CSS/index.css">
+  <link rel="stylesheet" type="text/css" href="CSS/chat.css">
 </head>
-
 <body>
     <div class="atm-container">
-
         <section class="banner">
             <div class="top-links">
                 <a href="#" class="top-link" id="language-toggle">ENG</a>
@@ -39,38 +35,15 @@
                 <strong translateRef="governmentPayoutTitle">Government Payout</strong>
             </button>
         </section>
+
         <div id="chat-toggle" class="chat-icon">
             <span  class="icon-bubble">💬</span>
-        </div>
-        
-        
-
-        <div id="language-modal" class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span class="close-modal">&times;</span>
-                </div>
-                <div class="language-grid">
-                    <a href="#" class="language-option">English ✔</a>
-                    <a href="#" class="language-option">Chinese</a>
-                    <a href="#" class="language-option">Tamil</a>
-                    <a href="#" class="language-option">Malay</a>
-                    <a href="#" class="language-option">Japanese</a>
-                    <a href="#" class="language-option">Korean</a>
-                    <a href="#" class="language-option">Arabic</a>
-                    <a href="#" class="language-option">Bengali</a>
-                    <a href="#" class="language-option">Burmese</a>
-                </div>
-            </div>
-            
         </div>
        
         <div id="chat-root"></div>
     </div>
-    
   </div>
   <script src="JS/index.js"></script>
-  <script src="JS/language_modal.js"></script> 
   <script src="JS/widget_loader.js" defer></script>
 </body>
 

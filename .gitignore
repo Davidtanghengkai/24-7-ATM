@@ -66,3 +66,18 @@ DbConfig.js
 # Google Application Credentials
 secureFolder/
 myatmproject-5425b7865e14.json
+
+# Hardhat files
+/cache
+/artifacts
+
+# TypeChain files
+/typechain
+/typechain-types
+
+# solidity-coverage files
+/coverage
+/coverage.json
+
+# Hardhat Ignition default folder for deployments against a local node
+ignition/deployments/chain-31337
