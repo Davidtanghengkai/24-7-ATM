@@ -1,0 +1,43 @@
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+body { background-color: #f5f5f5; color: #333; }
+
+.mobile-container { max-width: 400px; margin: 0 auto; background: #fff; min-height: 100vh; padding-bottom: 80px; }
+
+/* Header */
+.header { display: flex; justify-content: space-between; padding: 15px; align-items: center; }
+.logout-link { background: none; border: none; color: #0066cc; font-weight: bold; cursor: pointer; }
+
+/* Welcome */
+.welcome { padding: 20px; }
+.welcome h1 { font-size: 28px; font-weight: 700; }
+
+/* Quick Actions */
+.quick-actions-card {
+    display: flex; justify-content: space-around; align-items: center;
+    background: white; margin: 0 15px; padding: 20px 10px;
+    border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.action-item { text-align: center; font-size: 11px; flex: 1; }
+.icon-box { font-size: 24px; margin-bottom: 5px; }
+.icon-box-grey { font-size: 24px; color: #888; background: #eee; border-radius: 50%; width: 40px; height: 40px; line-height: 40px; margin: 0 auto 5px; }
+.divider { width: 1px; height: 40px; background: #eee; }
+
+/* Content Card */
+.content-card {
+    background: #fdf8f8; 
+    margin: 20px 15px 0 15px; /* Added 20px margin-top here */
+    padding: 40px;
+    text-align: center; 
+    border-radius: 12px; 
+    border: 1px solid #eee;
+}
+.grey-img-placeholder { font-size: 50px; background: #e0e0e0; width: 80px; height: 50px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
+
+/* Bottom Nav */
+.bottom-nav {
+    position: fixed; bottom: 0; width: 100%; max-width: 400px;
+    display: flex; justify-content: space-around; background: white;
+    padding: 10px 0; border-top: 1px solid #eee;
+}
+.nav-item { text-align: center; font-size: 10px; color: #666; display: flex; flex-direction: column; }
+.nav-item.active { color: #d7191c; }

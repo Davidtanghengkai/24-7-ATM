@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OCBC Login</title>
+    <link rel="stylesheet" href="/css/MobIndex.css">
+</head>
+<body class="login-page-bg">
+
+    <div class="nav-header">
+        <i class="back" onclick="window.history.back()"><</i>
+    </div>
+
+    <div class="login-form-container">
+        <div class="input-group">
+            <input type="text" id="accessCode" placeholder="Access Code" autocomplete="off">
+        </div>
+
+        <div class="input-group">
+            <input type="password" id="loginPin" placeholder="PIN" autocomplete="off">
+        </div>
+
+        <div class="action-container">
+            <button class="submit-login-btn" onclick="submitLogin()">Log in</button>
+            <p class="trouble-text" onclick="window.location.href='MobHome.html'">Trouble logging in</p>
+            
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/MobLogin.js"></script>
+</body>
+</html>

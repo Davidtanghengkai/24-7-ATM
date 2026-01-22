@@ -12,6 +12,8 @@ CREATE TABLE [User] (
     DOB DATE,
     nationalID VARCHAR(50),
     Email VARCHAR(255) UNIQUE,
+    AccessCode VARCHAR(50) UNIQUE,
+    LoginPin VARCHAR(255)
 );
 
 -- Creating the Biometrics table
@@ -48,12 +50,12 @@ CREATE TABLE Card (
 
 
 -- Insert into Users table
-INSERT INTO [User] (Name, Dob, nationalId,Email)
+INSERT INTO [User] (Name, Dob, nationalId,Email, AccessCode, LoginPin)
 VALUES 
-('John Tan', GETDATE(), 'S1234567J','hi1@gmail.com'),
-('Mary Lim', GETDATE(), 'S2345678B','hi2@gmail.com'),
-('Ahmad Ali', GETDATE(), 'S3456789C','hi3@gmail.com'),
-('Siti Rahman', GETDATE(), 'S4567890D','hi4@gmail.com');
+('John Tan', GETDATE(), 'S1234567J','hi1@gmail.com', 'USR001', '1234'),
+('Mary Lim', GETDATE(), 'S2345678B','hi2@gmail.com', 'USR002', '4321'),
+('Ahmad Ali', GETDATE(), 'S3456789C','hi3@gmail.com', 'USR003', '5555'),
+('Siti Rahman', GETDATE(), 'S4567890D','hi4@gmail.com', 'USR004', '6666');
 
 select * from [User]
 -- 2️⃣ Insert into Accounts table

@@ -1,4 +1,6 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const dotenv = require("dotenv");
 const cors = require('cors'); 
 const path = require("path");
@@ -9,6 +11,10 @@ dotenv.config();
 
 //Initialize Express App
 const app = express();
+const MobServer = http.createServer(app);
+const io = new Server(MobServer, {       
+    cors: { origin: "*" }             
+});
 const port = process.env.PORT || 3000; 
 
 // Middlewares
@@ -67,6 +73,11 @@ app.get('/api/users', userController.getAllUsers);
 app.get('/api/users/find', userController.findUserByEmail);
 app.get('/api/biometrics', userController.getAllBiometrics);
 app.post('/api/users/loginWithFace', userController.loginWithFace);
+app.get('/mobile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'MobIndex.html'));
+});
+app.post('/api/users/verifyMobLogin', userController.verifyMobLogin); 
+app.post('/api/users', userController.createUser);
 
 // == Card Routes ==
 app.post('/api/cards', cardController.createCard);
@@ -113,6 +124,12 @@ app.use('/api/watson', watsonRoutes);
 const server = app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/Index.html`);
     console.log(`API documentation: http://localhost:${port}/api-docs`);
+});
+
+MobServer.listen(port, '0.0.0.0', () => {
+
+    //REPLACE PART WITH YOUR IP ADDRESS
+    //console.log(`Mobile Server running on:  http://<IP ADDRESS>:${port}/mobile`);
 });
 
 process.on("SIGINT", async () => {

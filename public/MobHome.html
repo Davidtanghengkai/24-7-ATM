@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATM Mobile Home</title>
+    <link rel="stylesheet" href="CSS/MobHome.css">
+</head>
+<body>
+    <div class="mobile-container">
+        <header class="header">
+            <div class="header-left"></div> 
+            <div class="header-right">
+                <button onclick="logout()" class="logout-link">Logout</button>
+            </div>
+        </header>
+
+        <section class="welcome">
+            <h1>Hello, <span id="userName">User</span>!</h1>
+        </section>
+
+        <div class="quick-actions-card">
+            <div class="action-item">
+                <div class="icon-box">💰</div>
+                <span>PayNow</span>
+            </div>
+            <div class="action-item">
+                <div class="icon-box">📷</div>
+                <span>Scan & Pay</span>
+            </div>
+            <div class="action-item">
+                <div class="icon-box">💱</div>
+                <span>Foreign Exchange</span>
+            </div>
+            <div class="divider"></div>
+            <div class="action-item">
+                <div class="icon-box-grey">⚙️</div>
+                <span>Customise</span>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="grey-img-placeholder">💳</div>
+            <p>No credit cards</p>
+            <a href="#">Check out our credit cards</a>
+        </div>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active">🏠<span>Home</span></div>
+            <div class="nav-item">🌱<span>Plan</span></div>
+            <div class="nav-item">🔄<span>Pay & Transfer</span></div>
+            <div class="nav-item">🎁<span>Rewards</span></div>
+            <div class="nav-item">⣿<span>More</span></div>
+        </nav>
+    </div>
+
+    <script>
+        document.getElementById('userName').innerText = localStorage.getItem('userName') || 'User';
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/mobile';
+        }
+    </script>
+</body>
+</html>
