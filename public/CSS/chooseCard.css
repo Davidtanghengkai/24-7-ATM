@@ -16,6 +16,9 @@
     font-size: 2rem;
     color: #134c5f;
     margin-bottom: 1rem;
+    border-bottom: 5px solid #134c5f;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 /* =========================================
@@ -23,67 +26,94 @@
    ========================================= */
 .account-container {
     display: flex;
-    flex-direction: column;
-    gap: 2.5rem;                /* more vertical space between boxes */
+    flex-direction: row;
+    justify-content: flex-start;
     align-items: center;
-    width: 95%;
-    max-height: 600px;         /* a bit taller */
-    overflow-y: auto;
-    padding: 1.5rem 3rem;      /* increased padding */
+    width: calc(100% - 6rem); /* Match the width of the cards-container */
+    overflow-x: auto; 
+    scrollbar-width: none;
 }
 
-.account-block {
-    display: flex;
-    width: 100%;
-    border: 1px solid #e0e0e0;
-    border-radius: 14px;       /* slightly larger radius */
-    padding: 40px;             /* bigger padding */
-    margin-bottom: 42px;
-    box-sizing: border-box;
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);  /* slightly stronger shadow */
-    align-items: center;
-    min-height: 140px;         /* ensure a taller block */
+.account-container::-webkit-scrollbar {
+    display: none;
 }
 
-.account-left {
-    width: 45%;                /* slightly larger left column */
-    font-size: 1.5rem;         /* larger text */
-    font-weight: 800;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    color: #134c5f;
-    line-height: 1.15;
-}
-
-.account-right {
-    width: 55%;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 28px;                 /* larger gap between buttons */
-    padding-left: 48px;
-    align-items: center;
-}
-
-.card-btn {
-    padding: 28px;             /* larger click area */
-    font-size: 1.25rem;        /* bigger font */
-    font-weight: 700;
-    border: 2px solid #134c5f; /* use brand color for stronger contrast */
-    border-radius: 12px;
-    background: #fff;
-    cursor: pointer;
-    width: 100%;
+.account-button {
+    background: rgb(244, 244, 244);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    width: 300px;
+    flex-shrink: 0;
+    padding: 20px;
     text-align: center;
-    min-height: 72px;          /* taller buttons */
-    transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-.card-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    cursor: pointer;
+    font-size: 1.1rem;
 }
 
+.active {
+    background: #e31b18;
+    color: white;
+}
+
+.account-details {
+    width: calc(100% - 6rem); /* Fixed size relative to the main container */
+    height: 60vh;
+    background-color: #fcfcfc;
+    overflow: hidden; /* Ensure content stays within bounds */
+    padding: 40px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    display: flex; /* Ensure child elements like .cards-container can use flex properties */
+    flex-direction: column;
+}
+
+.account-no, .account-type, .account-balance {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+
+.cards-title{
+    margin-top: 30px;
+    font-size: 2rem;
+    color:#e31b18;
+    margin-bottom: 1rem;
+    border-bottom: 5px solid #e31b18d2;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    text-align: left;
+}
+
+.cards-container {
+    flex: 1;                 /* fills remaining space in account-details */
+    overflow-y: auto;        /* vertical scroll */
+    padding-right: 10px;
+    scrollbar-width: none;
+}
+
+.cards-container::-webkit-scrollbar {
+    display: none;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, max-content));
+    gap: 15px;
+    max-width: calc(220px * 3 + 15px * 2); /* HARD CAP: 3 cards */
+}
+
+.card-button {
+    width: 220px;
+    height: 70px;
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-size: 1.1rem;
+}
 .pin-modal-overlay {
     display: none;
     position: fixed;
