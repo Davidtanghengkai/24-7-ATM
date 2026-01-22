@@ -12,8 +12,8 @@ CREATE TABLE [User] (
     DOB DATE,
     nationalID VARCHAR(50),
     Email VARCHAR(255) UNIQUE,
-    AccessCode VARCHAR(50) UNIQUE,
-    LoginPin VARCHAR(255)
+    AccessCode VARCHAR(8) UNIQUE,
+    LoginPin VARCHAR(8)
 );
 
 -- Creating the Biometrics table
@@ -52,10 +52,10 @@ CREATE TABLE Card (
 -- Insert into Users table
 INSERT INTO [User] (Name, Dob, nationalId,Email, AccessCode, LoginPin)
 VALUES 
-('John Tan', GETDATE(), 'S1234567J','hi1@gmail.com', 'USR001', '1234'),
-('Mary Lim', GETDATE(), 'S2345678B','hi2@gmail.com', 'USR002', '4321'),
-('Ahmad Ali', GETDATE(), 'S3456789C','hi3@gmail.com', 'USR003', '5555'),
-('Siti Rahman', GETDATE(), 'S4567890D','hi4@gmail.com', 'USR004', '6666');
+('John Tan', GETDATE(), 'S1234567J','hi1@gmail.com', '11111111', '11111111'),
+('Mary Lim', GETDATE(), 'S2345678B','hi2@gmail.com', '22222222', '22222222'),
+('Ahmad Ali', GETDATE(), 'S3456789C','hi3@gmail.com', '33333333', '33333333'),
+('Siti Rahman', GETDATE(), 'S4567890D','hi4@gmail.com', '44444444', '44444444');
 
 select * from [User]
 -- 2️⃣ Insert into Accounts table
@@ -63,7 +63,7 @@ INSERT INTO Accounts (userID, Balance, Type) VALUES
 (1, 1500.50, 'Savings'),
 (2, 250.75, 'Checking'),
 (3, 3200.00, 'Savings'),
-(4, 500.25, 'Checking')
+(4, 500.25, 'Checking');
 
 -- Creating the Authlog table
 CREATE TABLE Authlog (
