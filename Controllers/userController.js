@@ -116,7 +116,7 @@ async function verifyMobLogin(req, res) {
         return res.status(400).json({ message: 'LoginPin and accessCode are required' });
     }
     try {
-        const user = await userModel.verifyMobLogin(LoginPin, accessCode);[]
+        const user = await userModel.verifyMobLogin(accessCode, LoginPin);
 
         if (!user) {
             return res.status(404).json({ message: "Invalid Access Code or Login Pin" });
