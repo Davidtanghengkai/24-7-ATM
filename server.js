@@ -92,6 +92,7 @@ app.get('/api/cards/active/user/:userId/account/:accountNo', cardController.find
 app.post('/api/accounts', accountController.createAccount);
 app.get('/api/accounts/user/:userId', accountController.getAccountsByUserId);
 app.post("/api/accounts/deposit", accountController.addBalance);
+app.post("/api/accounts/withdraw", accountController.withdraw);
 // == OTP Routes ==
 
 app.post('/api/send-otp', otpController.sendOtp);
@@ -105,6 +106,7 @@ app.get("/api/countries", bankController.fetchCountries);
 app.get("/api/banks/:country", bankController.fetchBanks);
 app.post("/api/transfer", validateTransfer, transactionController.createOverseasTransaction);
 app.post("/api/blockchain-user", blockchainUserController.addBlockchainUser);
+app.get("/api/accounts/:accountNo/transactions", transactionController.getHistory);
 app.get("/api/accounts/:accountNo/balance", accountController.fetchBalance);
 //Exchange rate proxy endpoint
 app.get("/api/rate", exchangeRateController.fetchExchangeRate);

@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Account</title>
-    <link rel="stylesheet" href="CSS/selectAccount.css">
+    <link rel="stylesheet" type="text/css" href="CSS/index.css">
+    <link rel="stylesheet" type="text/css" href="CSS/chat.css">
+    <link rel="stylesheet" type="text/css" href="CSS/selectAccount.css">
 </head>
 <body>
-
      <div class="atm-container">
-
         <!-- Top Right -->
         <div class="top-links">
             <a href="#" class="top-link" id="language-toggle">Eng</a>
             <span class="top-separator">|</span>
-            <a href="#" class="top-link">Exit</a>
+            <a href="TransactionCancel.html" class="top-link" translateRef="exitLink" >Exit</a>
         </div>
-
-        <!-- Back -->
-        <a onclick="window.history.back()" class="back-link">Back</a>
 
         <!-- MAIN CONTENT -->
         <main class="main-content">
@@ -27,42 +26,28 @@
             </div>
         </main>
 
-       
+        <a href="NewHomePage.html" class="back-btn" aria-label="Back">&larr;</a>
+
+        <div id="chat-toggle" class="chat-icon">
+            <span  class="icon-bubble">💬</span>
+        </div>
 
         <div id="chat-root"></div>
 
-        <!-- Language Modal -->
-        <div id="language-modal" class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <span class="close-modal">&times;</span>
-                </div>
-                <div class="language-grid">
-                    <a href="#" class="language-option">English ✔</a>
-                    <a href="#" class="language-option">Chinese</a>
-                    <a href="#" class="language-option">Tamil</a>
-                    <a href="#" class="language-option">Malay</a>
-                    <a href="#" class="language-option">Japanese</a>
-                    <a href="#" class="language-option">Korean</a>
-                    <a href="#" class="language-option">Arabic</a>
-                    <a href="#" class="language-option">Bengali</a>
-                    <a href="#" class="language-option">Burmese</a>
-                </div>
+        <!-- PIN Modal -->
+        <div class="pin-modal-overlay" id="pin-modal">
+            <div class="pin-modal-content">
+                <h2>Create Card PIN</h2>
+                <input type="password" id="new-card-pin" maxlength="6" placeholder="6-digit PIN" required>
+
+                <h2>Card Description</h2>
+                <input type="text" id="card-description" maxlength="25" placeholder="E.g., My Travel Card" required>
+                <button id="createCard">Create Card</button>
             </div>
         </div>
-
     </div>
-
-
-    <!-- PIN Modal -->
-    <div class="pin-modal-overlay" id="pin-modal">
-        <div class="pin-modal-content">
-            <h2>Create Card PIN</h2>
-            <input type="password" id="new-card-pin" maxlength="6" placeholder="6-digit PIN">
-            <button id="createCard">Create Card</button>
-        </div>
-    </div>
-
-    <script src="JS/selectAccount.js"></script>
+<script src="JS/index.js"></script>
+<script src="JS/widget_loader.js" defer></script>
+<script src="JS/selectAccount.js"></script>
 </body>
 </html>

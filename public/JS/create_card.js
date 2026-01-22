@@ -277,6 +277,7 @@ const modal2 = document.getElementById("registration-modal");
 const form = document.getElementById("registration-form");
 // Open modal and start camera
 const videoRes = document.getElementById("video1");
+const statusTextRes = document.getElementById("status1");
 
 async function openRegistrationModal() {
     modal2.classList.add("active");
@@ -310,8 +311,9 @@ form.onsubmit = async (e) => {
     const pin = document.getElementById("pin").value;
     const accountType = document.getElementById("accountType").value;
     const email = document.getElementById("email").value.trim();
+    const cardDescription = document.getElementById("card-description").value.trim() || "My Card";
 
-    statusText.textContent = "Scanning face...";
+    statusTextRes.textContent = "Scanning face...";
 
     // Detect face
     const detection = await faceapi
@@ -320,14 +322,13 @@ form.onsubmit = async (e) => {
         .withFaceDescriptor();
 
     if (!detection) {
-        alert("No face detected. Try again.");
-        statusText.textContent = "Position your face within the frame";
+        statusTextRes.textContent = "Position your face within the frame and try again.";
         return;
     }
 
     const descriptorArray = Array.from(detection.descriptor);
 
-    statusText.textContent = "Creating user...";
+    statusTextRes.textContent = "Creating user...";
 
     try {
         // 1. Create user
@@ -350,7 +351,7 @@ form.onsubmit = async (e) => {
         const userId = createdUser.userId;
         localStorage.setItem("userId", userId);
 
-        statusText.textContent = "Creating account...";
+        statusTextRes.textContent = "Creating account...";
 
         // 2. Create account
         const accountRes = await fetch("/api/accounts", {
@@ -362,7 +363,7 @@ form.onsubmit = async (e) => {
         const accountData = await accountRes.json();
         const accountNo = accountData.accountNo;
 
-        statusText.textContent = "Creating card...";
+        statusTextRes.textContent = "Creating card...";
 
         // 3. Create card
         const expiry = new Date();
@@ -375,13 +376,14 @@ form.onsubmit = async (e) => {
                 userId,
                 accountNo,
                 expiryDate: expiry.toISOString().split("T")[0],
-                pin
+                pin,
+                description: cardDescription
             })
         });
 
         const cardData = await cardRes.json();
 
-        statusText.textContent = "Registration complete!";
+        statusTextRes.textContent = "Registration complete!";
         modal2.style.display = "none";
         form.reset();
         closeRegistrationModal();
@@ -399,7 +401,7 @@ form.onsubmit = async (e) => {
     } catch (err) {
         console.error(err);
         alert("Error: " + err.message);
-        statusText.textContent = "Position your face within the frame";
+        statusTextRes.textContent = "Position your face within the frame";
     }
 };
 //#endregion

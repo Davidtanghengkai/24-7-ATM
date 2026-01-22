@@ -1,161 +1,83 @@
-/* --- Global & Container Setup --- */
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background-color: #f0f0f0; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-}
-
-.atm-container {
-    width: 1000px;
-    height: 700px;
-    background-color: #ffffff;
-    /* Adjust padding to create space on the right for the arrow */
-    padding: 30px 40px 30px 40px; 
-    box-sizing: border-box;
-    position: relative; /* CRITICAL: Anchor for absolute elements */
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-}
-
-/* --- Top Links (ENG | Exit) Container --- */
-.top-links {
-    position: absolute;
-    top: 30px; /* Position down from the top edge */
-    right: 40px; /* Position in from the right edge */
-    z-index: 10;
-    font-size: 1.1em;
-    color: #666;
-    /* Ensure child links/separators are aligned */
-    display: flex; 
-    align-items: center;
-}
-.top-link {
-    color: #333;
-    text-decoration: none;
-    margin: 0 8px; /* Space around ENG and Exit */
-    font-weight: bold;
-}
-.top-link:hover {
-    text-decoration: underline;
-}
-.top-separator {
-    color: #ccc;
-    font-weight: normal;
-}
-
-/* --- Top Section: Back Link & Greeting --- */
-.back-link {
-    color: #475066; 
-    text-decoration: none;
-    font-size: 1em;
-    font-weight: normal;
-    margin-bottom: 40px; /* Wider gap to greeting */
-    
-    /* Position back link in the top left corner */
-    position: absolute;
-    top: 35px; /* Slightly adjusted to align with .top-links */
-    left: 40px; 
-    z-index: 10;
-}
-
 /* --- Main Content & Greeting --- */
 .main-content {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    /* Move main content down below the top links */
-    padding-top: 50px; 
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 50px;
+  padding-left: 60px;
+  padding-right: 60px;
+  box-sizing: border-box;
 }
 
-.greeting {
-    font-size: 1.8em;
-    font-weight: normal;
-    line-height: 1.2;
-    color: #333;
-    margin: 0 0 30px 0;
+.greeting{
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.15;
+  color: #1f1f1f;
+  margin: 0 0 38px 0;
 }
 
 .section-title {
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #004a4f;
-    margin-bottom: 25px;
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #004a4f;
+  margin: 0 0 25px 0;
 }
 
 /* --- Features Grid Layout (Kept your size changes) --- */
 .features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 25px 30px; 
-    flex-grow: 1; 
-    padding-right: 80px; 
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 18px 22px;
+  align-content: start;  /* stop stretching rows */
 }
 
 .feature-box {
-    background-color: #f5f5f5; 
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    height: 100%; 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; 
-    align-items: flex-start;
-    padding: 40px 30px; 
-    box-sizing: border-box;
-    position: relative;
-    cursor: pointer;
-    text-align: left;
-    transition: box-shadow 0.2s, transform 0.2s;
+  background: #fff; /* IMPORTANT: white like your screenshot */
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+  padding: 20px 22px;
+  min-height: 160px; /* gives consistent card height */
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .feature-box:hover {
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.10);
 }
 
 .icon {
-    /* Adjusted size to match previous context */
-    font-size: 2.5em; 
-    color: #999;
-    position: absolute;
-    top: 15px;
-    right: 15px;
+  font-size: 2.2em;
+  color: #9b9b9b;
+  position: absolute;
+  top: 16px;
+  right: 16px;
 }
 
 .feature-text {
-    /* Adjusted size to match previous context */
-    font-size: 1.6em; 
-    font-weight: bold;
-    color: #555;
-    margin-top: auto;
+  font-size: 1.15em;
+  font-weight: 700;
+  color: #555;
+  margin-top: 28px; /* pushes text down away from icon */
+  line-height: 1.1;
 }
 
-/* --- Side Elements: Arrow & Chat Icon --- */
+/* Optional: arrow button (only if you really need it) */
 .scroll-right-btn {
-    position: absolute;
-    right: 0; 
-    top: 65%; 
-    transform: translateY(-50%);
-    width: 40px; 
-    height: 180px; /* Made taller to cover the grid height */
-    background-color: #E8E3E3; 
-    border: none;
-    color: #333;
-    font-size: 2em;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+  position: absolute;
+  right: 16px;
+  top: 60%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 180px;
+  background: #e8e3e3;
+  border: none;
+  border-radius: 10px;
+  font-size: 2em;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.18);
 }
 
