@@ -7,14 +7,17 @@ async function createUser(req, res) {
     const userData = req.body;
     console.log("Incoming userData:", userData);
     try {
-        const newUserId = await userModel.createUser(userData);
-        res.status(201).json({ message: "User created successfully", userId: newUserId });
+        const result = await userModel.createUser(userData);
+        res.status(201).json({ 
+            message: "User created successfully", 
+            userId: result.userId,
+            accessCode: result.AccessCode
+        });
     } catch (err) {
         console.error("Error in userController.createUser:", err);
         res.status(500).json({ message: "Internal server error, Failed to create user" });
     }
 }
-
 
 // GET /user/:id
 async function getUserById(req, res) {

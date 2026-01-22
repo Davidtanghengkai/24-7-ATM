@@ -4,27 +4,32 @@ const dbConfig = require('../dbConfig');
 
 async function createUser(userData) {
     console.log("Creating user with data:", userData);
-    const { name, dob, nationalID, Email, bioType, BioData } = userData;
+    const { name, dob, nationalID, Email, LoginPin, bioType, BioData } = userData;
+
+    const AccessCode = Math.floor(10000000 + Math.random() * 90000000).toString();
+
     let pool;
     try {
         pool = await sql.connect(dbConfig);
 
-        // 1️⃣ Insert User first
         const requestUser = pool.request();
         requestUser.input('name', sql.VarChar, name);
         requestUser.input('dob', sql.Date, dob);
         requestUser.input('nationalID', sql.VarChar, nationalID);
         requestUser.input('Email', sql.VarChar, Email);
+        requestUser.input('LoginPin', sql.VarChar, LoginPin);
+        requestUser.input('AccessCode', sql.VarChar, AccessCode);
 
         const userResult = await requestUser.query(`
-            INSERT INTO [User] (name, DOB, nationalID, Email)
-            OUTPUT INSERTED.id
-            VALUES (@name, @dob, @nationalID, @Email)
+            INSERT INTO [User] (name, DOB, nationalID, Email, LoginPin, AccessCode)
+            OUTPUT INSERTED.id, INSERTED.AccessCode
+            VALUES (@name, @dob, @nationalID, @Email, @LoginPin, @AccessCode)
         `);
 
         const userId = userResult.recordset[0].id;
+        const generatedCode = userResult.recordset[0].AccessCode;
 
-        // 2️⃣ If biometric data is provided, insert it
+        // 2️⃣ Insert biometric if provided
         if (bioType && BioData) {
             const bioReq = pool.request();
             let bioString;
@@ -47,7 +52,8 @@ async function createUser(userData) {
             `);
         }
 
-        return userId;
+        // Return both userId and AccessCode
+        return { userId, AccessCode: generatedCode };
 
     } catch (err) {
         console.error("Error in userModel.createUser:", err);

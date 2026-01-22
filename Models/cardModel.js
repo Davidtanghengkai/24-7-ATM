@@ -7,22 +7,23 @@ const dbConfig = require('../dbConfig');
  * (UPDATED: Manages its own connection)
  */
 async function createCard(cardData) {
-    const { userId, accountNo, expiryDate, pin, description } = cardData;
+    const { UserID, AccountNo, expiryDate, PIN, CardName } = cardData;
     let pool;
+
     try {
         pool = await sql.connect(dbConfig);
 
         const request = pool.request();
-        request.input('userId', sql.Int, userId);
-        request.input('accountNo', sql.Int, accountNo);
+        request.input('UserID', sql.Int, UserID);
+        request.input('AccountNo', sql.Int, AccountNo);
         request.input('expiryDate', sql.Date, expiryDate);
-        request.input('pin', sql.VarChar(6), pin);
-        request.input('description', sql.VarChar(50), description);
+        request.input('PIN', sql.VarChar(6), PIN);
+        request.input('CardName', sql.VarChar(50), CardName);
 
         const result = await request.query(`
-            INSERT INTO Card (UserID, AccountNo, status, expiryDate, PIN,createdTime, CardName)
+            INSERT INTO Card (UserID, AccountNo, status, expiryDate, PIN, createdTime, CardName)
             OUTPUT INSERTED.*
-            VALUES (@userId, @accountNo, 'active', @expiryDate, @pin, GETDATE(), @description)
+            VALUES (@UserID, @AccountNo, 'active', @expiryDate, @PIN, GETDATE(), @CardName)
         `);
 
         return result.recordset[0];
@@ -31,7 +32,7 @@ async function createCard(cardData) {
         console.error("Error in cardModel.createCard:", err);
         throw err;
     } finally {
-        if (pool)  await pool.close();
+        if (pool) await pool.close();
     }
 }
 
