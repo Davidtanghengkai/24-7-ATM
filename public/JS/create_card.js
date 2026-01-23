@@ -421,7 +421,7 @@ cardForm.onsubmit = async (e) => {
             })
         });
 
-        window.location.href = "index.html";
+        window.location.href = "Index.html";
 
     } catch (err) {
         console.error(err);

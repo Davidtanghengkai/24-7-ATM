@@ -45,6 +45,16 @@ async function loadAccounts() {
             selectAccountButton(acc.AccountNo);
         });
 
+
+        const createBtnContainer = document.createElement("div");
+        createBtnContainer.className = "account-box"; 
+        const createBtn = document.createElement("button");
+        createBtn.className = "create-account-btn";
+        createBtn.textContent = "+ Create New Account";
+        createBtn.onclick = openCreateAccountModal;
+        createBtnContainer.appendChild(createBtn);
+        container.appendChild(createBtnContainer);
+
     } catch (error) {
         console.error("Error loading accounts:", error);
     }
@@ -71,6 +81,10 @@ function selectAccount(accountNo) {
     document.getElementById("pin-modal").style.display = "flex";
 }
 
+document.getElementById("cancelCardCreate").onclick = () => {
+    document.getElementById("pin-modal").style.display = "none";
+};
+
 /* ===============================
    SUBMIT PIN → CREATE CARD
 ================================ */
@@ -86,6 +100,7 @@ async function submitCardPIN() {
     const pin = document.getElementById("new-card-pin").value.trim();
     const description = document.getElementById("card-description").value.trim();
     const userId = localStorage.getItem("userId");
+    const selectedAccountNo = localStorage.getItem("selectedAccountNo");
 
     if (!pin || pin.length !== 6) {
         alert("PIN must be 6 digits.");
@@ -99,13 +114,15 @@ async function submitCardPIN() {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
-            userId,
-            accountNo: selectedAccountNo,
-            expiryDate: expiry.toISOString(),
-            pin,
-            description
+            UserID: userId,
+            AccountNo: selectedAccountNo,
+            status: 'Active',
+            expiryDate: expiry.toISOString().split("T")[0],
+            PIN: pin,
+            CardName : description
         })
     });
+
     console.log("Create card response status:", res.status);
     const card = await res.json();
     console.log("Create card response:", card);
@@ -120,3 +137,76 @@ async function submitCardPIN() {
         alert("Error creating card: " + card.message);
     }
 }
+
+
+
+function openCreateAccountModal() {
+    document.getElementById("account-modal").style.display = "flex";
+}
+
+document.getElementById("cancelAccountCreate").onclick = () => {
+    document.getElementById("account-modal").style.display = "none";
+};
+
+document.getElementById("createAccountConfirm").onclick = async () => {
+    const userId = localStorage.getItem("userId");
+    const type = document.getElementById("new-account-type").value;
+    const name =
+        document.getElementById("new-account-name").value.trim() || "Account";
+
+    if (!type) {
+        alert("Please select an account type");
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/accounts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                userId,
+                Balance: 0,
+                Type: type,
+                AccountName: name,
+                Status: "Active"
+            })
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            alert(err.message || "Failed to create account");
+            return;
+        }
+
+        const data = await res.json();
+        const newAccountNo = data.accountNo;
+
+        // close account modal
+        document.getElementById("account-modal").style.display = "none";
+
+        // store selected account number
+        selectedAccountNo = newAccountNo;
+        localStorage.setItem("selectedAccountNo", newAccountNo);
+
+        loadAccounts(); // refresh account list
+
+        // show registration success modal
+        const successForm = document.getElementById("registration-success");
+        successForm.style.display = "flex"; // use flex for proper centering
+
+        // YES → open card creation modal
+        document.getElementById("success-btn").onclick = () => {
+            successForm.style.display = "none";
+            document.getElementById("pin-modal").style.display = "flex";
+        };
+
+        // NO → redirect to index.html
+        document.getElementById("no-btn").onclick = () => {
+            window.location.href = "index.html";
+        };
+
+    } catch (err) {
+        console.error(err);
+        alert("Account creation failed");
+    }
+};
