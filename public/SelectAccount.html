@@ -26,7 +26,7 @@
             </div>
         </main>
 
-        <a href="NewHomePage.html" class="back-btn" aria-label="Back">&larr;</a>
+        <a href="Index.html" class="back-btn" aria-label="Back">&larr;</a>
 
         <div id="chat-toggle" class="chat-icon">
             <span  class="icon-bubble">💬</span>
@@ -43,8 +43,42 @@
                 <h2>Card Description</h2>
                 <input type="text" id="card-description" maxlength="25" placeholder="E.g., My Travel Card" required>
                 <button id="createCard">Create Card</button>
+                <button id="cancelCardCreate">Cancel</button>
             </div>
         </div>
+
+
+        <!-- Create Account Modal -->
+        <div class="pin-modal-overlay" id="account-modal" style="display:none;">
+            <div class="pin-modal-content">
+                <h2>Create New Account</h2>
+
+                <label>Account Type</label>
+                <select id="new-account-type">
+                    <option value="">Select type</option>
+                    <option value="savings">Savings</option>
+                    <option value="business">Business</option>
+                    <option value="personal">Personal</option>
+                </select>
+
+                <label>Account Name</label>
+                <input type="text" id="new-account-name" maxlength="25" placeholder="e.g. My Second Account">
+
+                <button id="createAccountConfirm">Create Account</button>
+                <button id="cancelAccountCreate">Cancel</button>
+            </div>
+        </div>
+
+        <div id="registration-success">
+            <form>
+                <h1 class="success-title">Account Registration Successful!</h1>
+                <p class="success-message">Your OCBC Account has been created successfully.</p>
+                <p class="card-prompt">Would you like to add a new card to your account?</p>
+                <button type="button" class="no-btn" id="no-btn">No</button>
+                <button type="button" class="success-btn" id="success-btn">Yes</button>
+            </form>
+        </div>
+
     </div>
 <script src="JS/index.js"></script>
 <script src="JS/widget_loader.js" defer></script>
