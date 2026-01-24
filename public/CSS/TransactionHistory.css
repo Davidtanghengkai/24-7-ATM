@@ -3,7 +3,8 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    background: #f8f9fa;
+    background: #d9d9d9;
+    height: 100%;
 }
 
 .history-header {

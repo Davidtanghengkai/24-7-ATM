@@ -6,15 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Balance Enquiry - 24/7 ATM</title>
     <link rel="stylesheet" type="text/css" href="CSS/index.css">
+    <link rel="stylesheet" type="text/css" href="CSS/chat.css">
     <link rel="stylesheet" type="text/css" href="CSS/BalanceEnquiry.css">
 </head>
 
 <body>
     <div class="atm-container">
         <div class="top-links">
-            <a href="NewHomePage.html" class="top-link">Back to Home</a>
+            <a href="#" class="top-link" id="language-toggle">ENG</a>
             <span class="top-separator">|</span>
-            <a href="TransactionCancel.html" class="top-link">Exit</a>
+            <a href="TransactionCancel.html" class="top-link" translateRef="exitLink" >Exit</a>
         </div>
 
         <div class="balance-wrapper">
@@ -42,9 +43,15 @@
                     Exit</button>
             </div>
         </div>
-    </div>
+        <div id="chat-toggle" class="chat-icon">
+            <span  class="icon-bubble">💬</span>
+        </div>
 
-    <script src="JS/balance_enquiry.js"></script>
+        <div id="chat-root"></div>
+    </div>
+<script src="JS/index.js"></script>
+<script src="JS/widget_loader.js" defer></script>
+<script src="JS/balance_enquiry.js"></script>
 </body>
 
 </html>
