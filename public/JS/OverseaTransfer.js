@@ -243,11 +243,46 @@ document.getElementById("confirmTransfer").onclick = async () => {
 
     const data = await res.json();
 
-    if (res.ok) {
-      showSuccess("Transfer successful!");
-    } else {
-      showError(data.message || data.error || "Unknown error.");
+    // ✅ CASE 1: FRAUD VERIFY REQUIRED (rules triggered)
+    if (res.ok && (data.chainStatus === "VERIFY_REQUIRED" || data.status === "PENDING_VERIFICATION")) {
+      const msg = buildVerifyMessage(data.triggeredRules);
+      showError(msg); // reuse your error overlay as a "security popup"
+      return;
     }
+
+    // ✅ CASE 2: SUCCESSFUL ON_CHAIN
+    if (res.ok && data.chainStatus === "ON_CHAIN") {
+      // show success + ask user if they want another transaction
+      showSuccess("Transfer successful!");
+      // after they close success overlay, show the prompt
+      const closeBtn = document.getElementById("closeSuccess");
+      if (closeBtn) {
+        closeBtn.onclick = () => {
+          document.getElementById("successOverlay").classList.remove("active");
+          showAfterTransferPrompt();
+        };
+      } else {
+        // fallback if button missing
+        showAfterTransferPrompt();
+      }
+      return;
+    }
+
+    // ✅ CASE 3: Any other backend response
+    if (res.ok) {
+      // still treat as success but prompt user
+      showSuccess("Transfer processed.");
+      const closeBtn = document.getElementById("closeSuccess");
+      if (closeBtn) {
+        closeBtn.onclick = () => {
+          document.getElementById("successOverlay").classList.remove("active");
+          showAfterTransferPrompt();
+        };
+      }
+      return;
+    }
+
+    showError(data.message || data.error || "Unknown error.");
 
   } catch (err) {
     showError("Network error. Please try again.");
@@ -278,6 +313,27 @@ async function loadSenderBalance() {
   }
 }
 
+// -------------------------------------------------
+// FRAUD / VERIFY MESSAGE MAPPING
+// -------------------------------------------------
+function getRuleMessage(ruleCode) {
+  const map = {
+    "R1_NEW_RECEIVER": "This is a new recipient you have never transferred to before.",
+    "R2_AMOUNT_GT_HALF_BALANCE": "This transfer amount is more than half of your current balance.",
+    "R3_UNUSUAL_TIME": "This transfer is being made at an unusual time (late night hours).",
+    "R4_HIGH_VELOCITY_5M": "Too many transfers were made within 5 minutes."
+  };
+  return map[ruleCode] || `Security check triggered: ${ruleCode}`;
+}
+
+function buildVerifyMessage(triggeredRules = []) {
+  if (!Array.isArray(triggeredRules) || triggeredRules.length === 0) {
+    return "For your safety, please verify yourself to proceed with this transfer.";
+  }
+
+  const lines = triggeredRules.map(r => `• ${getRuleMessage(r)}`).join("\n");
+  return `For your safety, please verify yourself to proceed.\n\nTriggered checks:\n${lines}`;
+}
 
 // -------------------------------------------------
 // MODAL POPUP FUNCTION
@@ -307,6 +363,43 @@ function showSuccess(msg) {
     console.error("Success overlay element not found!");
   }
 }
+
+function showAfterTransferPrompt() {
+  const overlay = document.getElementById("afterTransferOverlay");
+  if (overlay) overlay.style.display = "flex";
+}
+
+function closeAfterTransferPrompt() {
+  const overlay = document.getElementById("afterTransferOverlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+// Reset UI back to step 1 for another transfer
+function resetTransferForm() {
+  // clear inputs except sender (since you keep from localStorage)
+  document.getElementById("receiverAccount").value = "";
+  document.getElementById("amount").value = "";
+  document.getElementById("country").selectedIndex = 0;
+  document.getElementById("bank").innerHTML = "";
+
+  exchangeRate = 0;
+  toCurrency = "";
+  rateText.textContent = "";
+  summary.innerHTML = "";
+
+  showStep(1);
+}
+
+// Buttons for after transfer prompt
+document.getElementById("btnAnotherYes").onclick = () => {
+  closeAfterTransferPrompt();
+  resetTransferForm();
+};
+
+document.getElementById("btnAnotherNo").onclick = () => {
+  // redirect to index/home page
+  window.location.href = "index.html";
+};
 
 document.getElementById("closeSuccess").onclick = () => {
   document.getElementById("successOverlay").classList.remove("active");
