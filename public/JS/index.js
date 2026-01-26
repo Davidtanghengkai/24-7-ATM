@@ -143,8 +143,9 @@ async function fetchAndApplyTranslations(languageName) {
     const translations = await response.json();
 
     for (const key in translations) {
-      const el = document.querySelector(`[translateRef="${key}"]`);
-      if (el) el.textContent = translations[key];
+       document.querySelectorAll(`[translateRef="${key}"]`).forEach(el => {
+       el.textContent = translations[key];
+      });
     }
 
   } catch (err) {
@@ -152,8 +153,3 @@ async function fetchAndApplyTranslations(languageName) {
     alert(`Sorry, we couldn't load the ${languageName} translation. Please try again.`);
   }
 }
-
-// 2) THEN YOUR PANEL CODE
-document.addEventListener("DOMContentLoaded", () => {
-  // ... your panel code that calls fetchAndApplyTranslations()
-});
