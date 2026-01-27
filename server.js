@@ -121,13 +121,32 @@ const watsonRoutes = require('./routes/api/watson');
 app.use('/api/watson', watsonRoutes);
 
 
-const server = app.listen(port, () => {
+
+
+io.on('connection', (socket) => {
+    console.log('New device connected:', socket.id);
+
+    socket.on('join-station', (stationId) => {
+        socket.join(stationId);
+        console.log(`Station ${stationId} is now online.`);
+    });
+
+    socket.on('nfc-trigger', (data) => {
+        console.log(`Phone triggered login for station: ${data.stationId}`);
+        
+        io.to(data.stationId).emit('login-command', {
+            cardNo: data.cardNo,
+            userName: data.userName
+        });
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Device disconnected');
+    });
+});
+MobServer.listen(port, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${port}/Index.html`);
     console.log(`API documentation: http://localhost:${port}/api-docs`);
-});
-
-MobServer.listen(port, '0.0.0.0', () => {
-
     //REPLACE PART WITH YOUR IP ADDRESS
     //console.log(`Mobile Server running on:  http://<IP ADDRESS>:${port}/mobile`);
 });

@@ -1,4 +1,4 @@
-
+const socket = io(window.location.origin);
 async function submitLogin() {
     const accessCode = document.getElementById('accessCode').value;
     const loginPin = document.getElementById('loginPin').value;
