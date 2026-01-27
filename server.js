@@ -13,7 +13,10 @@ dotenv.config();
 const app = express();
 const MobServer = http.createServer(app);
 const io = new Server(MobServer, {       
-    cors: { origin: "*" }             
+    cors: { 
+        origin: "*",
+        methods: ["GET", "POST"]
+    }             
 });
 const port = process.env.PORT || 3000; 
 
@@ -23,16 +26,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); 
 
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'a-very-strong-dev-secret-key', // Use an env variable
+    secret: process.env.SESSION_SECRET || 'a-very-strong-dev-secret-key',
     resave: false,
     saveUninitialized: true,
     cookie: {
         secure: process.env.NODE_ENV === 'production', 
-        maxAge: 15 * 60 * 1000 // 15 minutes to match OTP expiry
+        maxAge: 15 * 60 * 1000
     }
 }));
-
-
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -40,7 +41,6 @@ app.use(express.static(path.join(__dirname, "public")));
 const swaggerUi = require("swagger-ui-express");
 let swaggerDocument;
 
-// Safely load swagger-output.json
 try {
     swaggerDocument = require("./swagger-output.json");
 } catch (err) {
@@ -77,7 +77,6 @@ app.get('/mobile', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'MobIndex.html'));
 });
 app.post('/api/users/verifyMobLogin', userController.verifyMobLogin); 
-app.post('/api/users', userController.createUser);
 
 // == Card Routes ==
 app.post('/api/cards', cardController.createCard);
@@ -87,14 +86,13 @@ app.put('/api/cards/status/:cardNo', cardController.changeStatus);
 app.delete('/api/cards/:cardNo', cardController.deleteCard);
 app.get('/api/cards/active/user/:userId/account/:accountNo', cardController.findCardsByUserId);
 
-
 // == Account Routes ==
 app.post('/api/accounts', accountController.createAccount);
 app.get('/api/accounts/user/:userId', accountController.getAccountsByUserId);
 app.post("/api/accounts/deposit", accountController.addBalance);
 app.post("/api/accounts/withdraw", accountController.withdraw);
-// == OTP Routes ==
 
+// == OTP Routes ==
 app.post('/api/send-otp', otpController.sendOtp);
 app.post('/api/verify-otp', otpController.verifyOtp);
 
@@ -108,10 +106,11 @@ app.post("/api/transfer", validateTransfer, transactionController.createOverseas
 app.post("/api/blockchain-user", blockchainUserController.addBlockchainUser);
 app.get("/api/accounts/:accountNo/transactions", transactionController.getHistory);
 app.get("/api/accounts/:accountNo/balance", accountController.fetchBalance);
+
 //Exchange rate proxy endpoint
 app.get("/api/rate", exchangeRateController.fetchExchangeRate);
 
-// --- Base Route Just In Case ---
+// --- Base Route ---
 app.get('/', (req, res) => {
     res.send('How did we get here?');
 });
@@ -121,40 +120,89 @@ const watsonRoutes = require('./routes/api/watson');
 app.use('/api/watson', watsonRoutes);
 
 
+// WEBSOCKET SETUP
 
 
+// Store connected clients
+const connectedClients = new Map();
 io.on('connection', (socket) => {
-    console.log('New device connected:', socket.id);
-
+    console.log('✓ New device connected:', socket.id);
     socket.on('join-station', (stationId) => {
         socket.join(stationId);
-        console.log(`Station ${stationId} is now online.`);
+        connectedClients.set(socket.id, { type: 'atm', stationId });
+        console.log(`✓ Station ${stationId} joined (Socket: ${socket.id})`);
+        socket.emit('station-joined', { stationId, socketId: socket.id });
     });
 
     socket.on('nfc-trigger', (data) => {
-        console.log(`Phone triggered login for station: ${data.stationId}`);
+        console.log(`NFC Trigger received:`, {
+            jwtToken: data.jwtToken ? '✓ Present' : '✗ Missing',
+            userId: data.userId,
+            selectedCardId: data.selectedCardId,
+            selectedAccountNo: data.selectedAccountNo,
+            stationId: data.stationId
+        });
         
+        // Validate required fields
+        if (!data.stationId) {
+            console.error('❌ Invalid NFC trigger data - Missing stationId:', data);
+            socket.emit('nfc-error', { message: 'Missing stationId' });
+            return;
+        }
+
         io.to(data.stationId).emit('login-command', {
-            cardNo: data.cardNo,
-            userName: data.userName
+            jwtToken: data.jwtToken,
+            userId: data.userId,
+            selectedCardId: data.selectedCardId,
+            selectedAccountNo: data.selectedAccountNo,
+            
+            userName: data.userName || 'User',
+            stationId: data.stationId
+        }); 
+        console.log(`✓ Login command sent to station: ${data.stationId}`);
+        
+        socket.emit('nfc-sent', { 
+            stationId: data.stationId,
+            success: true 
         });
     });
 
+    socket.on('phone_button_click', (data) => {
+        console.log('Phone button clicked:', data);
+        io.emit('phone-action', data);
+    });
     socket.on('disconnect', () => {
-        console.log('Device disconnected');
+        const clientInfo = connectedClients.get(socket.id);
+        if (clientInfo) {
+            console.log(`✗ Device disconnected: ${clientInfo.type} - ${clientInfo.stationId || socket.id}`);
+            connectedClients.delete(socket.id);
+        } else {
+            console.log('✗ Device disconnected:', socket.id);
+        }
+    });
+    socket.on('error', (error) => {
+        console.error('Socket error:', error);
     });
 });
+
+
+// START SERVER
+
+
 MobServer.listen(port, '0.0.0.0', () => {
+    console.log('\n========================================');
     console.log(`Server running on http://localhost:${port}/Index.html`);
     console.log(`API documentation: http://localhost:${port}/api-docs`);
-    //REPLACE PART WITH YOUR IP ADDRESS
-    //console.log(`Mobile Server running on:  http://<IP ADDRESS>:${port}/mobile`);
+    console.log(`Mobile app: http://localhost:${port}/mobile`);
+    console.log('========================================\n');
 });
-
 process.on("SIGINT", async () => {
-    console.log("Server is gracefully shutting down");
-    server.close(() => {
-        console.log("HTTP server closed");
+    console.log("\n  Server is gracefully shutting down...");  
+    io.close(() => {
+        console.log("✓ WebSocket connections closed");
+    });  
+    MobServer.close(() => {
+        console.log("✓ HTTP server closed");
         process.exit(0);
     });
 });

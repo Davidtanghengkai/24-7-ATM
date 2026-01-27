@@ -1,61 +1,67 @@
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('userName').innerText = localStorage.getItem('userName') || 'User';
-    
-    fetchUserAccounts();
-});
 const socket = io(window.location.origin);
-
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('userName').innerText = localStorage.getItem('userName') || 'User';
+    const userName = localStorage.getItem('userName') || 'User';
+    document.getElementById('userName').innerText = userName;
     fetchUserAccounts();
+    setupSocketConnection();
+    addTriggerButton();
 });
-window.addEventListener('load', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    if (urlParams.get('auth') === 'true') {
-        const selectedCard = localStorage.getItem('activeNFCCard');
+function setupSocketConnection() {
+    socket.on('connect', () => {console.log('Connected to server. Socket ID:', socket.id);});
+    socket.on('disconnect', () => {console.log('Disconnected from server');});
 
-        if (selectedCard) {
-            socket.on('connect', () => {
-                console.log("Socket ready! Sending trigger...");
-                
-                socket.emit('nfc-trigger', {
-                    stationId: "ATM01",
-                    cardNo: selectedCard,
-                    userName: localStorage.getItem('userName') || "User"
-                });
-                alert("Trigger sent for card " + selectedCard);
-            });
-        } else {
-            alert("No card selected! Please pick a card first.");
-        }
-    }
-});
+    socket.on('nfc-sent', (data) => {showNotification('Session transferred to ATM!', 'success');});
 
-// --- Unified Card Selection ---
+    socket.on('nfc-error', (error) => {showNotification('Error: ' + error.message, 'error');});
+
+    socket.on('connect_error', (error) => {showNotification('Connection error. Please check your network.', 'error');});
+}
 function selectCardForNFC(cardNo, element) {
     document.querySelectorAll('.card-item').forEach(card => {
         card.style.border = "1px solid #eee";
         card.style.backgroundColor = "#ffffff";
     });
-    
+
     element.style.border = "2px solid #d7191c"; 
     element.style.backgroundColor = "#fff5f5";
 
-    localStorage.setItem('activeNFCCard', cardNo);
-    console.log("Card prepared for NFC tap:", cardNo);
-
+    localStorage.setItem('selectedCardId', cardNo);
+    showNotification('Card selected. Ready to transfer!', 'info');
 }
+function triggerNFCLogin(stationId = "ATM01") {
+    const selectedCard = localStorage.getItem('selectedCardId');
+    const userName = localStorage.getItem('userName') || 'User';
 
+    if (!selectedCard) {
+        showNotification('Please select a card first!', 'warning');
+        return;
+    }
+
+    if (!socket.connected) {
+        showNotification('Not connected to server. Please wait...', 'error');
+        return;
+    }
+    const sessionData = {
+        jwtToken: localStorage.getItem('token') || localStorage.getItem('jwtToken'),
+        userId: localStorage.getItem('userId'),
+        selectedCardId: selectedCard,
+        selectedAccountNo: localStorage.getItem('selectedAccountNo'),
+        stationId: stationId,
+        userName: userName,
+    };
+    socket.emit('nfc-trigger', sessionData);
+    
+    showNotification('Transferring to ATM...', 'info');
+}
 async function fetchUserAccounts() {
     const userId = localStorage.getItem('userId');
     const slider = document.getElementById('accountSlider');
 
     if (!userId) {
         console.error("No userId found in localStorage");
+        slider.innerHTML = '<p>Please log in again.</p>';
         return;
     }
-
     try {
         const response = await fetch(`/api/accounts/user/${userId}`);
         const accounts = await response.json();
@@ -82,8 +88,11 @@ async function selectAccount(accountNo, element) {
     const cardList = document.getElementById('cardList');
     const statusText = document.getElementById('placeholderText');
 
+
     document.querySelectorAll('.account-card').forEach(c => c.classList.remove('selected'));
     element.classList.add('selected');
+
+    localStorage.setItem('selectedAccountNo', accountNo);
 
     try {
         const response = await fetch(`/api/cards/active/user/${userId}/account/${accountNo}`);
@@ -94,15 +103,15 @@ async function selectAccount(accountNo, element) {
             cardList.style.display = 'block';
 
             cardList.innerHTML = cards.map(card => `
-            <div class="card-item" onclick="selectCardForNFC('${card.CardNo}', this)">
-                <div class="card-chip"></div>
-                <div class="card-info">
-                    <span class="card-name">${card.CardName}</span>
-                    <span class="card-number">**** ${String(card.CardNo).slice(-4)}</span>
+                <div class="card-item" onclick="selectCardForNFC('${card.CardNo}', this)">
+                    <div class="card-chip"></div>
+                    <div class="card-info">
+                        <span class="card-name">${card.CardName}</span>
+                        <span class="card-number">**** ${String(card.CardNo).slice(-4)}</span>
+                    </div>
+                    <div class="card-status active">${card.status}</div>
                 </div>
-                <div class="card-status active">${card.status}</div>
-            </div>
-        `).join('');  
+            `).join('');  
         } else {
             cardList.style.display = 'none';
             emptyState.style.display = 'block';
@@ -110,50 +119,71 @@ async function selectAccount(accountNo, element) {
         }
     } catch (err) {
         console.error("Error fetching cards:", err);
+        showNotification('Error loading cards', 'error');
     }
 }
 
-async function handleNFCScan(stationId) {
-    const selectedCard = localStorage.getItem('activeNFCCard');
-    const userId = localStorage.getItem('userId');
 
-    if (!selectedCard) {
-        alert("Please select a card in the app first!");
-        return;
-    }
 
-    const response = await fetch('/api/nfc/trigger-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            userId: userId,
-            cardNo: selectedCard,
-            stationId: stationId
-        })
-    });
-
-    if (response.ok) {
-        alert("Login command sent to PC!");
-    }
-}
-
-function selectCardForNFC(cardNo, element) {
-    document.querySelectorAll('.card-item').forEach(card => {
-        card.style.border = "1px solid #eee";
-        card.style.backgroundColor = "#ffffff";
-    });
+//Notifs
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
     
-    element.style.border = "2px solid #d7191c"; 
-    element.style.backgroundColor = "#fff5f5";
-
-    localStorage.setItem('activeNFCCard', cardNo);
+    const colors = {
+        success: '#28a745',
+        error: '#dc3545',
+        warning: '#ffc107',
+        info: '#17a2b8'
+    };
     
-    console.log("NFC Login Card set to:", cardNo);
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${colors[type] || colors.info};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+        max-width: 300px;
+    `;
+    notification.textContent = message;
     
-
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
 
 function logout() {
     localStorage.clear();
     window.location.href = '/mobile';
 }
+//NFC Trigger Button for testing
+function addTriggerButton() {
+    const triggerButton = document.createElement('button');
+    triggerButton.textContent = '🔓 Transfer to ATM';
+    triggerButton.style.cssText = `
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        background: #d7191c;
+        color: white;
+        border: none;
+        padding: 15px 25px;
+        border-radius: 25px;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        cursor: pointer;
+        z-index: 1000;
+    `;
+    
+    triggerButton.onclick = () => triggerNFCLogin('ATM01');
+    document.body.appendChild(triggerButton);
+}
+
+document.head.appendChild(style);
