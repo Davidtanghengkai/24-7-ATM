@@ -9,16 +9,40 @@
     align-items: center;
     text-align: center;
     width: 100%;
-    padding-top: 60px; /* Push down slightly from top links */
+    padding-top: 60px;
+}
+
+.title {
+    width: calc(100% - 6rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
 }
 
 .page-title {
     font-size: 2rem;
     color: #134c5f;
-    margin-bottom: 1rem;
     border-bottom: 5px solid #134c5f;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
+    margin: 0;
+}
+
+.freezeAll {
+    position: absolute;
+    right: 0;
+    padding: 8px 16px;
+    background-color: #134c5f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.freezeAll:hover {
+    background-color: #c91a17;
 }
 
 /* =========================================
@@ -29,8 +53,8 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    width: calc(100% - 6rem); /* Match the width of the cards-container */
-    overflow-x: auto; 
+    width: calc(100% - 6rem);
+    overflow-x: auto;
     scrollbar-width: none;
 }
 
@@ -56,15 +80,55 @@
 }
 
 .account-details {
-    width: calc(100% - 6rem); /* Fixed size relative to the main container */
+    width: calc(100% - 6rem);
     height: 60vh;
     background-color: #fcfcfc;
-    overflow: hidden; /* Ensure content stays within bounds */
+    overflow: hidden;
     padding: 40px;
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
-    display: flex; /* Ensure child elements like .cards-container can use flex properties */
+    display: flex;
     flex-direction: column;
+}
+
+.account-details:disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.account-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.account-info-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.account-info-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.freezeAccount {
+    padding: 8px 16px;
+    background-color: #134c5f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.freezeAccount:hover {
+    background-color: #c91a17;
 }
 
 .account-no, .account-type, .account-balance {
@@ -73,7 +137,6 @@
     justify-content: flex-start;
     align-items: flex-start;
 }
-
 
 .cards-title{
     margin-top: 30px;
@@ -87,8 +150,8 @@
 }
 
 .cards-container {
-    flex: 1;                 /* fills remaining space in account-details */
-    overflow-y: auto;        /* vertical scroll */
+    flex: 1;
+    overflow-y: auto;
     padding-right: 10px;
     scrollbar-width: none;
 }
@@ -101,7 +164,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, max-content));
     gap: 15px;
-    max-width: calc(220px * 3 + 15px * 2); /* HARD CAP: 3 cards */
+    max-width: calc(220px * 3 + 15px * 2);
 }
 
 .card-button {
@@ -114,6 +177,7 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     font-size: 1.1rem;
 }
+
 .pin-modal-overlay {
     display: none;
     position: fixed;
@@ -139,7 +203,7 @@
 
 .pin-modal-content h2 {
     margin: 0 0 15px;
-    color: #cc0000; /* red header */
+    color: #cc0000;
 }
 
 #card-pin {
@@ -160,7 +224,7 @@
 .pin-modal-content button {
     width: 100%;
     padding: 12px;
-    background: #cc0000; /* red */
+    background: #cc0000;
     color: white;
     border: none;
     border-radius: 8px;
@@ -171,5 +235,90 @@
 }
 
 .pin-modal-content button:hover {
-    background: #b20000; /* darker red */
+    background: #b20000; 
+}
+
+.code-modal-overlay {
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.code-modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border-top: 10px solid #cc0000;
+}
+
+.code-modal-content h2 {
+    margin-top: 0;
+    color: #cc0000;
+    font-family: sans-serif;
+}
+
+#code-display {
+    background: #f0f4f5;
+    color: #cc0000;
+    font-family: 'Courier New', monospace;
+    font-size: 2.2rem;
+    font-weight: bold;
+    padding: 15px;
+    margin: 20px 0;
+    border: 2px dashed #cc0000;
+    letter-spacing: 5px;
+    border-radius: 8px;
+}
+
+
+#auth-code {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    box-sizing: border-box; 
+    text-transform: uppercase;
+}
+
+#auth-code:focus {
+    border-color: #cc0000;
+    outline: none;
+}
+
+
+.error-message {
+    color: #c91a17;
+    font-size: 0.9rem;
+    margin: 10px 0;
+    height: 1rem; 
+}
+
+#confirmCode {
+    background-color: #cc0000;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+}
+
+#confirmCode:hover {
+    background-color: #b20000;
 }

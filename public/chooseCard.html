@@ -20,12 +20,14 @@
 
         <!-- MAIN CONTENT -->
         <main class="main-content">
-            <h1 class="page-title">Select Account</h1>
-
+            <div class="title">
+                <h1 class="page-title">Select Account</h1>
+                <button class="freezeAll" id="freeze-all-btn">Freeze All Accounts</button>
+            </div>
             <div class="account-container" id="account-container">
                 <!-- JS will load accounts here -->
                 <button class="account-button active" id="account1"><b>Account 1</b></button>
-                <button class="account-button" id="account2">Account 2</button>
+                <button class="account-button" id="account2" >Account 2</button>
                 <button class="account-button" id="account3">Account 3</button>
                 <button class="account-button" id="account4">Account 4</button>
                 <button class="account-button" id="account5">Account 5</button>
@@ -41,11 +43,11 @@
                 <h2 class="cards-title"><i>Select Card</i></h2>
                 <div class="cards-container" id="cards-container">
                     <div class="cards-grid">
-                <button class="card-button" id="card1">Card 1</button>
-                <button class="card-button" id="card2">Card 2</button>
-                <button class="card-button" id="card3">Card 3</button>
-                <button class="card-button" id="card4">Card 4</button>
-                <button class="card-button" id="card5">Card 5</button>
+                        <button class="card-button" id="card1">Card 1</button>
+                        <button class="card-button" id="card2">Card 2</button>
+                        <button class="card-button" id="card3">Card 3</button>
+                        <button class="card-button" id="card4">Card 4</button>
+                        <button class="card-button" id="card5">Card 5</button>
                     </div>
 
                 </div>
@@ -68,6 +70,16 @@
                 <input type="password" id="card-pin" maxlength="6" placeholder="6-digit PIN" required>
                 <p id="pin-error" class="error-message"></p>
                 <button id="confirmPin">Confirm PIN</button>
+            </div>
+        </form>
+
+        <form class="code-modal-overlay" id="code-modal">
+            <div class="code-modal-content">
+                <h2>Enter Authorization Code</h2>
+                <p id="code-display"></p>
+                <input type="text" id="auth-code" placeholder="Authorization Code" required>
+                <p id="code-error" class="error-message"></p>
+                <button id="confirmCode">Confirm Code</button>
             </div>
         </form>
 
