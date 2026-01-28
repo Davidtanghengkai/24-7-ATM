@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         '<p style="text-align: center; font-size: 1.2rem;">You are now verified.</p>' +
                     '</main>';
                 await new Promise(resolve => setTimeout(resolve, 1500)); // Pause for 1.5 seconds
-                window.location.href = "chooseCard.html";
+                window.location.href = "WaitingPage.html";
                 
             } else {
                 //server failure
