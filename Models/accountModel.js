@@ -36,7 +36,11 @@ async function getAccountsByUserId(userId) {
         pool = await sql.connect(dbConfig);
         const request = pool.request();
         request.input('userId', sql.Int, userId);
-        const result = await request.query(`SELECT * FROM Accounts WHERE userId = @userId`);
+        const result = await request.query(`          
+            SELECT * FROM Accounts WHERE userID = 5 ORDER BY 
+            (CASE WHEN UPPER(TRIM(Status)) = 'ACTIVE' THEN 0 ELSE 1 END) ASC, 
+            [AccountNo] ASC;
+        `);
         return result.recordset;
     }
     catch (err) {
@@ -115,4 +119,43 @@ async function increaseBalance(accountNo, amount) {
   }
 }
 
-module.exports = { getBalance, updateBalance, createAccount, getAccountsByUserId, increaseBalance};
+async function freezeAccount(accountNo) {
+  let pool;
+    try {
+        pool = await sql.connect(dbConfig);
+        const request = pool.request();
+        request.input('accountNo', sql.Int, accountNo);
+        const result = await request.query(`UPDATE Accounts SET Status = 'Frozen' WHERE accountNo = @accountNo`);
+        return result.rowsAffected[0] === 1;
+    }
+    catch (err) {
+        console.error("Error in accountModel.freezeAccount:", err);
+        throw err;
+    }
+    finally {
+        if (pool) pool.close();
+    }
+}
+
+
+async function freezeAllAccounts(userId) {
+  let pool;
+    try {
+        pool = await sql.connect(dbConfig);
+        const request = pool.request();
+        request.input('userId', sql.Int, userId);
+        const result = await request.query(`UPDATE Accounts SET Status = 'Frozen' WHERE userID = @userId`);
+        return result.rowsAffected[0];
+    }
+    catch (err) {
+        console.error("Error in accountModel.freezeAllAccounts:", err);
+        throw err;
+    }
+    finally {
+        if (pool) pool.close();
+    }
+}
+
+
+
+module.exports = { getBalance, updateBalance, createAccount, getAccountsByUserId, increaseBalance, freezeAccount, freezeAllAccounts };

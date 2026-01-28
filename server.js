@@ -87,6 +87,9 @@ app.delete('/api/cards/:cardNo', cardController.deleteCard);
 app.get('/api/cards/active/user/:userId/account/:accountNo', cardController.findCardsByUserId);
 
 // == Account Routes ==
+app.put("/api/accounts/freeze/:accountNo", accountController.freezeAccount);
+app.put("/api/accounts/freeze-all/:userId", accountController.freezeAllAccounts);
+
 app.post('/api/accounts', accountController.createAccount);
 app.get('/api/accounts/user/:userId', accountController.getAccountsByUserId);
 app.post("/api/accounts/deposit", accountController.addBalance);

@@ -146,7 +146,41 @@ async function withdraw(req, res) {
   }
 }
 
+async function freezeAccount(req, res) {
+    try {
+        const { accountNo } = req.params;
+        const result = await accountModel.freezeAccount(accountNo);
+        if (result) {
+            res.status(200).json({ message: `Account ${accountNo} has been frozen.` });
+        } else {
+            res.status(404).json({ message: "Account not found or could not be frozen." });
+        }
+    } 
+    catch (err) {
+        console.error("Error in freezeAccount controller:", err);
+        res.status(500).json({ message: "Error freezing account", error: err.message });
+        }
+}
+
+async function freezeAllAccounts(req, res) {
+    try {
+        const { userId } = req.params;
+        const result = await accountModel.freezeAllAccounts(userId);
+        if (result) {
+            res.status(200).json({ message: `All accounts for user ${userId} have been frozen.` });
+        } else {
+            res.status(404).json({ message: "User not found or could not be frozen." });
+        }
+    } 
+    catch (err) {
+        console.error("Error in freezeAllAccounts controller:", err);
+        res.status(500).json({ message: "Error freezing all accounts", error: err.message });
+        }
+}
+
+
+
 module.exports = {
     getAccountsByUserId,
-    createAccount, fetchBalance, updateAccountBalance, addBalance, withdraw
+    createAccount, fetchBalance, updateAccountBalance, addBalance, withdraw, freezeAccount, freezeAllAccounts
 };
