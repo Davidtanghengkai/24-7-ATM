@@ -1,6 +1,7 @@
 const sql = require("mssql");
 const dbConfig = require("../dbConfig");
 const { recordOverseasOnChain, toCents } = require("../services/blockchainService");
+const { computeFraudFeatures, decideFraud } = require("../services/fraudService");
 
 function makeRef() {
   return `OTR-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
@@ -29,7 +30,7 @@ async function createTransaction(data) {
 
   let txnID;
   let receiverBcUserID;
-
+  let fraudResult= null;
   // ----------------- PHASE 1: SQL (ATOMIC) -----------------
   let conn;
   let tx;
@@ -73,6 +74,58 @@ async function createTransaction(data) {
       }
 
       receiverBcUserID = Number(bc.recordset[0].bcUserID);
+    }
+    
+    // 2.5) FRAUD RULE CHECK (if any rule triggers → ask user to verify)
+    {
+      const features = await computeFraudFeatures(tx, {
+        senderAccountNo,
+        receiverAccountNo,
+        amountNum
+      });
+
+      fraudResult = decideFraud(features);
+
+      if (fraudResult.decision === "VERIFY") {
+        // Insert txn but don't deduct balance, don't do blockchain yet
+        const req = new sql.Request(tx);
+        req.input("senderAccountNo", sql.Int, senderAccountNo);
+        req.input("receiverAccountNo", sql.VarChar(30), String(receiverAccountNo));
+        req.input("bankID", sql.Int, bankID);
+        req.input("amount", sql.Decimal(18, 2), amountNum);
+        req.input("currency", sql.VarChar(10), currency);
+        req.input("exchangeRate", sql.Decimal(10, 4), rateNum);
+        req.input("totalConverted", sql.Decimal(18, 2), totalConverted);
+        req.input("txnType", sql.VarChar(20), txnType || "Overseas");
+        req.input("reference", sql.VarChar(50), reference);
+        req.input("receiverBcUserID", sql.Int, receiverBcUserID);
+
+        const insert = await req.query(`
+          INSERT INTO Transactions
+            (senderAccountNo, receiverAccountNo, bankID, amount, currency, exchangeRate, totalConverted,
+             status, txnType, [timestamp],
+             receiverBcUserID, receiverVerified, reference, chainStatus)
+          OUTPUT INSERTED.txnID
+          VALUES
+            (@senderAccountNo, @receiverAccountNo, @bankID, @amount, @currency, @exchangeRate, @totalConverted,
+             'PENDING_VERIFICATION', @txnType, GETDATE(),
+             @receiverBcUserID, 1, @reference, 'VERIFY_REQUIRED')
+        `);
+
+        txnID = insert.recordset[0].txnID;
+
+        await tx.commit(); // commit insert
+
+        // ✅ return verification message immediately
+        return {
+          txnID,
+          reference,
+          chainStatus: "VERIFY_REQUIRED",
+          status: "PENDING_VERIFICATION",
+          message: "Please verify yourself to proceed with this transaction",
+          triggeredRules: fraudResult.hits
+        };
+      }
     }
 
     // 3) Deduct sender balance

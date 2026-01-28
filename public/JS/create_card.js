@@ -271,68 +271,72 @@ async function checkDistance(fullDetection) {
     return box.width > 280; // too close
 }
 
- 
-//#registers new user
+// ---------------- Registration Modal ----------------
+
+//#region registers new user
+let createdUserId = null;
+let createdAccountNo = null;
+let generatedAccessCode = null;
+
 const modal2 = document.getElementById("registration-modal");
 const form = document.getElementById("registration-form");
-// Open modal and start camera
+const successForm = document.getElementById("registration-success");
+const cardForm = document.getElementById("create-card-form");
 const videoRes = document.getElementById("video1");
 const statusTextRes = document.getElementById("status1");
 
 async function openRegistrationModal() {
     modal2.classList.add("active");
-
     await startCamera(videoRes);
 }
 
-async function closeRegistrationModal() {
+function closeRegistrationModal() {
     modal2.classList.remove("active");
     stopCamera();
 }
 
-modal2.addEventListener('click', e => {
-    if (e.target === modal2) closeRegistrationModal();
+modal2.addEventListener("click", e => {
+    if (e.target.classList.contains('registration-modal-overlay')) {
+        closeRegistrationModal();
+    }
 });
 
-// Escape key to close
-document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeRegistrationModal();
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeRegistrationModal();
 });
 
-
-// Form submission
+// ---------------- FORM SUBMIT ----------------
 form.onsubmit = async (e) => {
     e.preventDefault();
 
-    // Collect form data
     const name = document.getElementById("name").value.trim();
     const dob = document.getElementById("dob").value;
-    const ic  = document.getElementById("ic").value.trim();
-    const pin = document.getElementById("pin").value;
-    const accountType = document.getElementById("accountType").value;
+    const ic = document.getElementById("ic").value.trim();
     const email = document.getElementById("email").value.trim();
-    const cardDescription = document.getElementById("card-description").value.trim() || "My Card";
+    const profilePin = document.getElementById("profile-pin").value;
+    const accountType = document.getElementById("accountType").value;
+    const accountName =
+        document.getElementById("account-description").value.trim() || "Account";
 
     statusTextRes.textContent = "Scanning face...";
 
-    // Detect face
     const detection = await faceapi
         .detectSingleFace(videoRes, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks()
         .withFaceDescriptor();
 
     if (!detection) {
-        statusTextRes.textContent = "Position your face within the frame and try again.";
+        statusTextRes.textContent = "Face not detected. Try again.";
         return;
     }
 
     const descriptorArray = Array.from(detection.descriptor);
 
-    statusTextRes.textContent = "Creating user...";
-
     try {
-        // 1. Create user
-        const createUserRes = await fetch("/api/users", {
+        statusTextRes.textContent = "Creating user...";
+
+        // create user profile
+        const userRes = await fetch("/api/users", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -340,70 +344,91 @@ form.onsubmit = async (e) => {
                 dob,
                 nationalID: ic,
                 Email: email,
+                LoginPin: profilePin,
                 bioType: "face",
                 BioData: JSON.stringify(descriptorArray)
             })
         });
 
-        if (!createUserRes.ok) throw new Error(await createUserRes.text());
-
-        const createdUser = await createUserRes.json();
-        const userId = createdUser.userId;
-        localStorage.setItem("userId", userId);
+        if (!userRes.ok) throw new Error(await userRes.text());
+        const userData = await userRes.json();
+        createdUserId = userData.userId;
 
         statusTextRes.textContent = "Creating account...";
 
-        // 2. Create account
+        // create account
         const accountRes = await fetch("/api/accounts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, accountType, balance: 0 })
-        });
-
-        const accountData = await accountRes.json();
-        const accountNo = accountData.accountNo;
-
-        statusTextRes.textContent = "Creating card...";
-
-        // 3. Create card
-        const expiry = new Date();
-        expiry.setFullYear(expiry.getFullYear() + 5);
-
-        const cardRes = await fetch("/api/cards", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                userId,
-                accountNo,
-                expiryDate: expiry.toISOString().split("T")[0],
-                pin,
-                description: cardDescription
+                userId: createdUserId,
+                Balance: 0,
+                Type: accountType,
+                AccountName: accountName,
+                Status: "Active"
             })
         });
 
-        const cardData = await cardRes.json();
+        if (!accountRes.ok) throw new Error(await accountRes.text());
+        const accountData = await accountRes.json();
+        createdAccountNo = accountData.accountNo;
+        generatedAccessCode = userData.accessCode;
 
-        statusTextRes.textContent = "Registration complete!";
-        modal2.style.display = "none";
-        form.reset();
-        closeRegistrationModal();
+        // show access code for mobile banking setup
+        document.getElementById("access-code").textContent = generatedAccessCode;
 
-        if(videoRes.srcObject){
-            videoRes.srcObject.getTracks().forEach(track => track.stop());
-        }
+        form.style.display = "none";
+        successForm.style.display = "block";
 
-        window.location.href = "Index.html";
-
-        console.log(
-            `User created!\nAccount No: ${accountNo}\nCard No: ${cardData.card.CardNo}`
-        );
+        stopCamera();
 
     } catch (err) {
         console.error(err);
-        alert("Error: " + err.message);
-        statusTextRes.textContent = "Position your face within the frame";
+        statusTextRes.textContent = "Registration failed.";
     }
 };
+
+document.getElementById("success-btn").onclick = () => {
+    successForm.style.display = "none";
+    cardForm.style.display = "block";
+};
+
+document.getElementById("no-btn").onclick = () => {
+    window.location.href = "index.html";
+};
+
+cardForm.onsubmit = async (e) => {
+    e.preventDefault();
+
+    const pin = document.getElementById("pin").value;
+    const description =
+        document.getElementById("card-description").value.trim() || "Card";
+
+    const expiry = new Date();
+    expiry.setFullYear(expiry.getFullYear() + 5);
+
+    try {
+        await fetch("/api/cards", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                UserID: createdUserId,
+                AccountNo: createdAccountNo,
+                status: "Active",
+                expiryDate: expiry.toISOString().split("T")[0],
+                PIN: pin,
+                CardName: description
+            })
+        });
+
+        window.location.href = "Index.html";
+
+    } catch (err) {
+        console.error(err);
+        alert("Card creation failed.");
+    }
+};
+
 //#endregion
 
 // Utility to display errors on the modal's status text

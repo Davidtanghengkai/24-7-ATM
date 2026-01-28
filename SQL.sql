@@ -12,8 +12,8 @@ CREATE TABLE [User] (
     DOB DATE,
     nationalID VARCHAR(50),
     Email VARCHAR(255) UNIQUE,
-    AccessCode VARCHAR(50) UNIQUE,
-    LoginPin VARCHAR(255)
+    AccessCode VARCHAR(8) UNIQUE,
+    LoginPin VARCHAR(8)
 );
 
 -- Creating the Biometrics table
@@ -31,6 +31,8 @@ CREATE TABLE Accounts (
     userID INT, -- Reference to the User
     Balance DECIMAL(18, 2), -- Account balance
     Type VARCHAR(50), -- Type of account (savings, checking, etc.)
+    AccountName VARCHAR(25) NOT NULL default 'Account',
+    Status VARCHAR(10) NOT NULL DEFAULT 'Active',
     FOREIGN KEY (userID) REFERENCES [User](id) -- Foreign Key referencing User table
 );
 
@@ -39,7 +41,7 @@ CREATE TABLE Card (
     CardNo INT PRIMARY KEY IDENTITY(1,1), -- Card number as the primary key
     UserID INT, -- Reference to the User
     AccountNo INT, -- Reference to the Account
-    status VARCHAR(50), -- Card status (active, blocked, etc.)
+    status VARCHAR(50) NOT NULL DEFAULT 'Active', -- Card status (active, blocked, etc.)
     expiryDate DATE, -- Expiry date of the card
     PIN VARCHAR(6), -- 6-digit PIN
     createdTime DATETIME, -- Time the card was created
@@ -52,10 +54,10 @@ CREATE TABLE Card (
 -- Insert into Users table
 INSERT INTO [User] (Name, Dob, nationalId,Email, AccessCode, LoginPin)
 VALUES 
-('John Tan', GETDATE(), 'S1234567J','hi1@gmail.com', 'USR001', '1234'),
-('Mary Lim', GETDATE(), 'S2345678B','hi2@gmail.com', 'USR002', '4321'),
-('Ahmad Ali', GETDATE(), 'S3456789C','hi3@gmail.com', 'USR003', '5555'),
-('Siti Rahman', GETDATE(), 'S4567890D','hi4@gmail.com', 'USR004', '6666');
+('John Tan', GETDATE(), 'S1234567J','hi1@gmail.com', '11111111', '11111111'),
+('Mary Lim', GETDATE(), 'S2345678B','hi2@gmail.com', '22222222', '22222222'),
+('Ahmad Ali', GETDATE(), 'S3456789C','hi3@gmail.com', '33333333', '33333333'),
+('Siti Rahman', GETDATE(), 'S4567890D','hi4@gmail.com', '44444444', '44444444');
 
 select * from [User]
 -- 2️⃣ Insert into Accounts table
@@ -63,7 +65,7 @@ INSERT INTO Accounts (userID, Balance, Type) VALUES
 (1, 1500.50, 'Savings'),
 (2, 250.75, 'Checking'),
 (3, 3200.00, 'Savings'),
-(4, 500.25, 'Checking')
+(4, 500.25, 'Checking');
 
 -- Cards for John Tan (User 1, Account 1)
 INSERT INTO Card (UserID, AccountNo, status, expiryDate, PIN, createdTime, CardName) VALUES
@@ -120,31 +122,28 @@ CREATE TABLE BlockchainUser (
 
 -- Creating the Transactions table
 CREATE TABLE Transactions (
-    txnID INT PRIMARY KEY IDENTITY(1,1),          -- Unique transaction ID
-    senderAccountNo INT NOT NULL,                 -- FK -> Accounts(AccountNo)
-    receiverAccountNo VARCHAR(20) NOT NULL,       -- Receiver's account number
-    bankID INT NOT NULL,                          -- FK -> Bank(bankID)
-    amount DECIMAL(18, 2) NOT NULL,               -- Amount in SGD
-    currency VARCHAR(10) NOT NULL,                -- Recipient's currency (MYR, USD, etc.)
-    exchangeRate DECIMAL(10,4) NOT NULL,          -- Conversion rate at time of transfer
-    totalConverted DECIMAL(18,2) NULL,            -- Calculated amount in target currency
-    status VARCHAR(20) DEFAULT 'Pending',         -- Transaction status (Pending, Confirmed, Failed)
-    txnType VARCHAR(20) DEFAULT 'Overseas',       -- Local / Overseas
-    timestamp DATETIME DEFAULT GETDATE(),         -- Timestamp of transaction
-    blockID INT NULL,                             -- BlockchainLedger reference (optional)
+    txnID INT PRIMARY KEY IDENTITY(1,1),          
+    senderAccountNo INT NOT NULL,                 
+    receiverAccountNo VARCHAR(30) NOT NULL,       
+    bankID INT NOT NULL,                          
+    amount DECIMAL(18, 2) NOT NULL,               
+    currency VARCHAR(10) NOT NULL,                
+    exchangeRate DECIMAL(10,4) NOT NULL,          
+    totalConverted DECIMAL(18,2) NULL,            
+    status VARCHAR(20) DEFAULT 'Pending',         
+    txnType VARCHAR(20) DEFAULT 'Overseas',       
+    timestamp DATETIME DEFAULT GETDATE(),         
+    receiverBcUserID INT NULL,
+	receiverVerified BIT NOT NULL DEFAULT 0,
+    reference VARCHAR(50) NOT NULL UNIQUE,
+	chainStatus VARCHAR(20) NOT NULL DEFAULT 'SQL_ONLY',
+	blockchainTxHash VARCHAR(66) NULL,
+	blockchainBlockNo INT NULL,
     FOREIGN KEY (senderAccountNo) REFERENCES Accounts(AccountNo),
-    FOREIGN KEY (bankID) REFERENCES Bank(bankID)
+    FOREIGN KEY (bankID) REFERENCES Bank(bankID),
+	FOREIGN KEY (receiverBcUserID) REFERENCES BlockchainUser(bcUserID)
 );
 
--- Creating the BlockchainLedger table
-CREATE TABLE BlockchainLedger (
-    blockID INT PRIMARY KEY IDENTITY(1,1),
-    previousHash VARCHAR(64),
-    currentHash VARCHAR(64),
-    transactionData VARCHAR(MAX),
-    timestamp DATETIME DEFAULT GETDATE(),
-    validatedBy VARCHAR(50) -- e.g. 'ATM001', 'BankServer'
-);
 
 INSERT INTO Bank (bankName, country, currency)
 VALUES
