@@ -67,6 +67,26 @@ INSERT INTO Accounts (userID, Balance, Type) VALUES
 (3, 3200.00, 'Savings'),
 (4, 500.25, 'Checking');
 
+-- Cards for John Tan (User 1, Account 1)
+INSERT INTO Card (UserID, AccountNo, status, expiryDate, PIN, createdTime, CardName) VALUES
+(1,1, 'active', DATEADD(year, 3, GETDATE()), '121212', GETDATE(), 'Visa Debit'),
+(1,1, 'active', DATEADD(year, 3, GETDATE()), '112233', GETDATE(), 'OCBC 360 Card');
+
+-- Cards for Mary Lim (User 2, Account 2)
+INSERT INTO Card (UserID, AccountNo, status, expiryDate, PIN, createdTime, CardName) VALUES
+(2,2, 'active', DATEADD(year, 3, GETDATE()), '232323', GETDATE(), 'Mastercard Debit'),
+(2,2, 'active', DATEADD(year, 3, GETDATE()), '445566', GETDATE(), 'Frank Card');
+
+-- Cards for Ahmad Ali (User 3, Account 3)
+INSERT INTO Card (UserID, AccountNo, status, expiryDate, PIN, createdTime, CardName) VALUES
+(3,3, 'active', DATEADD(year, 3, GETDATE()), '343434', GETDATE(), 'Visa Savings'),
+(3,3, 'active', DATEADD(year, 3, GETDATE()), '778899', GETDATE(), 'Titanium Rewards');
+
+-- Cards for Siti Rahman (User 4, Account 4)
+INSERT INTO Card (UserID, AccountNo, status, expiryDate, PIN, createdTime, CardName) VALUES
+(4,4, 'active', DATEADD(year, 3, GETDATE()), '454545', GETDATE(), 'Mastercard Debit'),
+(4,4, 'active', DATEADD(year, 3, GETDATE()), '009988', GETDATE(), 'NTUC Plus! Card');
+
 -- Creating the Authlog table
 CREATE TABLE Authlog (
     Id INT PRIMARY KEY IDENTITY(1,1), -- Auto-incremented Authlog ID

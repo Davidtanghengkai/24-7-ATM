@@ -1,4 +1,4 @@
-
+const socket = io(window.location.origin);
 async function submitLogin() {
     const accessCode = document.getElementById('accessCode').value;
     const loginPin = document.getElementById('loginPin').value;
@@ -18,7 +18,7 @@ async function submitLogin() {
             localStorage.setItem('userName', result.userName);
 
             // Redirect to the mobile home page
-            window.location.href = '/mobile-home.html';
+            window.location.href = 'MobHome.html';
         } else {
             alert(result.message || 'Login Failed');
         }
