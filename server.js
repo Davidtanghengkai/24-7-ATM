@@ -33,9 +33,6 @@ app.use(session({
 }));
 
 
-
-app.use(express.static(path.join(__dirname, "public")));
-
 //// Swagger Setup for API Documentation
 const swaggerUi = require("swagger-ui-express");
 let swaggerDocument;
@@ -89,6 +86,9 @@ app.get('/api/cards/active/user/:userId/account/:accountNo', cardController.find
 
 
 // == Account Routes ==
+app.put("/api/accounts/freeze/:accountNo", accountController.freezeAccount);
+app.put("/api/accounts/freeze-all/:userId", accountController.freezeAllAccounts);
+
 app.post('/api/accounts', accountController.createAccount);
 app.get('/api/accounts/user/:userId', accountController.getAccountsByUserId);
 app.post("/api/accounts/deposit", accountController.addBalance);
@@ -121,15 +121,18 @@ const watsonRoutes = require('./routes/api/watson');
 app.use('/api/watson', watsonRoutes);
 
 
-const server = app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/Index.html`);
-    console.log(`API documentation: http://localhost:${port}/api-docs`);
-});
+app.use(express.static(path.join(__dirname, "public")));
+
+// const server = app.listen(port, () => {
+//     console.log(`Server running on http://localhost:${port}/Index.html`);
+//     console.log(`API documentation: http://localhost:${port}/api-docs`);
+// });
 
 MobServer.listen(port, '0.0.0.0', () => {
-
-    //REPLACE PART WITH YOUR IP ADDRESS
-    //console.log(`Mobile Server running on:  http://<IP ADDRESS>:${port}/mobile`);
+    console.log(`--- Unified Server Running ---`);
+    console.log(`Web/API: http://localhost:${port}/Index.html`);
+    console.log(`Mobile:  http://localhost:${port}/mobile`);
+    console.log(`API documentation: http://localhost:${port}/api-docs`);
 });
 
 process.on("SIGINT", async () => {

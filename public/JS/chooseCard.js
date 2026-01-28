@@ -58,24 +58,40 @@ function selectAccount(acc, clickedBtn) {
 function loadAccountDetails(acc) {
     const details = document.getElementById("account-details");
 
-    details.innerHTML = `
-        <h2 class="account-no">Account No: ${acc.AccountNo}</h2>
+    if (acc.Status !== 'Active') {
+        details.classList.add("disabled");
+        details.innerHTML = `<h2 class="account-no">Account No: ${acc.AccountNo}</h2>
         <h3 class="account-type">Account type: ${acc.Type}</h3>
         <h3 class="account-balance">Balance: $${acc.Balance.toFixed(2)}</h3>
+        <p style="color:red;"><i>This account is not active. Please select another account.</i></p>`;
+    }
+    else{
+        details.innerHTML = `
+            <div class="account-info">
+                <div class=account-info-left>
+                    <h2 class="account-no">Account No: ${acc.AccountNo}</h2>
+                    <h3 class="account-type">Account type: ${acc.Type}</h3>
+                    <h3 class="account-balance">Balance: $${acc.Balance.toFixed(2)}</h3>
+                </div>
+                <div class="account-info-right">
+                <button class="freezeAccount" id="freeze-btn">Freeze Account</button>
+                </div>
+            </div>
 
-        <h2 class="cards-title"><i>Select Card</i></h2>
-        <div class="cards-container" id="cards-container">
-            <div class="cards-grid" id="cards-grid"></div>
-        </div>
-    `;
+            <h2 class="cards-title"><i>Select Card</i></h2>
+            <div class="cards-container" id="cards-container">
+                <div class="cards-grid" id="cards-grid"></div>
+            </div>
+        `;
+    }
 
-    loadCards(acc.AccountNo);
+    loadCards(acc.AccountNo, acc.Status);
 }
 
 // -------------------------------------------
 // LOAD CARDS FOR SELECTED ACCOUNT
 // -------------------------------------------
-async function loadCards(accountNo) {
+async function loadCards(accountNo, accountStatus) {
     const userId = localStorage.getItem("userId");
 
     try {
@@ -90,15 +106,27 @@ async function loadCards(accountNo) {
             return;
         }
 
-        cards.forEach(card => {
-            const btn = document.createElement("button");
-            btn.classList.add("card-button");
-            btn.innerHTML = `<b><i>${card.CardName}</i></b>`;
+        if (accountStatus !== 'Active') {
+            cards.forEach(card => {
+                const btn = document.createElement("button");
+                btn.classList.add("card-button");
+                btn.disabled = true;
+                btn.innerHTML = `<b><i>${card.CardName}</i></b>`;
 
-            btn.onclick = () => selectCard(card.CardNo, accountNo, card.PIN);
-            grid.appendChild(btn);
-        });
+                btn.onclick = () => selectCard(card.CardNo, accountNo, card.PIN);
+                grid.appendChild(btn);
+            });
+        }
+        else{
+            cards.forEach(card => {
+                const btn = document.createElement("button");
+                btn.classList.add("card-button");
+                btn.innerHTML = `<b><i>${card.CardName}</i></b>`;
 
+                btn.onclick = () => selectCard(card.CardNo, accountNo, card.PIN);
+                grid.appendChild(btn);
+            });
+        }
     } catch (error) {
         console.error("Error loading cards:", error);
     }
@@ -161,4 +189,82 @@ document.getElementById("confirmPin").addEventListener("click", (e) => {
     localStorage.setItem("selectedAccountNo", accountNo);
 
     window.location.href = "NewHomePage.html";
+});
+
+
+let currentAccountToFreeze = null;
+let freezeMode = "single"; // "single" or "all"
+
+const generateAuthCode = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+document.addEventListener("click", (e) => {
+    // freeze 1 account
+    if (e.target && e.target.id === "freeze-btn") {
+        freezeMode = "single";
+        const accountNoElement = document.querySelector(".account-no");
+        const match = accountNoElement.textContent.match(/\d+/); //get account number
+        currentAccountToFreeze = match ? match[0] : null;
+        openFreezeModal("Freeze Account " + currentAccountToFreeze);
+    }
+
+    // freeze all
+    if (e.target && (e.target.id === "freeze-all-btn" || e.target.classList.contains("freezeAll"))) {
+        freezeMode = "all";
+        openFreezeModal("Freeze All Accounts");
+    }
+});
+
+// confirmation modal display
+function openFreezeModal(titleText) {
+    document.querySelector("#code-modal h2").textContent = titleText;
+    document.getElementById("code-display").textContent = generateAuthCode();
+    document.getElementById("code-error").textContent = "";
+    document.getElementById("auth-code").value = "";
+    document.getElementById("code-modal").style.display = "flex";
+}
+
+// confirm freeze action logic
+document.getElementById("confirmCode").addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    const enteredCode = document.getElementById("auth-code").value;
+    const displayedCode = document.getElementById("code-display").textContent;
+    const userId = localStorage.getItem("userId");
+
+    if (enteredCode !== displayedCode) {
+        document.getElementById("code-error").textContent = "Incorrect code.";
+        return;
+    }
+
+    try {
+        let url = "";
+        if (freezeMode === "single") {
+            url = `/api/accounts/freeze/${currentAccountToFreeze}`;
+        } else {
+            url = `/api/accounts/freeze-all/${userId}`;
+        }
+
+        const res = await fetch(url, { method: "PUT" });
+
+        if (res.ok) {
+            document.getElementById("code-error").textContent = (freezeMode === "single" ? "Account frozen." : "All accounts have been frozen.");
+            location.reload();
+        } else {
+            const errorData = await res.json();
+            document.getElementById("code-error").textContent = errorData.message || "Failed to process.";
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("code-error").textContent ="Server communication error.";
+    }
+});
+
+//close if model is clicked out
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById("code-modal");
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
 });
