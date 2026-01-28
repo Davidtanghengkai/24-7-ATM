@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchUserAccounts();
     setupSocketConnection();
     addTriggerButton();
+    checkForNFCTrigger();
 });
 function setupSocketConnection() {
     socket.on('connect', () => {console.log('Connected to server. Socket ID:', socket.id);});
@@ -28,6 +29,8 @@ function selectCardForNFC(cardNo, element) {
     localStorage.setItem('selectedCardId', cardNo);
     showNotification('Card selected. Ready to transfer!', 'info');
 }
+
+
 function triggerNFCLogin(stationId = "ATM01") {
     const selectedCard = localStorage.getItem('selectedCardId');
     const userName = localStorage.getItem('userName') || 'User';
@@ -52,6 +55,26 @@ function triggerNFCLogin(stationId = "ATM01") {
     socket.emit('nfc-trigger', sessionData);
     
     showNotification('Transferring to ATM...', 'info');
+}
+
+function checkForNFCTrigger() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // This looks for "?trigger=true" in your URL
+    if (urlParams.get('trigger') === 'true') {
+        console.log('📡 NFC Tag detected via URL redirect');
+        
+        setTimeout(() => {
+            const userId = localStorage.getItem('userId');
+            const selectedCard = localStorage.getItem('selectedCardId');
+            
+            if (userId && selectedCard) {
+                triggerNFCLogin('ATM01'); // Calls your existing function
+            } else {
+                showNotification('Please log in and select a card first!', 'warning');
+            }
+        }, 800); // 800ms delay to ensure socket connects first
+    }
 }
 async function fetchUserAccounts() {
     const userId = localStorage.getItem('userId');
