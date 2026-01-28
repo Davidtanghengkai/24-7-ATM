@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('userName').innerText = userName;
     fetchUserAccounts();
     setupSocketConnection();
-    addTriggerButton();
+    // addTriggerButton();
     checkForNFCTrigger();
 });
 function setupSocketConnection() {
@@ -61,9 +61,7 @@ function checkForNFCTrigger() {
     const urlParams = new URLSearchParams(window.location.search);
     
     // This looks for "?trigger=true" in your URL
-    if (urlParams.get('trigger') === 'true') {
-        console.log('📡 NFC Tag detected via URL redirect');
-        
+    if (urlParams.get('trigger') === 'true') {        
         setTimeout(() => {
             const userId = localStorage.getItem('userId');
             const selectedCard = localStorage.getItem('selectedCardId');
@@ -187,26 +185,26 @@ function logout() {
     window.location.href = '/mobile';
 }
 //NFC Trigger Button for testing
-function addTriggerButton() {
-    const triggerButton = document.createElement('button');
-    triggerButton.textContent = '🔓 Transfer to ATM';
-    triggerButton.style.cssText = `
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        background: #d7191c;
-        color: white;
-        border: none;
-        padding: 15px 25px;
-        border-radius: 25px;
-        font-weight: bold;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        cursor: pointer;
-        z-index: 1000;
-    `;
+// function addTriggerButton() {
+//     const triggerButton = document.createElement('button');
+//     triggerButton.textContent = '🔓 Transfer to ATM';
+//     triggerButton.style.cssText = `
+//         position: fixed;
+//         bottom: 80px;
+//         right: 20px;
+//         background: #d7191c;
+//         color: white;
+//         border: none;
+//         padding: 15px 25px;
+//         border-radius: 25px;
+//         font-weight: bold;
+//         box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+//         cursor: pointer;
+//         z-index: 1000;
+//     `;
     
-    triggerButton.onclick = () => triggerNFCLogin('ATM01');
-    document.body.appendChild(triggerButton);
-}
+//     triggerButton.onclick = () => triggerNFCLogin('ATM01');
+//     document.body.appendChild(triggerButton);
+// }
 
 document.head.appendChild(style);

@@ -37,7 +37,7 @@ async function getAccountsByUserId(userId) {
         const request = pool.request();
         request.input('userId', sql.Int, userId);
         const result = await request.query(`          
-            SELECT * FROM Accounts WHERE userID = 5 ORDER BY 
+            SELECT * FROM Accounts WHERE userID = @userId ORDER BY 
             (CASE WHEN UPPER(TRIM(Status)) = 'ACTIVE' THEN 0 ELSE 1 END) ASC, 
             [AccountNo] ASC;
         `);
