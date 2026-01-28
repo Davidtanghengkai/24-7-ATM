@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waiting for Approval - 24/7 ATM</title>
+    <link rel="stylesheet" href="CSS/Index.css">
+    <style>
+        .waiting-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255, 255, 255, 0.1);
+            border-top: 8px solid #d7191c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 30px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #fff, #ccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #aaa;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        .status-badge {
+            margin-top: 40px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            background: rgba(215, 25, 28, 0.1);
+            border: 1px solid rgba(215, 25, 28, 0.3);
+            color: #d7191c;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #d7191c;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0.95);
+                opacity: 0.5;
+            }
+        }
+
+        .back-btn {
+            margin-top: 50px;
+            padding: 12px 30px;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid #444;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #666;
+            color: white;
+        }
+
+        #denial-message {
+            display: none;
+            color: #ff4d4d;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="waiting-container">
+        <div class="spinner" id="main-spinner"></div>
+        <div id="status-icon" style="display: none; font-size: 80px; margin-bottom: 30px;">❌</div>
+
+        <h1 id="waiting-title">Waiting for Approval</h1>
+        <p id="waiting-desc">Please check your mobile device. We've sent an authentication request to your registered
+            phone.</p>
+
+        <div id="denial-message">Login request was denied.</div>
+
+        <div class="status-badge" id="status-badge">
+            <div class="status-dot"></div>
+            <span>Awaiting mobile response...</span>
+        </div>
+
+        <a href="LoginPage.html" class="back-btn">Cancel and Back to Login</a>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="JS/waiting.js"></script>
+</body>
+
+</html>
