@@ -33,19 +33,33 @@ function setupSocketConnection() {
     socket.on('mobile-auth-request', (data) => {
         console.log('Authentication request received:', data);
         
-        const approved = confirm(`Login request from ATM ${data.stationId}. Do you approve?`);
-        
-        socket.emit('mobile-auth-response', {
-            stationId: data.stationId,
-            userId: data.userId,
-            approved: approved
-        });
-        
-        if (approved) {
-            showNotification('Login approved!', 'success');
-        } else {
-            showNotification('Login denied.', 'warning');
-        }
+        const modal = document.getElementById('auth-modal');
+        const stationIdSpan = document.getElementById('modal-station-id');
+        const approveBtn = document.getElementById('auth-approve');
+        const denyBtn = document.getElementById('auth-deny');
+
+        if (stationIdSpan) stationIdSpan.innerText = data.stationId;
+        if (modal) modal.style.display = 'flex';
+
+        const sendResponse = (approved) => {
+            socket.emit('mobile-auth-response', {
+                stationId: data.stationId,
+                userId: data.userId,
+                approved: approved
+            });
+            if (modal) modal.style.display = 'none';
+            if (approved) {
+                showNotification('Login approved!', 'success');
+            } else {
+                showNotification('Login denied.', 'warning');
+            }
+            // Clean up listeners to avoid multiple responses
+            approveBtn.onclick = null;
+            denyBtn.onclick = null;
+        };
+
+        if (approveBtn) approveBtn.onclick = () => sendResponse(true);
+        if (denyBtn) denyBtn.onclick = () => sendResponse(false);
     });
 }
 
@@ -158,8 +172,6 @@ async function selectAccount(accountNo, element) {
     }
 }
 
-
-
 //Notifs
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
@@ -189,7 +201,7 @@ function showNotification(message, type = 'info') {
     document.body.appendChild(notification);
     
     setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease-in';
+        notification.style.animation = 'slideIn 0.3s ease-out'; // Fixed animation name
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
