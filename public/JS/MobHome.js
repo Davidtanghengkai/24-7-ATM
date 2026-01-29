@@ -1,13 +1,26 @@
 const socket = io(window.location.origin);
 document.addEventListener('DOMContentLoaded', () => {
     const userName = localStorage.getItem('userName') || 'User';
+    const userId = localStorage.getItem('userId');
+    
     document.getElementById('userName').innerText = userName;
     fetchUserAccounts();
     setupSocketConnection();
     addTriggerButton();
+
+    if (userId) {
+        socket.emit('join-user', userId);
+    }
 });
+
 function setupSocketConnection() {
-    socket.on('connect', () => {console.log('Connected to server. Socket ID:', socket.id);});
+    socket.on('connect', () => {
+        console.log('Connected to server. Socket ID:', socket.id);
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            socket.emit('join-user', userId);
+        }
+    });
     socket.on('disconnect', () => {console.log('Disconnected from server');});
 
     socket.on('nfc-sent', (data) => {showNotification('Session transferred to ATM!', 'success');});
@@ -15,7 +28,41 @@ function setupSocketConnection() {
     socket.on('nfc-error', (error) => {showNotification('Error: ' + error.message, 'error');});
 
     socket.on('connect_error', (error) => {showNotification('Connection error. Please check your network.', 'error');});
+
+    // --- New Authentication Approval Listener ---
+    socket.on('mobile-auth-request', (data) => {
+        console.log('Authentication request received:', data);
+        
+        const modal = document.getElementById('auth-modal');
+        const stationIdSpan = document.getElementById('modal-station-id');
+        const approveBtn = document.getElementById('auth-approve');
+        const denyBtn = document.getElementById('auth-deny');
+
+        if (stationIdSpan) stationIdSpan.innerText = data.stationId;
+        if (modal) modal.style.display = 'flex';
+
+        const sendResponse = (approved) => {
+            socket.emit('mobile-auth-response', {
+                stationId: data.stationId,
+                userId: data.userId,
+                approved: approved
+            });
+            if (modal) modal.style.display = 'none';
+            if (approved) {
+                showNotification('Login approved!', 'success');
+            } else {
+                showNotification('Login denied.', 'warning');
+            }
+            // Clean up listeners to avoid multiple responses
+            approveBtn.onclick = null;
+            denyBtn.onclick = null;
+        };
+
+        if (approveBtn) approveBtn.onclick = () => sendResponse(true);
+        if (denyBtn) denyBtn.onclick = () => sendResponse(false);
+    });
 }
+
 function selectCardForNFC(cardNo, element) {
     document.querySelectorAll('.card-item').forEach(card => {
         card.style.border = "1px solid #eee";
@@ -28,6 +75,7 @@ function selectCardForNFC(cardNo, element) {
     localStorage.setItem('selectedCardId', cardNo);
     showNotification('Card selected. Ready to transfer!', 'info');
 }
+
 function triggerNFCLogin(stationId = "ATM01") {
     const selectedCard = localStorage.getItem('selectedCardId');
     const userName = localStorage.getItem('userName') || 'User';
@@ -53,6 +101,7 @@ function triggerNFCLogin(stationId = "ATM01") {
     
     showNotification('Transferring to ATM...', 'info');
 }
+
 async function fetchUserAccounts() {
     const userId = localStorage.getItem('userId');
     const slider = document.getElementById('accountSlider');
@@ -123,8 +172,6 @@ async function selectAccount(accountNo, element) {
     }
 }
 
-
-
 //Notifs
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
@@ -154,7 +201,7 @@ function showNotification(message, type = 'info') {
     document.body.appendChild(notification);
     
     setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease-in';
+        notification.style.animation = 'slideIn 0.3s ease-out'; // Fixed animation name
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
@@ -185,5 +232,3 @@ function addTriggerButton() {
     triggerButton.onclick = () => triggerNFCLogin('ATM01');
     document.body.appendChild(triggerButton);
 }
-
-document.head.appendChild(style);

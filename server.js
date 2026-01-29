@@ -174,6 +174,35 @@ io.on('connection', (socket) => {
         console.log('Phone button clicked:', data);
         io.emit('phone-action', data);
     });
+
+    // --- New Authentication Approval Events ---
+
+    // Mobile joins a room specific to the user
+    socket.on('join-user', (userId) => {
+        socket.join(`user-${userId}`);
+        console.log(`✓ User ${userId} joined their mobile room (Socket: ${socket.id})`);
+    });
+
+    // ATM signals it's waiting for mobile approval
+    socket.on('atm-waiting-auth', (data) => {
+        console.log(`ATM ${data.stationId} waiting for user ${data.userId} approval`);
+        // Send request to the user's mobile devices
+        io.to(`user-${data.userId}`).emit('mobile-auth-request', {
+            stationId: data.stationId,
+            userId: data.userId
+        });
+    });
+
+    // Mobile responds to the approval request
+    socket.on('mobile-auth-response', (data) => {
+        console.log(`Mobile response for user ${data.userId}: ${data.approved ? 'Approved' : 'Denied'}`);
+        // Send result back to the specific ATM station
+        io.to(data.stationId).emit('atm-auth-result', {
+            approved: data.approved,
+            userId: data.userId
+        });
+    });
+
     socket.on('disconnect', () => {
         const clientInfo = connectedClients.get(socket.id);
         if (clientInfo) {
