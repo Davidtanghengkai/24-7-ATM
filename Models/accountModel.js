@@ -41,6 +41,7 @@ async function getAccountsByUserId(userId) {
             (CASE WHEN UPPER(TRIM(Status)) = 'ACTIVE' THEN 0 ELSE 1 END) ASC, 
             [AccountNo] ASC;
         `);
+
         return result.recordset;
     }
     catch (err) {

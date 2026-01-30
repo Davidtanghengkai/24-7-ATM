@@ -12,7 +12,10 @@ async function createOverseasTransaction(req, res) {
       receiverCountry,
       amount,
       fromCurrency,
-      toCurrency
+      toCurrency,
+      forceProceed,      // ✅
+      pendingTxnID,      // ✅
+      reference      
     } = req.body;
 
     // 1) Validate (same scenario)
@@ -78,24 +81,27 @@ async function createOverseasTransaction(req, res) {
       amount: amtNum,
       currency: String(toCurrency),
       exchangeRate: rateNum,
-      txnType: "Overseas"
+      txnType: "Overseas",
+      forceProceed: forceProceed === true,
+      pendingTxnID: pendingTxnID ? Number(pendingTxnID) : null,
+      reference: reference || null,
+      isVerified: !!req.user
     });
+
+    if (result.chainStatus === "VERIFY_REQUIRED") {
+      return res.status(200).json(result);
+    }
 
     // 6) Response (keep same scenario fields + add chain proof)
     return res.status(201).json({
-      message: "Transaction completed successfully",
+      chainStatus: result.chainStatus,
       blockchainVerified: true,
-
+      txnID: result.txnID,
+      reference: result.reference,
       rate: rateNum,
       senderAccountNo,
       receiverAccountNo,
       convertedAmount: `${totalConverted} ${toCurrency}`,
-
-      // NEW: on-chain proof fields
-      txnID: result.txnID,
-      reference: result.reference,
-      chainStatus: result.chainStatus,
-
       // keep compatibility for your old UI labels (optional)
       blockID: result.blockNumber || null,
       blockHash: result.txHash || null

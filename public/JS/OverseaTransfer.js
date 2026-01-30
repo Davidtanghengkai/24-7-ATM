@@ -7,6 +7,7 @@ const resultBox = document.getElementById("result");
 
 let exchangeRate = 0;
 let toCurrency = "";
+let isSubmitting = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   const savedAccount = localStorage.getItem("selectedAccountNo");
@@ -17,6 +18,17 @@ document.addEventListener("DOMContentLoaded", () => {
       senderInput.setAttribute("readonly", true);
   }
 });
+
+
+(function () {
+  if (!document.getElementById("startFaceBtn")) {
+    const hiddenBtn = document.createElement("button");
+    hiddenBtn.id = "startFaceBtn";
+    hiddenBtn.style.display = "none";
+    document.body.appendChild(hiddenBtn);
+  }
+})();
+
 // -------------------------------------------------
 // STEP NAVIGATION
 // -------------------------------------------------
@@ -221,73 +233,97 @@ document.getElementById("next4").onclick = () => {
 // CONFIRM TRANSFER
 // -------------------------------------------------
 document.getElementById("confirmTransfer").onclick = async () => {
-  const bankData = JSON.parse(document.getElementById("bank").value);
+  if (isSubmitting) return;
+  isSubmitting = true;
 
-  const payload = {
-    senderAccountNo: parseInt(document.getElementById("senderAccount").value),
-    receiverAccountNo: document.getElementById("receiverAccount").value,
-    receiverBankID: bankData.id,
-    receiverBankName: bankData.name,
-    receiverCountry: bankData.country,
-    amount: parseFloat(document.getElementById("amount").value),
-    fromCurrency: "SGD",
-    toCurrency: bankData.currency
-  };
+  const btn = document.getElementById("confirmTransfer");
+  btn.disabled = true;
 
   try {
-    const res = await fetch("/api/transfer", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    const bankData = JSON.parse(document.getElementById("bank").value);
+    const payload = {
+      senderAccountNo: parseInt(document.getElementById("senderAccount").value),
+      receiverAccountNo: document.getElementById("receiverAccount").value,
+      receiverBankID: bankData.id,
+      receiverBankName: bankData.name,
+      receiverCountry: bankData.country,
+      amount: parseFloat(document.getElementById("amount").value),
+      fromCurrency: "SGD",
+      toCurrency: bankData.currency
+    };
 
-    const data = await res.json();
+    // 1) First attempt
+    const first = await submitTransfer(payload);
 
-    // ✅ CASE 1: FRAUD VERIFY REQUIRED (rules triggered)
-    if (res.ok && (data.chainStatus === "VERIFY_REQUIRED" || data.status === "PENDING_VERIFICATION")) {
-      const msg = buildVerifyMessage(data.triggeredRules);
-      showError(msg); // reuse your error overlay as a "security popup"
+    console.log("FIRST /api/transfer =>", first.res.status, first.data);
+
+    // VERIFY REQUIRED
+    if (first.res.ok && (first.data.chainStatus === "VERIFY_REQUIRED" || first.data.status === "PENDING_VERIFICATION")) {
+      const pendingTxnID = first.data.txnID;
+      const pendingRef = first.data.reference;
+
+      showError(buildVerifyMessage(first.data.triggeredRules));
+
+      // after user sees message, run face verify
+      setTimeout(async () => {
+        try {
+          const token = await forceFaceVerifyAndGetToken();
+          if (!token) {
+            showError("Face verification failed. Transfer cancelled.");
+            return;
+          }
+
+          const secondPayload = { ...payload, pendingTxnID, reference: pendingRef };
+          const second = await submitTransfer(secondPayload, { token, forceProceed: true });
+
+          console.log("SECOND /api/transfer =>", second.res.status, second.data);
+
+          if (second.res.ok && second.data.chainStatus === "ON_CHAIN") {
+            hideErrorOverlay();
+            showSuccess("Transfer successful after verification!");
+            return;
+          }
+
+          showError(second.data.message || second.data.error || "Transfer failed after verification.");
+        } finally {
+          // ✅ IMPORTANT: reset after the retry flow finishes
+          btn.disabled = false;
+          isSubmitting = false;
+        }
+      }, 400);
+
+      // stop here; the retry flow will reset the button
       return;
     }
 
-    // ✅ CASE 2: SUCCESSFUL ON_CHAIN
-    if (res.ok && data.chainStatus === "ON_CHAIN") {
-      // show success + ask user if they want another transaction
+    // Normal success
+    if (first.res.ok && first.data.chainStatus === "ON_CHAIN") {
+      hideErrorOverlay();
       showSuccess("Transfer successful!");
-      // after they close success overlay, show the prompt
-      const closeBtn = document.getElementById("closeSuccess");
-      if (closeBtn) {
-        closeBtn.onclick = () => {
-          document.getElementById("successOverlay").classList.remove("active");
-          showAfterTransferPrompt();
-        };
-      } else {
-        // fallback if button missing
-        showAfterTransferPrompt();
-      }
       return;
     }
 
-    // ✅ CASE 3: Any other backend response
-    if (res.ok) {
-      // still treat as success but prompt user
-      showSuccess("Transfer processed.");
-      const closeBtn = document.getElementById("closeSuccess");
-      if (closeBtn) {
-        closeBtn.onclick = () => {
-          document.getElementById("successOverlay").classList.remove("active");
-          showAfterTransferPrompt();
-        };
-      }
+    if (first.res.ok && first.data.chainStatus === "NEEDS_REVIEW") {
+      showError("Transfer recorded but blockchain needs review (NEEDS_REVIEW).");
       return;
     }
 
-    showError(data.message || data.error || "Unknown error.");
-
+    showError(first.data.message || first.data.error || `Transfer failed (HTTP ${first.res.status})`);
   } catch (err) {
-    showError("Network error. Please try again.");
+    console.error("confirmTransfer error:", err);
+    showError("Network/JS error. Please try again.");
+  } finally {
+    // ✅ ALWAYS reset for normal flow
+    // NOTE: verify flow returns earlier and resets inside setTimeout finally.
+    if (!btn.disabled) {
+      // already reset
+    } else {
+      btn.disabled = false;
+      isSubmitting = false;
+    }
   }
 };
+
 
 async function loadSenderBalance() {
   const sender = document.getElementById("senderAccount").value.trim();
@@ -338,6 +374,11 @@ function buildVerifyMessage(triggeredRules = []) {
 // -------------------------------------------------
 // MODAL POPUP FUNCTION
 // -------------------------------------------------
+function hideErrorOverlay() {
+  const err = document.getElementById("errorOverlay");
+  if (err) err.style.display = "none";
+}
+
 function showError(msg) {
   document.getElementById("overlayMessage").textContent = msg;
   document.getElementById("errorOverlay").style.display = "flex";
@@ -350,6 +391,7 @@ document.getElementById("closeOverlay").onclick = () => {
 
 // SHOW SUCCESS MODAL
 function showSuccess(msg) {
+  hideErrorOverlay();
   const successOverlay = document.getElementById("successOverlay");
   const successMessage = document.getElementById("successMessage");
   
@@ -362,6 +404,9 @@ function showSuccess(msg) {
   } else {
     console.error("Success overlay element not found!");
   }
+  setTimeout(() => {
+    showAfterTransferPrompt();
+  }, 400);
 }
 
 function showAfterTransferPrompt() {
@@ -404,3 +449,82 @@ document.getElementById("btnAnotherNo").onclick = () => {
 document.getElementById("closeSuccess").onclick = () => {
   document.getElementById("successOverlay").classList.remove("active");
 };
+
+async function submitTransfer(payload, { token = null, forceProceed = false } = {}) {
+  const headers = { "Content-Type": "application/json" };
+
+  // ✅ default: use saved token (normal transfer)
+  const finalToken = token || localStorage.getItem("jwtToken");
+  if (finalToken) headers["Authorization"] = `Bearer ${finalToken}`;
+
+  const body = forceProceed ? { ...payload, forceProceed: true } : payload;
+
+  const res = await fetch("/api/transfer", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body)
+  });
+
+  const data = await res.json().catch(() => ({}));
+  return { res, data };
+}
+
+
+async function forceFaceVerifyAndGetToken() {
+  // close the fraud message overlay (it blocks clicks)
+  const errOverlay = document.getElementById("errorOverlay");
+  if (errOverlay) errOverlay.style.display = "none";
+
+  // login.js already defines these functions globally
+  if (typeof openFaceModal !== "function" || typeof scanUserFace !== "function") {
+    showError("Face verification module not loaded. Check if login.js is included.");
+    return null;
+  }
+
+  await openFaceModal();
+
+  // make sure models are loaded
+  if (typeof loadFaceModels === "function") {
+    await loadFaceModels();
+  }
+
+  // let camera stabilize
+  await new Promise(r => setTimeout(r, 800));
+
+  const videoEl = document.getElementById("video");
+  const result = await scanUserFace(videoEl);
+
+  if (!result || !result.success) {
+    const status = document.getElementById("status");
+    if (status) status.textContent = "❌ " + (result?.message || "Face scan failed");
+    setTimeout(() => { if (typeof closeFaceModal === "function") closeFaceModal(); }, 1200);
+    return null;
+  }
+
+  // get token
+  const tokenRes = await fetch("/api/users/loginWithFace", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId: result.userId })
+  });
+
+  const tokenData = await tokenRes.json().catch(() => ({}));
+  if (!tokenRes.ok) {
+    if (typeof closeFaceModal === "function") closeFaceModal();
+    showError(tokenData.message || "Verification failed");
+    return null;
+  }
+
+  localStorage.setItem("jwtToken", tokenData.token);
+  localStorage.setItem("userId", tokenData.userId);
+
+  const status = document.getElementById("status");
+  if (status) status.textContent = "✅ Verified!";
+  setTimeout(() => { if (typeof closeFaceModal === "function") closeFaceModal(); }, 700);
+
+  return tokenData.token;
+}
+
+function handleCancel() {
+  window.history.back();
+}
