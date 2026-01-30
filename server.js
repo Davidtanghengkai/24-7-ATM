@@ -55,7 +55,7 @@ const userController = require('./Controllers/userController');
 const cardController = require('./Controllers/cardController');
 const otpController = require('./Controllers/otpController');
 const accountController = require('./Controllers/accountController');
-const transactionController = require("./controllers/transactionController");
+const transactionController = require("./Controllers/transactionController");
 const bankController= require("./controllers/bankController");
 const blockchainUserController = require("./controllers/blockchainUserController");
 const exchangeRateController = require("./controllers/exchangeRateController");
@@ -63,7 +63,7 @@ const translationController = require("./controllers/translationController");
 
 // Middlewares
 const  validateTransfer = require("./middleware/validateTransfer");
-
+const optionalVerifyToken = require("./middleware/optionalAuth");
 //Routes
 
 // == User Routes ==
@@ -105,7 +105,7 @@ app.post('/api/translations', translationController.getTranslations);
 // Oversea Transfer Routes
 app.get("/api/countries", bankController.fetchCountries);
 app.get("/api/banks/:country", bankController.fetchBanks);
-app.post("/api/transfer", validateTransfer, transactionController.createOverseasTransaction);
+app.post("/api/transfer",validateTransfer,optionalVerifyToken, transactionController.createOverseasTransaction);
 app.post("/api/blockchain-user", blockchainUserController.addBlockchainUser);
 app.get("/api/accounts/:accountNo/transactions", transactionController.getHistory);
 app.get("/api/accounts/:accountNo/balance", accountController.fetchBalance);
