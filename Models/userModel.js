@@ -81,7 +81,7 @@ async function getUserById(userId) {
     } catch (err) {
         console.error("Error in userModel.getById:", err);
         throw err;
-    } finally {
+    } finally { 
         if (pool) pool.close();
     }
 }
