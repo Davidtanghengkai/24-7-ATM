@@ -15,22 +15,29 @@ async function createTransaction(data) {
     amount,
     currency,
     exchangeRate,
-    txnType
+    txnType,
+    forceProceed = false,
+    isVerified= false,
+    pendingTxnID = null,
+    reference: incomingRef = null
   } = data;
 
   const amountNum = Number(amount);
   const rateNum = Number(exchangeRate);
+  let reference = incomingRef || makeRef();
+
 
   if (!senderAccountNo || !receiverAccountNo || !bankID || !amountNum || amountNum <= 0 || !currency || !rateNum) {
     throw new Error("Invalid input");
   }
 
   const totalConverted = amountNum * rateNum;
-  const reference = makeRef();
+
 
   let txnID;
   let receiverBcUserID;
   let fraudResult= null;
+  let usingExistingPending = false;
   // ----------------- PHASE 1: SQL (ATOMIC) -----------------
   let conn;
   let tx;
@@ -86,7 +93,7 @@ async function createTransaction(data) {
 
       fraudResult = decideFraud(features);
 
-      if (fraudResult.decision === "VERIFY") {
+      if (fraudResult.decision === "VERIFY" && !(isVerified && forceProceed)) {
         // Insert txn but don't deduct balance, don't do blockchain yet
         const req = new sql.Request(tx);
         req.input("senderAccountNo", sql.Int, senderAccountNo);
@@ -128,6 +135,34 @@ async function createTransaction(data) {
       }
     }
 
+    if (isVerified && forceProceed && pendingTxnID) {
+      usingExistingPending = true;
+
+      // 1) load & validate pending txn
+      const q = await new sql.Request(tx)
+        .input("id", sql.Int, pendingTxnID)
+        .query(`
+          SELECT txnID, senderAccountNo, receiverAccountNo, bankID, amount, status, reference, receiverBcUserID
+          FROM Transactions WITH (UPDLOCK, ROWLOCK)
+          WHERE txnID=@id
+        `);
+
+      if (q.recordset.length === 0) throw new Error("Pending transaction not found");
+
+      const row = q.recordset[0];
+
+      if (row.status !== "PENDING_VERIFICATION") throw new Error("Transaction is not pending verification");
+      if (Number(row.senderAccountNo) !== senderAccountNo) throw new Error("Sender mismatch");
+      if (String(row.receiverAccountNo) !== String(receiverAccountNo)) throw new Error("Receiver mismatch");
+      if (Number(row.bankID) !== bankID) throw new Error("Bank mismatch");
+      if (Number(row.amount) !== amountNum) throw new Error("Amount mismatch");
+
+      // IMPORTANT: use stored reference + bcUserID
+      txnID = row.txnID;
+      receiverBcUserID = Number(row.receiverBcUserID);
+      reference = row.reference;
+    }
+
     // 3) Deduct sender balance
     {
       const req = new sql.Request(tx);
@@ -142,34 +177,50 @@ async function createTransaction(data) {
     }
 
     // 4) Insert transaction (PENDING_CHAIN)
-    {
+    if(usingExistingPending) {
       const req = new sql.Request(tx);
-      req.input("senderAccountNo", sql.Int, senderAccountNo);
-      req.input("receiverAccountNo", sql.VarChar(30), String(receiverAccountNo));
-      req.input("bankID", sql.Int, bankID);
-      req.input("amount", sql.Decimal(18, 2), amountNum);
-      req.input("currency", sql.VarChar(10), currency);
+      req.input("id", sql.Int, txnID);
       req.input("exchangeRate", sql.Decimal(10, 4), rateNum);
       req.input("totalConverted", sql.Decimal(18, 2), totalConverted);
-      req.input("txnType", sql.VarChar(20), txnType || "Overseas");
       req.input("reference", sql.VarChar(50), reference);
-      req.input("receiverBcUserID", sql.Int, receiverBcUserID);
 
-      const insert = await req.query(`
-        INSERT INTO Transactions
-          (senderAccountNo, receiverAccountNo, bankID, amount, currency, exchangeRate, totalConverted,
-           status, txnType, timestamp,
-           receiverBcUserID, receiverVerified, reference, chainStatus)
-        OUTPUT INSERTED.txnID
-        VALUES
-          (@senderAccountNo, @receiverAccountNo, @bankID, @amount, @currency, @exchangeRate, @totalConverted,
-           'Confirmed', @txnType, GETDATE(),
-           @receiverBcUserID, 1, @reference, 'PENDING_CHAIN')
+      await req.query(`
+        UPDATE Transactions
+        SET status='Confirmed',
+            chainStatus='PENDING_CHAIN',
+            exchangeRate=@exchangeRate,
+            totalConverted=@totalConverted,
+            reference=@reference,
+            [timestamp]=GETDATE()
+        WHERE txnID=@id
       `);
+      } else{
+        const req = new sql.Request(tx);
+        req.input("senderAccountNo", sql.Int, senderAccountNo);
+        req.input("receiverAccountNo", sql.VarChar(30), String(receiverAccountNo));
+        req.input("bankID", sql.Int, bankID);
+        req.input("amount", sql.Decimal(18, 2), amountNum);
+        req.input("currency", sql.VarChar(10), currency);
+        req.input("exchangeRate", sql.Decimal(10, 4), rateNum);
+        req.input("totalConverted", sql.Decimal(18, 2), totalConverted);
+        req.input("txnType", sql.VarChar(20), txnType || "Overseas");
+        req.input("reference", sql.VarChar(50), reference);
+        req.input("receiverBcUserID", sql.Int, receiverBcUserID);
 
-      txnID = insert.recordset[0].txnID;
-    }
+        const insert = await req.query(`
+          INSERT INTO Transactions
+            (senderAccountNo, receiverAccountNo, bankID, amount, currency, exchangeRate, totalConverted,
+            status, txnType, timestamp,
+            receiverBcUserID, receiverVerified, reference, chainStatus)
+          OUTPUT INSERTED.txnID
+          VALUES
+            (@senderAccountNo, @receiverAccountNo, @bankID, @amount, @currency, @exchangeRate, @totalConverted,
+            'Confirmed', @txnType, GETDATE(),
+            @receiverBcUserID, 1, @reference, 'PENDING_CHAIN')
+        `);
 
+        txnID = insert.recordset[0].txnID;
+      }
     await tx.commit();
   } catch (err) {
     if (tx) await tx.rollback().catch(() => {});
@@ -234,19 +285,21 @@ async function createWithdrawal(data) {
   try {
     conn = await sql.connect(dbConfig);
     const request = conn.request();
+    const reference = makeRef("WDR");
     request.input("accountNo", sql.Int, accountNo);
     request.input("amount", sql.Decimal(18, 2), amount);
+    request.input("reference", sql.VarChar(50), reference);
     
     // Using bankID = 1 as a default for ATM withdrawals
     // receiverAccountNo = 'ATM'
     const result = await request.query(`
       INSERT INTO Transactions 
-        (senderAccountNo, receiverAccountNo, bankID, amount, currency, exchangeRate, totalConverted, status, txnType, timestamp)
+        (senderAccountNo, receiverAccountNo, bankID, amount, currency, exchangeRate, totalConverted, status, txnType, timestamp, reference,chainStatus)
       VALUES 
-        (@accountNo, 'ATM', 1, @amount, 'SGD', 1.0, @amount, 'Confirmed', 'Withdrawal', GETDATE())
+        (@accountNo, 'ATM', 1, @amount, 'SGD', 1.0, @amount, 'Confirmed', 'Withdrawal', GETDATE(), @reference, 'SQL_ONLY')
     `);
     
-    return { success: true };
+    return { success: true,reference,rowsAffected:result.rowsAffected[0] };
   } catch (err) {
     console.error("Error in transactionModel.createWithdrawal:", err);
     throw err;
@@ -284,18 +337,20 @@ async function createDeposit(data) {
   try {
     conn = await sql.connect(dbConfig);
     const request = conn.request();
+    const reference = makeRef("DEP");
     request.input("accountNo", sql.Int, accountNo);
     request.input("amount", sql.Decimal(18, 2), amount);
+    request.input("reference", sql.VarChar(50), reference);
     
     // For deposits, sender is 'ATM' and receiver is the account
     const result = await request.query(`
       INSERT INTO Transactions 
-        (senderAccountNo, receiverAccountNo, bankID, amount, currency, exchangeRate, totalConverted, status, txnType, timestamp)
+        (senderAccountNo, receiverAccountNo, bankID, amount, currency, exchangeRate, totalConverted, status, txnType, timestamp, reference,chainStatus)
       VALUES 
-        (1, CAST(@accountNo AS VARCHAR(20)), 1, @amount, 'SGD', 1.0, @amount, 'Confirmed', 'Deposit', GETDATE())
+        (1, CAST(@accountNo AS VARCHAR(20)), 1, @amount, 'SGD', 1.0, @amount, 'Confirmed', 'Deposit', GETDATE(), @reference, 'SQL_ONLY' )
     `);
     
-    return { success: true };
+    return { success: true,reference,rowsAffected:result.rowsAffected[0] };
   } catch (err) {
     console.error("Error in transactionModel.createDeposit:", err);
     throw err;

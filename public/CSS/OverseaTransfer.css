@@ -216,3 +216,139 @@ button.next:hover,
   outline: none;
   box-shadow: 0 0 0 3px rgba(31, 157, 85, 0.25);
 }
+
+/* ===============================
+   FACE VERIFICATION MODAL
+================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* when active */
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-content {
+  background: #ffffff;
+  width: 420px;
+  max-width: 90%;
+  padding: 24px 22px 28px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+  animation: slideUp 0.3s ease;
+}
+
+/* Title */
+.modal-content h3 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+}
+
+/* Subtitle / instruction */
+#status {
+  margin: 0 0 14px;
+  font-size: 15px;
+  color: #666;
+}
+
+/* Camera preview */
+#video {
+  width: 100%;
+  height: 240px;
+  background: #000;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-bottom: 16px;
+  border: 2px solid #eee;
+}
+
+/* Cancel button */
+#closeFaceBtn {
+  background: #f2f2f2;
+  color: #333;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#closeFaceBtn:hover {
+  background: #e0e0e0;
+}
+
+/* ===============================
+   ANIMATION
+================================ */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ✅ overlays should NOT block clicks when hidden */
+.overlay,
+.modal-overlay {
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* ✅ only block clicks when actually shown */
+.overlay[style*="display: flex"],
+#successOverlay.active,
+.modal-overlay.active {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.cancel-btn {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+
+  background: transparent;
+  border: 3px solid #ccc;
+  color: #000000;
+
+  padding: 8px 18px;
+  font-size: 20px;
+  font-weight: 600;
+
+  border-radius: 10px;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: #f2f2f2;
+  border-color: #e60000;
+}
+
+.cancel-btn:active {
+  transform: scale(0.96);
+}
+
+.cancel-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.15);
+}
+
