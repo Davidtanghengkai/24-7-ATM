@@ -279,8 +279,7 @@ async function sendText(text) {
             window.location.href = "/OverseaTransfer.html";
         }
         //show xchange rate
-        if (topIntent === "action_8922_intent_11929") {  // <-- replace with your real Watson intent id
-        // You can parse currencies from entities later; for now, use defaults:
+        if (topIntent === "action_8922_intent_11929") { 
         const base   = "SGD";
         const target = "USD";
 
