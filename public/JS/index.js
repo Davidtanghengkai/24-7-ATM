@@ -153,3 +153,62 @@ async function fetchAndApplyTranslations(languageName) {
     alert(`Sorry, we couldn't load the ${languageName} translation. Please try again.`);
   }
 }
+  
+function showCancelModal({
+  title = "Are you sure you want to EXIT?",
+  onYes = () => (window.location.href = "index.html"),
+  onNo = () => {}
+} = {}) {
+  if (document.getElementById("cancel-overlay")) return;
+
+  const overlay = document.createElement("div");
+  overlay.id = "cancel-overlay";
+  overlay.className = "cancel-overlay";
+
+  overlay.innerHTML = `
+    <div class="cancel-modal">
+      <h1>${title}</h1>
+      <div class="cancel-actions">
+        <button class="cash-btn" id="cancelNoBtn">No</button>
+        <button class="cash-btn" id="cancelYesBtn">Yes</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  const noBtn = document.getElementById("cancelNoBtn");
+  const yesBtn = document.getElementById("cancelYesBtn");
+
+  noBtn.onclick = () => { onNo(); overlay.remove(); };
+  yesBtn.onclick = () => { onYes(); overlay.remove(); };
+
+  overlay.onclick = (e) => {
+    if (e.target === overlay) overlay.remove();
+  };
+
+  const esc = (e) => {
+    if (e.key === "Escape") {
+      overlay.remove();
+      document.removeEventListener("keydown", esc);
+    }
+  };
+  document.addEventListener("keydown", esc);
+}
+
+// ------------------------------
+// Exit link handler (works on ALL pages)
+// ------------------------------
+document.addEventListener("click", (e) => {
+  const exitLink = e.target.closest(".top-link"); // works even if click on child elements
+  if (!exitLink) return;
+
+  e.preventDefault();
+
+  showCancelModal({
+    title: "Are you sure you want to EXIT?",
+    onYes: () => (window.location.href = "index.html"),
+    onNo: () => {} // just close modal
+  });
+});
+
