@@ -261,3 +261,59 @@ body {
     width: 92%;
   }
 }
+
+.cancel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+
+.cancel-modal {
+  background: #fffaf5;
+  border-radius: 14px;
+  padding: 22px 24px;
+  width: min(420px, 90vw);
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+}
+
+.cancel-modal h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 16px;
+}
+
+.cancel-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 30px;
+}
+
+.cancel-actions .cash-btn {
+  min-width: 110px;
+  padding: 10px 0;
+  font-size: 16px;
+  border-radius: 10px;
+}
+
+#cancelNoBtn {
+  background: #e6e6e6;
+  color: #333;
+}
+
+#cancelYesBtn {
+  background: #e60000;
+  color: #fff;
+}
+
+#cancelYesBtn:hover {
+  background: #a80a0a;
+}
