@@ -388,6 +388,128 @@ if (inputEl) {
     });
 }
 
+// --- Web Speech API integration for the mic button ---
+// Ensures the mic button added by `widget.html` becomes interactive
+(function initSpeech() {
+    const recordBtn = document.getElementById('record');
+    const recordingIndicator = document.getElementById('recordingIndicator');
+    if (!recordBtn) return; // widget not present on this page
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+    if (!SpeechRecognition) {
+        recordBtn.disabled = true;
+        recordBtn.title = 'Speech recognition not supported in this browser. Use Chrome.';
+        recordBtn.addEventListener('click', () => alert('Speech recognition not supported in this browser. Use Chrome or a Chromium-based browser.'));
+        return;
+    }
+
+    let recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+    recognition.continuous = true;
+
+    let recognizing = false;
+    let silenceTimer = null;
+    let noSpeechTimer = null;
+    const SILENCE_TIMEOUT = 1500; // ms of silence before auto-stop
+    const NO_SPEECH_TIMEOUT = 8000; // ms to wait for first speech after start
+
+    function clearTimers() {
+        if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+        if (noSpeechTimer) { clearTimeout(noSpeechTimer); noSpeechTimer = null; }
+    }
+
+    recognition.onstart = () => {
+        recognizing = true;
+        recordBtn.textContent = 'Stop';
+        if (recordingIndicator) recordingIndicator.style.display = 'inline';
+        recordBtn.classList.add('recording');
+
+        // If user doesn't speak at all within NO_SPEECH_TIMEOUT, stop recognition
+        if (noSpeechTimer) clearTimeout(noSpeechTimer);
+        noSpeechTimer = setTimeout(() => {
+            try { recognition.stop(); } catch (e) {}
+            clearTimers();
+        }, NO_SPEECH_TIMEOUT);
+    };
+
+    recognition.onend = () => {
+        recognizing = false;
+        recordBtn.textContent = '🎙️';
+        if (recordingIndicator) recordingIndicator.style.display = 'none';
+        recordBtn.classList.remove('recording');
+        clearTimers();
+    };
+
+    recognition.onspeechstart = () => {
+        // user started speaking; cancel the 'no speech' timeout
+        if (noSpeechTimer) { clearTimeout(noSpeechTimer); noSpeechTimer = null; }
+        if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+    };
+
+    recognition.onspeechend = () => {
+        // schedule a short stop in case of silence
+        if (silenceTimer) clearTimeout(silenceTimer);
+        silenceTimer = setTimeout(() => {
+            try { recognition.stop(); } catch (e) {}
+        }, 500);
+    };
+
+    recognition.onresult = (event) => {
+        let interim = '';
+        let final = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) final += transcript + ' ';
+            else interim += transcript;
+        }
+        if (inputEl) inputEl.value = (final + interim).trim();
+
+        // Reset silence timer each time we get results
+        if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+        silenceTimer = setTimeout(() => {
+            try { recognition.stop(); } catch (e) {}
+        }, SILENCE_TIMEOUT);
+
+        // If we had a waiting no-speech timer, cancel it now
+        if (noSpeechTimer) { clearTimeout(noSpeechTimer); noSpeechTimer = null; }
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error || event);
+        clearTimers();
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+            alert('Microphone permission denied. Please allow microphone access for voice input.');
+        } else if (event.error === 'no-speech') {
+            alert('No speech detected. Try speaking more clearly or check your microphone.');
+        } else {
+            alert('Speech recognition error: ' + (event.error || 'unknown'));
+        }
+    };
+
+    recordBtn.addEventListener('click', async () => {
+        if (recognizing) {
+            recognition.stop();
+            return;
+        }
+
+        try {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+            }
+            recognition.start();
+        } catch (err) {
+            console.error('Could not start recognition:', err);
+            if (err.name === 'NotAllowedError' || err.name === 'SecurityError') {
+                alert('Microphone permission denied. Please allow microphone access and try again.');
+            } else {
+                alert('Could not start speech recognition: ' + (err.message || err.name || 'unknown'));
+            }
+        }
+    });
+})();
+
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM fully loaded and parsed.");
 

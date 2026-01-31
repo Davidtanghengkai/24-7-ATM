@@ -33,6 +33,7 @@
     "mssql": "^12.1.0",
     "nodemailer": "^7.0.10",
     "nodemon": "^3.1.11",
+    "peer": "^1.0.2",
     "socket.io": "^4.8.3",
     "socketio": "^1.0.0",
     "swagger-autogen": "^2.23.7",
