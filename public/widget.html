@@ -12,7 +12,128 @@
   <div id="inputRow">
     <input id="text" type="text" placeholder="Type a message..." />
     <button id="send">Send</button>
+    <!-- Microphone toggle for Web Speech API -->
+    <button id="record" title="Start/Stop voice input">🎙️</button>
+    <span id="recordingIndicator" aria-hidden="true" style="display:none;margin-left:8px;color:#d00">● Recording</span>
   </div>
 </div>
+
+<script>
+// Voice-to-text using Web Speech API (Chrome / Chromium)
+// Wrapped in DOMContentLoaded to ensure elements exist and to aid debugging
+document.addEventListener('DOMContentLoaded', () => {
+  const recordBtn = document.getElementById('record');
+  const sendBtn = document.getElementById('send');
+  const textInput = document.getElementById('text');
+  const chatDiv = document.getElementById('chat');
+  const recordingIndicator = document.getElementById('recordingIndicator');
+  let recognition, recognizing = false;
+
+  if (!recordBtn) return;
+
+  // Polyfill for vendor-prefixed implementation
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+  if (!SpeechRecognition) {
+    recordBtn.disabled = true;
+    recordBtn.title = 'Speech recognition not supported in this browser. Use Chrome.';
+    recordBtn.addEventListener('click', () => alert('Speech recognition not supported in this browser. Use Chrome or a Chromium-based browser.'));
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'en-US'; // change as needed
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+  recognition.continuous = true; // keeps listening until stopped
+
+  recognition.onstart = () => {
+    recognizing = true;
+    recordBtn.textContent = 'Stop';
+    recordingIndicator.style.display = 'inline';
+    recordBtn.setAttribute('aria-pressed', 'true');
+    recordBtn.classList.add('recording');
+  };
+
+  recognition.onend = () => {
+    recognizing = false;
+    recordBtn.textContent = '🎙️';
+    recordingIndicator.style.display = 'none';
+    recordBtn.setAttribute('aria-pressed', 'false');
+    recordBtn.classList.remove('recording');
+  };
+
+  recognition.onresult = (event) => {
+    let interim = '';
+    let final = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) final += transcript + ' ';
+      else interim += transcript;
+    }
+    // show the live combined text in the input
+    textInput.value = (final + interim).trim();
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error:', event.error || event);
+    // show user-friendly message for common errors
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      alert('Microphone permission denied. Please allow microphone access for voice input.');
+    } else if (event.error === 'no-speech') {
+      alert('No speech detected. Try speaking more clearly or check your microphone.');
+    } else {
+      alert('Speech recognition error: ' + (event.error || 'unknown'));
+    }
+  };
+
+  recordBtn.addEventListener('click', async () => {
+    if (recognizing) {
+      recognition.stop();
+      return;
+    }
+
+    // Request microphone permission first so users see a prompt if needed
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        // some browsers might still allow speech recognition without getUserMedia, try start anyway
+        recognition.start();
+        return;
+      }
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      recognition.start();
+    } catch (err) {
+      console.error('Could not start recognition:', err);
+      if (err.name === 'NotAllowedError' || err.name === 'SecurityError') {
+        alert('Microphone permission denied. Please allow microphone access and try again.');
+      } else {
+        alert('Could not start speech recognition: ' + (err.message || err.name || 'unknown'));
+      }
+    }
+  });
+
+  function appendMessage(text) {
+    const p = document.createElement('p');
+    p.textContent = 'You: ' + text;
+    chatDiv.appendChild(p);
+    // scroll into view
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+  }
+
+  sendBtn.addEventListener('click', () => {
+    const text = textInput.value.trim();
+    if (!text) return;
+    appendMessage(text);
+    textInput.value = '';
+    textInput.focus();
+  });
+
+  textInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sendBtn.click();
+    }
+  });
+});
+</script>
 
 
