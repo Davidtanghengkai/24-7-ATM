@@ -20,6 +20,8 @@ const io = new Server(MobServer, {
 });
 const port = process.env.PORT || 3000; 
 
+
+
 // Middlewares
 app.use(cors()); 
 app.use(express.urlencoded({ extended: true }));
@@ -35,7 +37,8 @@ app.use(session({
     }
 }));
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public"), { index: false }));
+
 
 //// Swagger Setup for API Documentation
 const swaggerUi = require("swagger-ui-express");
@@ -114,7 +117,7 @@ app.get("/api/accounts/:accountNo/balance", accountController.fetchBalance);
 app.get("/api/rate", exchangeRateController.fetchExchangeRate);
 
 // --- Base Route ---
-app.get('/', (req, res) => {
+app.get('/info', (req, res) => {
     res.send('How did we get here?');
 });
 
@@ -218,6 +221,35 @@ io.on('connection', (socket) => {
 });
 
 
+//Chatrooms 
+const { v4: uuidV4 } = require('uuid');
+//const sio = require('socket.io')(Server);
+
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.get('/', (req, res) => {
+    res.redirect(`/${uuidV4()}`)
+})
+app.get('/:room', (req, res) => {
+    res.render('room', { roomId: req.params.room })
+});
+
+
+
+
+io.on('connection', socket => {
+    socket.on('join-room', (roomId, userId) => {
+        socket.join(roomId);
+        socket.to(roomId).emit('user-connected', userId);
+
+        socket.on('disconnect', () => {
+            socket.to(roomId).emit('user-disconnected', userId);
+        })
+    })
+})
+
 // START SERVER
 
 
@@ -238,3 +270,5 @@ process.on("SIGINT", async () => {
         process.exit(0);
     });
 });
+
+
