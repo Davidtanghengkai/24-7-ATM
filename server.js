@@ -6,6 +6,8 @@ const cors = require('cors');
 const path = require("path");
 const session = require("express-session");
 const jwt = require('jsonwebtoken');
+const { ExpressPeerServer } = require('peer');
+
 
 dotenv.config();
 
@@ -18,6 +20,12 @@ const io = new Server(MobServer, {
         methods: ["GET", "POST"]
     }             
 });
+// ===== PeerJS Server (embedded) =====
+const peerServer = ExpressPeerServer(MobServer, {
+  debug: true
+});
+app.use('/peerjs', peerServer);
+
 const port = process.env.PORT || 3000; 
 
 
@@ -129,6 +137,7 @@ app.use('/api/watson', watsonRoutes);
 // WEBSOCKET SETUP
 
 
+
 // Store connected clients
 const connectedClients = new Map();
 io.on('connection', (socket) => {
@@ -138,6 +147,15 @@ io.on('connection', (socket) => {
         connectedClients.set(socket.id, { type: 'atm', stationId });
         console.log(`✓ Station ${stationId} joined (Socket: ${socket.id})`);
         socket.emit('station-joined', { stationId, socketId: socket.id });
+    });
+
+    socket.on('join-room', (roomId, userId) => {
+        socket.join(roomId);
+        socket.to(roomId).emit('user-connected', userId);
+
+        socket.on('disconnect', () => {
+            socket.to(roomId).emit('user-disconnected', userId);
+        });
     });
 
     socket.on('nfc-trigger', (data) => {
@@ -239,16 +257,6 @@ app.get('/:room', (req, res) => {
 
 
 
-io.on('connection', socket => {
-    socket.on('join-room', (roomId, userId) => {
-        socket.join(roomId);
-        socket.to(roomId).emit('user-connected', userId);
-
-        socket.on('disconnect', () => {
-            socket.to(roomId).emit('user-disconnected', userId);
-        })
-    })
-})
 
 // START SERVER
 
