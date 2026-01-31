@@ -55,6 +55,7 @@
   padding: 1rem;
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   background: #1a1a1a;
 }
 
@@ -81,7 +82,7 @@
   color: #000;
   border-radius: 4px 12px 12px 12px;
   align-self: flex-start;
-  margin-bottom: 15px;
+  margin-bottom: 2px;
 }
 
 .bubble.user {
@@ -139,4 +140,31 @@
 .icon-bubble { 
     font-size: 2.5em; 
     color: white;
+}
+
+.options {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 1px;
+    padding-left: 2px;
+} 
+
+/* The buttons themselves */
+.options button {
+    background: #ffffff; /* White background like the reference */
+    border: 1px solid #dee2e6;
+    color: #212529;
+    padding: 2px 7px;
+    border-radius: 15px; 
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Hover effect */
+.options button:hover {
+    background: #f8f9fa;
+    border-color: #ef0707; 
+    color: #ef0707;
 }
