@@ -61,6 +61,7 @@ package-lock.json
 
 #.env and DB Config files
 .env
+*.json
 DbConfig.js
 
 # Google Application Credentials
