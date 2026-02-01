@@ -37,10 +37,22 @@
 #chat-header {
   background: #1a1a1a;
   color: white;
-  padding: 1rem;
+  padding: 0.8rem 1rem; /* Slightly reduced padding for a sleeker look */
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.header-info {
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+}
+.bot-header-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%; 
+  background: #fff;  
+  padding: 2px;     
 }
 
 #chat-close {

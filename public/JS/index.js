@@ -196,19 +196,16 @@ function showCancelModal({
   document.addEventListener("keydown", esc);
 }
 
-// ------------------------------
-// Exit link handler (works on ALL pages)
-// ------------------------------
-document.addEventListener("click", (e) => {
-  const exitLink = e.target.closest(".top-link"); // works even if click on child elements
-  if (!exitLink) return;
+const exitBtn = document.getElementById("exit");
 
-  e.preventDefault();
-
-  showCancelModal({
-    title: "Are you sure you want to EXIT?",
-    onYes: () => (window.location.href = "index.html"),
-    onNo: () => {} // just close modal
+if (exitBtn) {
+  exitBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    
+    showCancelModal({
+      title: "Are you sure you want to EXIT?",
+      onYes: () => (window.location.href = "index.html"),
+      onNo: () => {} 
+    });
   });
-});
-
+}
