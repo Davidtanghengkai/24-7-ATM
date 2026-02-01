@@ -470,7 +470,16 @@ if (inputEl) {
             if (event.results[i].isFinal) final += transcript + ' ';
             else interim += transcript;
         }
-        if (inputEl) inputEl.value = (final + interim).trim();
+        if (inputEl) {
+            inputEl.value = (final + interim).trim();
+            // ensure the caret and visible area show the end of the text
+            try {
+                inputEl.selectionStart = inputEl.selectionEnd = inputEl.value.length;
+                inputEl.scrollLeft = inputEl.scrollWidth;
+            } catch (e) {
+                // some elements might not support selection/scroll - ignore
+            }
+        }
 
         // Reset silence timer each time we get results
         if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
