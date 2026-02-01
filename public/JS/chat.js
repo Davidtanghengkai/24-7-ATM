@@ -278,6 +278,12 @@ async function sendText(text) {
         if (topIntent === "action_15189_intent_26505") {
             window.location.href = "/OverseaTransfer.html";
         }
+
+        //video teller redirect
+        if (topIntent === "action_42712_intent_44282") {
+            window.location.href = "/";
+        }
+
         //show xchange rate
         if (topIntent === "action_8922_intent_11929") { 
         const base   = "SGD";
