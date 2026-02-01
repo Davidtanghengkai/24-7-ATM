@@ -1,0 +1,92 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a1a;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+}
+
+#meeting-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#main-stage {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#remote-video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+}
+
+#self-view {
+    position: absolute;
+    bottom: 100px;
+    right: 30px;
+    width: 280px;
+    height: 160px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    border: 2px solid #444;
+    z-index: 100;
+}
+
+#local-video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); 
+}
+
+.label {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+#controls {
+    position: absolute;
+    bottom: 25px;
+    display: flex;
+    gap: 15px;
+    background: #2c2c2c;
+    padding: 12px 25px;
+    border-radius: 50px;
+    border: 1px solid #444;
+}
+
+.icon-btn {
+    background: #444;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.icon-btn.hangup {
+    background: #ef0707; /* Red leave button */
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: bold;
+}

@@ -40,16 +40,31 @@ body {
   object-fit: contain;
 }
 
-/* Top navigation links (top-right) */
 .top-links {
-  position: absolute;
-  top: 25px;
-  right: 40px;
-  z-index: 20;
-  font-size: 1.1em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    position: absolute;
+    top: 25px;
+    left: 40px; 
+    right: 40px; 
+    z-index: 20;
+    font-size: 1.1em;
+    
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;           
+}
+.topL-link {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+.topL-link:hover {
+    text-decoration: underline;
+}
+.right-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .top-link {
@@ -317,3 +332,4 @@ body {
 #cancelYesBtn:hover {
   background: #a80a0a;
 }
+

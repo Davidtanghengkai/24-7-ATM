@@ -270,13 +270,17 @@ MobServer.listen(port, '0.0.0.0', () => {
 });
 process.on("SIGINT", async () => {
     console.log("\n  Server is gracefully shutting down...");  
-    io.close(() => {
-        console.log("✓ WebSocket connections closed");
-    });  
-    MobServer.close(() => {
-        console.log("✓ HTTP server closed");
-        process.exit(0);
-    });
+    // io.close(() => {
+    //     console.log("✓ WebSocket connections closed");
+    // });  
+    // MobServer.close(() => {
+    //     console.log("✓ HTTP server closed");
+    //     process.exit(0);
+    // });
+    io.close();
+    MobServer.close();
+    process.exit(0);
+
 });
 
 
