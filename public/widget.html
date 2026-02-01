@@ -75,6 +75,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // show the live combined text in the input
     textInput.value = (final + interim).trim();
+    // ensure the caret and visible area show the end of the text
+    try {
+      textInput.selectionStart = textInput.selectionEnd = textInput.value.length;
+      textInput.scrollLeft = textInput.scrollWidth;
+    } catch (e) {
+      // ignore if selection/scroll not supported
+    }
   };
 
   recognition.onerror = (event) => {
